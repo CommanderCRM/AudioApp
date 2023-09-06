@@ -59,17 +59,33 @@ class AudioMetrics:
 
         return dp[n][m]
 
+    def get_boundaries(self, y1, y2):
+        """Нахождение 1000 элементов аудиоряда в границах его середины"""
+        middle_index_y1 = len(y1) // 2
+        middle_index_y2 = len(y2) // 2
+        start_index_y1 = middle_index_y1 - 500
+        end_index_y1 = middle_index_y1 + 500
+
+        start_index_y2 = middle_index_y2 - 500
+        end_index_y2 = middle_index_y2 + 500
+
+        return(start_index_y1, end_index_y1, start_index_y2, end_index_y2)
+
+
     def get_audio_dtw(self, y1, y2):
-        """Получение DTW между двумя аудиофайлами"""
-        distance = self.dtw(y1[1:1000], y2[1:1000])
+        """Получение DTW между двумя аудиофайлами (1000 эл.)"""
+        start_index_y1, end_index_y1, start_index_y2, end_index_y2 = self.get_boundaries(y1, y2)
+        distance = self.dtw(y1[start_index_y1:end_index_y1], y2[start_index_y2:end_index_y2])
         return distance
 
     def get_audio_erp(self, y1, y2):
-        """Получение ERP между двумя аудиофайлами"""
-        distance = self.erp(y1[1:1000], y2[1:1000],1,1)
+        """Получение ERP между двумя аудиофайлами (1000 эл.)"""
+        start_index_y1, end_index_y1, start_index_y2, end_index_y2 = self.get_boundaries(y1, y2)
+        distance = self.erp(y1[start_index_y1:end_index_y1], y2[start_index_y2:end_index_y2],1,1)
         return distance
 
     def get_audio_edr(self, y1, y2):
-        """Получение EDR между двумя аудиофайлами"""
-        distance = self.edr(y1[1:1000], y2[1:1000],1)
+        """Получение EDR между двумя аудиофайлами (1000 эл.)"""
+        start_index_y1, end_index_y1, start_index_y2, end_index_y2 = self.get_boundaries(y1, y2)
+        distance = self.edr(y1[start_index_y1:end_index_y1], y2[start_index_y2:end_index_y2],1)
         return distance
