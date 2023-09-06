@@ -8,7 +8,7 @@ class AudioFile:
         self.file = file
 
     def load(self):
-        """Загрузка информации о файле (аудиоряд, частота дискретизации)"""
+        """Загрузка информации о файле (аудиоряд, частота дискретизации по умолчанию)"""
         y, sr = librosa.load(self.file, sr=None)
         return y, sr
 
