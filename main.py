@@ -1,5 +1,5 @@
-from tools.tools import AudioFile
-from preprocessing.preprocessing import AudioPreprocessor
+from audiotools.tools import AudioFile
+from audiopreproc.preprocessing import AudioPreprocessor
 
 file = AudioFile('1.wav')
 y, sr = file.load()
