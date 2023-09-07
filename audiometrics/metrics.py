@@ -87,5 +87,5 @@ class AudioMetrics:
     def get_audio_edr(self, y1, y2):
         """Получение EDR между двумя аудиофайлами (1000 эл.)"""
         start_index_y1, end_index_y1, start_index_y2, end_index_y2 = self.get_boundaries(y1, y2)
-        distance = self.edr(y1[start_index_y1:end_index_y1], y2[start_index_y2:end_index_y2],1)
+        distance = self.edr(y1[start_index_y1:end_index_y1], y2[start_index_y2:end_index_y2],0.001)
         return distance
