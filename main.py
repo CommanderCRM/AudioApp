@@ -23,4 +23,4 @@ file8 = AudioFile('8.wav')
 y8, sr8 = file8.load()
 
 segm = Segmentation()
-print('Borders:', segm.voiced_unvoiced_silence(y8, sr8))
+print('Segments:', segm.voiced_unvoiced_silence(y8, sr8))
