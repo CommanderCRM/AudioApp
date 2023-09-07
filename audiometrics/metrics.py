@@ -22,7 +22,10 @@ class AudioMetrics:
 
 
     def edr(self, s, t, k):
-        """Расстояние EDR"""
+        """
+        Расстояние EDR
+        k - чувствительность
+        """
         n = len(s)
         m = len(t)
         dp = [[0 for j in range(m+1)] for i in range(n+1)]
@@ -43,7 +46,11 @@ class AudioMetrics:
 
 
     def erp(self, s, t, k, g):
-        """Расстояние ERP"""
+        """
+        Расстояние ERP
+        k - чувствительность
+        g - стоимость замены
+        """
         n = len(s)
         m = len(t)
         dp = [[float('inf') for j in range(m+1)] for i in range(n+1)]
@@ -81,7 +88,7 @@ class AudioMetrics:
     def get_audio_erp(self, y1, y2):
         """Получение ERP между двумя аудиофайлами (1000 эл.)"""
         start_index_y1, end_index_y1, start_index_y2, end_index_y2 = self.get_boundaries(y1, y2)
-        distance = self.erp(y1[start_index_y1:end_index_y1], y2[start_index_y2:end_index_y2],1,1)
+        distance = self.erp(y1[start_index_y1:end_index_y1], y2[start_index_y2:end_index_y2],0.001,1)
         return distance
 
     def get_audio_edr(self, y1, y2):
