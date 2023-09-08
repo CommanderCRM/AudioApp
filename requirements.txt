@@ -1,3 +1,5 @@
 librosa
 soundfile
 noisereduce
+numpy
+scipy

@@ -1,5 +1,6 @@
 from audiotools.tools import AudioFile
 from audiopreproc.preprocessing import AudioPreprocessor
+from audiopreproc.voiceactivity import VoiceActivityDetector
 from audiometrics.metrics import AudioMetrics
 from audiosegm.segmentation import Segmentation
 
@@ -27,3 +28,6 @@ y8, sr8 = file8.load()
 
 segm = Segmentation()
 print(f'Segments of {file8_name}:', segm.voiced_unvoiced_silence(y8, sr8))
+
+VAD = VoiceActivityDetector()
+print(f'Voice activity detection in {file8_name}:', VAD.detect_voice_activity(y8, sr8))
