@@ -3,3 +3,7 @@ soundfile
 noisereduce
 numpy
 scipy
+pydantic
+fastapi
+uvicorn
+pytest
