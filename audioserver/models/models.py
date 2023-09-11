@@ -8,6 +8,10 @@ class Gender(str, Enum):
     male = "male"
     female = "female"
 
+model_config = {
+    'use_enum_values': True
+}
+
 class Patient(BaseModel):
     """Схема данных пациента"""
     fullName: str = Field(...,
@@ -31,6 +35,4 @@ class Patient(BaseModel):
     isPasswordChanged: bool = Field(...,
                                     example=False,
                                     description="Флаг, указывающий, изменён ли пароль")
-    class Config:
-        """Валидация значений массива"""
-        use_enum_values = True
+    model_config = model_config
