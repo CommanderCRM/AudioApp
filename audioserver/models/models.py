@@ -1,6 +1,5 @@
 from typing import Optional
 from enum import Enum
-from datetime import datetime
 from pydantic import BaseModel, Field
 
 class Gender(str, Enum):
@@ -18,7 +17,7 @@ class Patient(BaseModel):
                           json_schema_extra={
                           "example": "Иванов Иван Иванович",
                           "description": "Полное имя пациента"})
-    dateOfBirth: datetime = Field(...,
+    dateOfBirth: str = Field(...,
                                   json_schema_extra={
                                   "example": "01.09.1990",
                                   "description": "Дата рождения пациента"})
