@@ -5,5 +5,5 @@ numpy
 scipy
 pydantic
 fastapi
-uvicorn
+uvicorn[standard]
 pytest
