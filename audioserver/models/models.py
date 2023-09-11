@@ -15,24 +15,31 @@ model_config = {
 class Patient(BaseModel):
     """Схема данных пациента"""
     fullName: str = Field(...,
-                          example="Иванов Иван Иванович",
-                          description="Полное имя пациента")
+                          json_schema_extra={
+                          "example": "Иванов Иван Иванович",
+                          "description": "Полное имя пациента"})
     dateOfBirth: datetime = Field(...,
-                                  example="01.09.1990",
-                                  description="Дата рождения пациента")
+                                  json_schema_extra={
+                                  "example": "01.09.1990",
+                                  "description": "Дата рождения пациента"})
     gender: Gender = Field(...,
-                        example="male",
-                        description="Пол пациента")
+                        json_schema_extra={
+                        "example": "male",
+                        "description": "Пол пациента"})
     medicalCardNumber: str = Field(...,
-                                   example="11111111",
-                                   description="Номер мед. карты пациента")
+                                   json_schema_extra={
+                                   "example": "11111111",
+                                   "description": "Номер мед. карты пациента"})
     password: Optional[str] = Field(None,
-                                    example=None,
-                                    description="Хэш постоянного пароля пациента")
+                                    json_schema_extra={
+                                    "example": None,
+                                    "description": "Хэш постоянного пароля пациента"})
     temporaryPassword: Optional[str] = Field(None,
-                                            example="c32041a07c88c1a1d429c12f3 etc",
-                                            description="Хэш временного пароля пациента")
+                                            json_schema_extra={
+                                            "example": "c32041a07c88c1a1d429c12f3 etc",
+                                            "description": "Хэш временного пароля пациента"})
     isPasswordChanged: bool = Field(...,
-                                    example=False,
-                                    description="Флаг, указывающий, изменён ли пароль")
+                                    json_schema_extra={
+                                    "example": False,
+                                    "description": "Флаг, указывающий, изменён ли пароль"})
     model_config = model_config
