@@ -31,3 +31,7 @@ print(f'Segments of {file8_name}:', segm.voiced_unvoiced_silence(y8, sr8))
 
 VAD = VoiceActivityDetector()
 print(f'Voice activity detection in {file8_name}:', VAD.detect_voice_activity(y8, sr8))
+
+file8_base64_string = file8.encode_base64()
+AudioFile.decode_base64(file8_base64_string, '888.wav')
+print(f'Difference between {file8_name} and its decoded base64 version:', AudioFile.compare_files('8.wav', '888.wav'))
