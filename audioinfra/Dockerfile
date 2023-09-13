@@ -1,5 +1,5 @@
 # Первый этап - устанавливаем зависимости
-FROM python:3.10-slim as builder
+FROM python:3.11-slim as builder
 LABEL stage=intermediate
 
 WORKDIR /app
@@ -16,7 +16,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Второй этап - копируем .venv из первого и подготавливаем к запуску
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 COPY --from=builder /opt/venv /opt/venv
 
