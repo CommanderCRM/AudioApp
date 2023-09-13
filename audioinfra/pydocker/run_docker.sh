@@ -12,6 +12,6 @@ docker run\
             -it\
             --rm\
             -p $HOST_PORT:$CONTAINER_PORT\
-            -v "$(pwd)/..":/app\
+            -v "$(pwd)/../..":/app\
             $DOCKER_NAME\
             -c "bash ./$FOLDER_NAME/$SCRIPT_NAME"
