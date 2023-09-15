@@ -16,3 +16,9 @@ def select_all_patients():
     with Session(engine) as session:
         patients = session.exec(select(PatientTable)).all()
         return patients
+
+def select_patient_by_key(medicalcardnumber: str):
+    """Получение пациента по ключу"""
+    with Session(engine) as session:
+        patient = session.exec(select(PatientTable).where(PatientTable.medicalcardnumber == medicalcardnumber)).first()
+        return bool(patient)

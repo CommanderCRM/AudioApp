@@ -9,7 +9,7 @@ class Gender(str, Enum):
     female = "f"
 
 class Patient(SQLModel):
-    '''Таблица пациента'''
+    '''Модель пациента'''
     medicalcardnumber: str = Field(
         default=None,
         title="111",
@@ -50,8 +50,9 @@ class Patient(SQLModel):
     class Config():
         """Конфигурация модели"""
         use_enum_values = True
+
 class PatientTable(Patient, table=True):
-    '''Таблица пациента'''
+    '''Таблица пациента SQL'''
     medicalcardnumber: str = Field(
         default=None,
         primary_key=True,
