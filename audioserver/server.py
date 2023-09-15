@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from models.models import Patient
 from db.tables import PatientTable
 from db.actions import insert_patient, select_all_patients
 
@@ -13,4 +12,4 @@ async def create_patient(patient: PatientTable):
 @app.get("/patients")
 async def get_patients():
     """Получение пациентов по запросу GET"""
-    return select_all_patients
+    return select_all_patients()

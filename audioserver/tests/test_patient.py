@@ -1,21 +1,22 @@
+from datetime import date
 import pytest
 from pydantic import ValidationError
-from models.models import Patient
+from db.tables import Patient
 
 patient_data = {
-        'fullName': 'Иванов Иван Иванович',
-        'dateOfBirth': '01.01.1990',
-        'gender': 'male',
-        'medicalCardNumber': '11111111',
-        'isPasswordChanged': False,
-        'password': None,
-        'temporaryPassword': 'cbat'
+    'medicalcardnumber': '111',
+    'fullname': 'Иван Иванович Иванов',
+    'gender': 'm',
+    'constantpassword': '',
+    'temporarypassword': 'cbat',
+    'ispasswordchanged': False,
+    'dateofbirth': date(1990, 9, 1)
     }
 
 def test_correct_patient_data():
     """Корректные данные"""
     patient = Patient(**patient_data)
-    assert patient.model_dump() == patient_data
+    assert patient.dict() == patient_data
 
 def test_incorrect_gender():
     """Неверный пол"""

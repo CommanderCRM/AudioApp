@@ -1,41 +1,42 @@
-CREATE TABLE PatientTable (
-  MedicalCardNumber INT PRIMARY KEY,
-  FullName VARCHAR(255),
-  Gender CHAR(1),
-  ConstantPassword VARCHAR(128),
-  TemporaryPassword VARCHAR(128),
-  IsPasswordChanged BOOL
+CREATE TABLE patientTable (
+  medicalCardNumber VARCHAR(12) PRIMARY KEY,
+  fullName VARCHAR(255),
+  gender CHAR(1),
+  constantPassword VARCHAR(128),
+  temporaryPassword VARCHAR(128),
+  isPasswordChanged BOOL,
+  dateOfBirth DATE
 );
 
-CREATE TABLE ReferenceTable (
-  ReferenceId serial PRIMARY KEY,
-  ReferenceName VARCHAR(50),
-  Type VARCHAR(50),
-  MedicalCardNumber int REFERENCES PatientTable(MedicalCardNumber),
-  Base64Audio VARCHAR
+CREATE TABLE referenceTable (
+  referenceId serial PRIMARY KEY,
+  referenceName VARCHAR(50),
+  type VARCHAR(50),
+  medicalCardNumber VARCHAR(12) REFERENCES patientTable(medicalCardNumber),
+  base64Value VARCHAR
 );
 
-CREATE TABLE DistoredSpeechTable (
-  DistoredSpeechId serial PRIMARY KEY,
-  Type VARCHAR(50),
-  MedicalCardNumber int REFERENCES PatientTable(MedicalCardNumber),
-  Base64Audio VARCHAR
+CREATE TABLE distoredSpeechTable (
+  distoredSpeechId serial PRIMARY KEY,
+  type VARCHAR(50),
+  medicalCardNumber VARCHAR(12) REFERENCES patientTable(medicalCardNumber),
+  base64Value VARCHAR
 );
 
-CREATE TABLE SpeechQualityTable (
-  SpeechQualityId serial PRIMARY KEY,
-  Score int,
-  ReferenceId int REFERENCES ReferenceTable(ReferenceId),
-  DistoredSpeechId int REFERENCES DistoredSpeechTable(DistoredSpeechId)
+CREATE TABLE speechQualityTable (
+  speechQualityId serial PRIMARY KEY,
+  score int,
+  referenceId int REFERENCES referenceTable(referenceId),
+  distoredSpeechId int REFERENCES distoredSpeechTable(distoredSpeechId)
 );
 
-CREATE TABLE SessionTable (
-  SessionId serial PRIMARY KEY,
-  MedicalCardNumber int REFERENCES PatientTable(MedicalCardNumber)
+CREATE TABLE sessionTable (
+  sessionId serial PRIMARY KEY,
+  medicalCardNumber VARCHAR(12) REFERENCES patientTable(medicalCardNumber)
 );
 
-CREATE TABLE SpeechQualitySessionTable (
-  SpeechQualitySessionId serial PRIMARY KEY,
-  SpeechQualityId int REFERENCES SpeechQualityTable(SpeechQualityId),
-  SessionId int REFERENCES SessionTable(SessionId)
+CREATE TABLE speechQualitySessionTable (
+  speechQualitySessionId serial PRIMARY KEY,
+  speechQualityId int REFERENCES speechQualityTable(speechQualityId),
+  sessionId int REFERENCES sessionTable(sessionId)
 );
