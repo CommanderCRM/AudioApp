@@ -1,7 +1,7 @@
 from enum import Enum
 from fastapi import FastAPI, Response, status
-from db.tables import PatientTable
-from db.actions import insert_patient, select_all_patients, select_patient_by_key
+from db.tables import PatientTable, ShortPatientModel
+from db.actions import insert_patient, select_all_patients, select_patient_by_key, update_patient, delete_patient
 
 app = FastAPI()
 
@@ -32,3 +32,13 @@ async def create_patient(patient: PatientTable, response: Response):
 async def get_patients():
     """Получение пациентов по запросу GET"""
     return select_all_patients()
+
+@app.put("/patients/{medical_card_number}")
+async def update_patient_record(medical_card_number: str, patient_update: ShortPatientModel):
+    """Обновление информации o пациенте по запросу PUT"""
+    return update_patient(medical_card_number, patient_update)
+
+@app.delete("/patients/{medical_card_number}")
+async def delete_patient_record(medical_card_number: str):
+    """Удаление информации o пациенте по запросу DELETE"""
+    return delete_patient(medical_card_number)
