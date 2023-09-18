@@ -1,42 +1,56 @@
-CREATE TABLE patientTable (
-  medicalCardNumber VARCHAR(12) PRIMARY KEY,
-  fullName VARCHAR(255),
+CREATE TABLE patient_table (
+  medical_card_number VARCHAR(12) PRIMARY KEY,
+  full_name VARCHAR(255),
   gender CHAR(1),
-  constantPassword VARCHAR(128),
-  temporaryPassword VARCHAR(128),
-  isPasswordChanged BOOL,
-  dateOfBirth DATE
+  constant_password VARCHAR(128),
+  temporary_password VARCHAR(128),
+  is_password_changed BOOL,
+  date_of_birth DATE,
+  town VARCHAR(64)
 );
 
-CREATE TABLE referenceTable (
-  referenceId serial PRIMARY KEY,
-  referenceName VARCHAR(50),
-  type VARCHAR(50),
-  medicalCardNumber VARCHAR(12) REFERENCES patientTable(medicalCardNumber),
-  base64Value VARCHAR
+CREATE TABLE reference_table (
+  reference_id serial PRIMARY KEY,
+  reference_name VARCHAR(50),
+  referenct_type VARCHAR(50),
+  medical_card_number VARCHAR(12) REFERENCES patient_table(medical_card_number),
+  base64_value VARCHAR
 );
 
-CREATE TABLE distoredSpeechTable (
-  distoredSpeechId serial PRIMARY KEY,
-  type VARCHAR(50),
-  medicalCardNumber VARCHAR(12) REFERENCES patientTable(medicalCardNumber),
-  base64Value VARCHAR
+CREATE TABLE speech_table (
+  speech_id serial PRIMARY KEY,
+  speech_type VARCHAR(50),
+  medical_card_number VARCHAR(12) REFERENCES patient_table(medical_card_number),
+  base64_value VARCHAR
 );
 
-CREATE TABLE speechQualityTable (
-  speechQualityId serial PRIMARY KEY,
+CREATE TABLE speech_quality_table (
+  speech_quality_id serial PRIMARY KEY,
   score int,
-  referenceId int REFERENCES referenceTable(referenceId),
-  distoredSpeechId int REFERENCES distoredSpeechTable(distoredSpeechId)
+  reference_id int REFERENCES reference_table(reference_id),
+  speech_id int REFERENCES speech_table(speech_id)
 );
 
-CREATE TABLE sessionTable (
-  sessionId serial PRIMARY KEY,
-  medicalCardNumber VARCHAR(12) REFERENCES patientTable(medicalCardNumber)
+CREATE TABLE session_table (
+  session_id serial PRIMARY KEY,
+  medical_card_number VARCHAR(12) REFERENCES patient_table(medical_card_number)
 );
 
-CREATE TABLE speechQualitySessionTable (
-  speechQualitySessionId serial PRIMARY KEY,
-  speechQualityId int REFERENCES speechQualityTable(speechQualityId),
-  sessionId int REFERENCES sessionTable(sessionId)
+CREATE TABLE speech_quality_session_table (
+  speech_quality_session_id serial PRIMARY KEY,
+  speech_quality_id int REFERENCES speech_quality_table(speech_quality_id),
+  session_id int REFERENCES session_table(session_id)
+);
+
+CREATE TABLE doctor_table (
+  username VARCHAR(255) PRIMARY KEY,
+  specialization VARCHAR(255),
+  town VARCHAR(64),
+  password VARCHAR(128),
+  full_name VARCHAR(255)
+);
+
+CREATE TABLE specialist_table (
+  username VARCHAR(255) PRIMARY KEY,
+  password VARCHAR(128)
 );
