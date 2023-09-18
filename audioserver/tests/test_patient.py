@@ -4,13 +4,14 @@ from pydantic import ValidationError
 from db.tables import Patient
 
 patient_data = {
-    'medicalcardnumber': '111',
-    'fullname': 'Иван Иванович Иванов',
+    'medical_card_number': '111',
+    'full_name': 'Иван Иванович Иванов',
     'gender': 'm',
-    'constantpassword': '',
-    'temporarypassword': 'cbat',
-    'ispasswordchanged': False,
-    'dateofbirth': date(1990, 9, 1)
+    'constant_password': '',
+    'temporary_password': 'cbat',
+    'is_password_changed': False,
+    'date_of_birth': date(1990, 9, 1),
+    'town': 'Tomsk'
     }
 
 def test_correct_patient_data():

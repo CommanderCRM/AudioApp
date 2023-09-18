@@ -14,15 +14,15 @@ class ErrorCode(Enum):
 @app.post("/patients")
 async def create_patient(patient: PatientTable, response: Response):
     """Создание пациента по запросу POST"""
-    if select_patient_by_key(patient.medicalcardnumber):
+    if select_patient_by_key(patient.medical_card_number):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorCode.CARD_EXISTS
 
-    if not patient.ispasswordchanged and patient.constantpassword:
+    if not patient.is_password_changed and patient.constant_password:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorCode.CONST_PASS_WITH_UNCHANGED_FLAG
 
-    if patient.ispasswordchanged and patient.temporarypassword:
+    if patient.is_password_changed and patient.temporary_password:
         response.status_code = status.HTTP_400_BAD_REQUEST
         return ErrorCode.TEMP_PASS_WITH_CHANGED_FLAG
 
