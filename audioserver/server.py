@@ -1,5 +1,6 @@
 from enum import Enum
 from fastapi import FastAPI, Response, status
+from fastapi.responses import JSONResponse
 from db.tables import PatientTable, ShortPatientModel
 from db.actions import insert_patient, select_all_patients, select_patient_by_key, update_patient, delete_patient
 
@@ -16,15 +17,15 @@ async def create_patient(patient: PatientTable, response: Response):
     """Создание пациента по запросу POST"""
     if select_patient_by_key(patient.medical_card_number):
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return ErrorCode.CARD_EXISTS
+        return JSONResponse(content={"result_code": ErrorCode.CARD_EXISTS.value})
 
     if not patient.is_password_changed and patient.constant_password:
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return ErrorCode.CONST_PASS_WITH_UNCHANGED_FLAG
+        return JSONResponse(content={"result_code": ErrorCode.CONST_PASS_WITH_UNCHANGED_FLAG.value})
 
     if patient.is_password_changed and patient.temporary_password:
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return ErrorCode.TEMP_PASS_WITH_CHANGED_FLAG
+        return JSONResponse(content={"result_code": ErrorCode.TEMP_PASS_WITH_CHANGED_FLAG.value})
 
     return insert_patient(patient)
 
