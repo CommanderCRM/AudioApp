@@ -1,6 +1,7 @@
 from enum import Enum
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
+from sqlalchemy import exc
 from db.tables import PatientTable, ShortPatientModel
 from db.actions import insert_patient, select_all_patients, select_patient_by_key, update_patient, delete_patient
 
@@ -13,19 +14,19 @@ class ErrorCode(Enum):
     TEMP_PASS_WITH_CHANGED_FLAG = 4
 
 @app.post("/patients")
-async def create_patient(patient: PatientTable, response: Response):
+async def create_patient(patient: PatientTable):
     """Создание пациента по запросу POST"""
     if select_patient_by_key(patient.medical_card_number):
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return JSONResponse(content={"result_code": ErrorCode.CARD_EXISTS.value})
+        return JSONResponse(content={"result_code": ErrorCode.CARD_EXISTS.value},
+                            status_code=status.HTTP_400_BAD_REQUEST)
 
     if not patient.is_password_changed and patient.constant_password:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return JSONResponse(content={"result_code": ErrorCode.CONST_PASS_WITH_UNCHANGED_FLAG.value})
+        return JSONResponse(content={"result_code": ErrorCode.CONST_PASS_WITH_UNCHANGED_FLAG.value},
+                            status_code=status.HTTP_400_BAD_REQUEST)
 
     if patient.is_password_changed and patient.temporary_password:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return JSONResponse(content={"result_code": ErrorCode.TEMP_PASS_WITH_CHANGED_FLAG.value})
+        return JSONResponse(content={"result_code": ErrorCode.TEMP_PASS_WITH_CHANGED_FLAG.value},
+                            status_code=status.HTTP_400_BAD_REQUEST)
 
     return insert_patient(patient)
 
@@ -37,7 +38,11 @@ async def get_patients():
 @app.put("/patients/{medical_card_number}")
 async def update_patient_record(medical_card_number: str, patient_update: ShortPatientModel):
     """Обновление информации o пациенте по запросу PUT"""
-    return update_patient(medical_card_number, patient_update)
+    try:
+        return update_patient(medical_card_number, patient_update)
+    except exc.IntegrityError:
+        return JSONResponse(content={"result_code": ErrorCode.CARD_EXISTS.value},
+                            status_code=status.HTTP_400_BAD_REQUEST)
 
 @app.delete("/patients/{medical_card_number}")
 async def delete_patient_record(medical_card_number: str):

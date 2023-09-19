@@ -16,6 +16,7 @@ class PatientTable(SQLModel, table=True):
         primary_key=True,
         title="111",
         description="Номер мед. карты",
+        min_length=12,
         max_length=12
     )
     full_name: str = Field(
@@ -64,6 +65,7 @@ class FullPatientModel(SQLModel):
         default=None,
         title="111",
         description="Номер мед. карты",
+        min_length=12,
         max_length=12
     )
     full_name: str = Field(
@@ -117,6 +119,7 @@ class ShortPatientModel(SQLModel):
         default=None,
         title="111",
         description="Номер мед. карты",
+        min_length=12,
         max_length=12
     )
     gender: Gender = Field(
