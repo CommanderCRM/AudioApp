@@ -417,7 +417,8 @@
           "base64_value_segment": {
             "type": "string",
             "description": "сегментированное значение речи, закодированное в base64",
-            "example": "примерно такой же, как и в base64_value"
+            "example": "примерно такой же, как и в base64_value",
+            "nullable": true
           },
           "real_value": {
             "type": "string",
@@ -436,8 +437,8 @@
             "description": "Идентификатор произнесённой речи"
           },
           "speech_score": {
-            "type": "integer",
-            "example": 50,
+            "type": "number",
+            "example": 50.5,
             "description": "Оценка качества речи"
           },
           "type": {
