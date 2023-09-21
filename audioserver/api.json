@@ -129,7 +129,7 @@
         }
       }
     },
-    "/patients/{medical_card_number}": {
+    "/patients/{card_number}": {
       "get": {
         "tags": [
           "patients"
@@ -138,7 +138,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "medical_card_number",
+            "name": "card_number",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/card_number"
@@ -155,7 +155,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/medical_patient_info"
+                    "$ref": "#/components/schemas/session_patient_info"
                   }
                 }
               }
@@ -167,7 +167,7 @@
         }
       }
     },
-    "/patients/{medical_card_number}/speech": {
+    "/patients/{card_number}/speech": {
       "post": {
         "tags": [
           "patients"
@@ -176,7 +176,7 @@
         "parameters": [
           {
             "in": "path",
-            "name": "medical_card_number",
+            "name": "card_number",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/card_number"
@@ -236,14 +236,14 @@
         "parameters": [
           {
             "in": "path",
-            "name": "medical_card_number",
+            "name": "card_number",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/card_number"
             }
           }
         ],
-        "description": "Получить информацию о пациенте и его сенсах",
+        "description": "Получить информацию о существующих фразах и слогах",
         "operationId": "getPhrases",
         "responses": {
           "200": {
@@ -270,7 +270,7 @@
     "schemas": {
       "card_number": {
         "type": "string",
-        "example": 11111111,
+        "example": 111111111111,
         "description": "Номер личной карты пациента, используется как логин при входе",
         "minLength": 12,
         "maxLength": 12
@@ -279,7 +279,7 @@
         "type": "object",
         "description": "полная информация о пациенте, используется при регистрации",
         "properties": {
-          "full_mame": {
+          "full_name": {
             "type": "string",
             "example": "Кривошеин Илья Андреевич",
             "description": "Полное имя пациента"
@@ -484,7 +484,7 @@
           }
         }
       },
-      "medical_patient_info": {
+      "session_patient_info": {
         "type": "object",
         "description": "информация о пациенте и его сеансах",
         "properties": {
