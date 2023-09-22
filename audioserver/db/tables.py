@@ -70,7 +70,7 @@ class PatientTable(SQLModel, table=True):
         """Конфигурация модели"""
         use_enum_values = True
 
-class FullPatientModel(SQLModel):
+class PostPatientInfo(SQLModel):
     """Полная модель пациента"""
     full_name: str = Field(
         title="Иван Иванович Иванов",
@@ -123,7 +123,7 @@ class FullPatientModel(SQLModel):
         """Конфигурация модели"""
         use_enum_values = True
 
-class ShortPatientModel(SQLModel):
+class GetPatientInfo(SQLModel):
     """Короткая модель пациента"""
     full_name: str = Field(
         title="Иван Иванович Иванов",
@@ -139,7 +139,7 @@ class ShortPatientModel(SQLModel):
         description="Пол пациента",
         max_length=1
     )
-    medical_card_number: str = Field(
+    card_number: str = Field(
         default=None,
         title="111",
         description="Номер мед. карты",
