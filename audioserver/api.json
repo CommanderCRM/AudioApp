@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Doctors API",
-    "description": " Следующие для добавления методы: GET - получить информацию о речи (чтобы слушать/скачивать),  POST - сравнить сеансы POST - создать сеанс\n\nTODO: после добавить параметры на запросы в /patients/{...}/speech, чтобы отличать их друг от друга, запросы на аутентификацию, после этого API для врача будет готов (без учёта доработок) ",
+    "description": " Следующие для добавления методы: POST - сравнить сеансы\n\nTODO: добавить коды ошибок, после добавить запросы на аутентификацию, после этого API для врача будет готов (без учёта доработок) ",
     "version": "1.1.0"
   },
   "servers": [
@@ -30,7 +30,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/full_patient_info"
+                "$ref": "#/components/schemas/post_patient_info"
               }
             }
           },
@@ -117,7 +117,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/short_patient_info"
+                    "$ref": "#/components/schemas/get_patient_info"
                   }
                 }
               }
@@ -155,7 +155,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/session_patient_info"
+                    "$ref": "#/components/schemas/get_session_patient_info"
                   }
                 }
               }
@@ -165,14 +165,12 @@
             "description": "Внутрненняя ошибка сервера"
           }
         }
-      }
-    },
-    "/patients/{card_number}/speech": {
+      },
       "post": {
         "tags": [
           "patients"
         ],
-        "summary": "Загрузить/записать речь",
+        "summary": "Создать сеанс",
         "parameters": [
           {
             "in": "path",
@@ -183,13 +181,14 @@
             }
           }
         ],
-        "description": "Передать информацию о записанной речи на сервер (путем записи или загрузки файла)",
-        "operationId": "postSpeech",
+        "description": "Получить информацию о пациенте и его сенсах",
+        "operationId": "postSession",
         "requestBody": {
+          "description": "Создать сеанс",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/speech_info"
+                "$ref": "#/components/schemas/post_session_info"
               }
             }
           },
@@ -223,11 +222,133 @@
               }
             }
           },
+          "404": {
+            "description": "Пациента не существует"
+          },
           "500": {
             "description": "Внутренняя ошибка сервера"
           }
         }
+      }
+    },
+    "/patients/{card_number}/session/{session_id}": {
+      "get": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Получить информацию о сеансе",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "description": "Получить информацию о сеансе",
+        "operationId": "getSession",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/get_session_info"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
       },
+      "post": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Загрузить/записать речь",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "description": "Передать информацию о записанной речи на сервер (путем записи или загрузки файла)",
+        "operationId": "postSpeech",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/post_speech_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пациента не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/patients/{card_number}/session/{session_id}/speech": {
       "get": {
         "tags": [
           "patients"
@@ -241,6 +362,14 @@
             "schema": {
               "$ref": "#/components/schemas/card_number"
             }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
           }
         ],
         "description": "Получить информацию о существующих фразах и слогах",
@@ -253,11 +382,68 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/phrases_info"
+                    "$ref": "#/components/schemas/get_phrases_info"
                   }
                 }
               }
             }
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/patients/{card_number}/session/{session_id}/speech/{speech_id}": {
+      "get": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Пололучить информацию о речи (используется, чтоюы скачать/прослушать речь)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "speech_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/speech_id"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "description": "Получить информацию о речи, чтобы сформировать звуковой файл для выгрузки/прослушивания",
+        "operationId": "getSpeech",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_speech_info"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента"
+          },
+          "404": {
+            "description": "Речи или пациент не найдены"
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -275,7 +461,17 @@
         "minLength": 12,
         "maxLength": 12
       },
-      "full_patient_info": {
+      "speech_id": {
+        "type": "integer",
+        "example": 1337,
+        "description": "идентификатор аудиофайла, закодированного в base64, в базе данных"
+      },
+      "session_id": {
+        "type": "integer",
+        "example": 1337,
+        "description": "идентификатор сеанса в базе данных"
+      },
+      "post_patient_info": {
         "type": "object",
         "description": "полная информация о пациенте, используется при регистрации",
         "properties": {
@@ -293,17 +489,13 @@
           "doctor_info": {
             "type": "array",
             "items": {
-              "oneOf": [
-                {
-                  "type": "integer"
-                }
+              "type": "string",
+              "example": [
+                "Илиа Кривошеин",
+                "Никита Шабонов",
+                "Алексей Боров"
               ]
             },
-            "example": [
-              1,
-              2,
-              3
-            ],
             "description": "идентификаторы лечащих врачей, при создании отправляется только один идентификатор врача, который добавляет пациента"
           },
           "hospital": {
@@ -347,7 +539,7 @@
           }
         }
       },
-      "short_patient_info": {
+      "get_patient_info": {
         "description": "сокращённая информация о пациенте, используется при получении информации о пациенте",
         "type": "object",
         "properties": {
@@ -370,7 +562,7 @@
             ],
             "description": "Пол пациента"
           },
-          "medical_card_number": {
+          "card_number": {
             "$ref": "#/components/schemas/card_number"
           },
           "doctor_info": {
@@ -391,15 +583,10 @@
           }
         }
       },
-      "speech_info": {
+      "post_speech_info": {
         "type": "object",
         "description": "информация о произнесённой речи, необходимая для загрузки",
         "properties": {
-          "session_id": {
-            "type": "integer",
-            "example": 1,
-            "description": "идентификатор сеанса, в рамках которого произнесена речь"
-          },
           "speech_type": {
             "type": "string",
             "enum": [
@@ -427,14 +614,12 @@
           }
         }
       },
-      "short_speech_info": {
+      "get_speech_info_array": {
         "type": "object",
         "description": "информация о произнесённой речи, необходимая для отображения на клиенте",
         "properties": {
           "speech_id": {
-            "type": "integer",
-            "example": 1,
-            "description": "Идентификатор произнесённой речи"
+            "$ref": "#/components/schemas/speech_id"
           },
           "speech_score": {
             "type": "number",
@@ -456,15 +641,32 @@
           }
         }
       },
-      "session": {
+      "get_speech_info": {
         "type": "object",
-        "description": "информация о сеансах пациента",
+        "description": "информация о речи, необходимая для прослушивания/скачивания",
         "properties": {
-          "session_id": {
-            "type": "integer",
-            "example": 1,
-            "description": "идентификатор сеанса речевой реабилитации"
-          },
+          "base64_value": {
+            "type": "string",
+            "description": "записанный звуковой файл, закодированный в base64",
+            "example": "UklGRgYvAABXQVZFZm10IBIAAAABAAEA4C4AAMBdAAACABAAAABkYXRh4C4AAP//AAAAAAEAAAAAAAAAAAD//wAAAAABAAIAAQABAAEAAAAAAAEAAQABAAEA/////wAAAAABAAEA//8BAAEAAAACAAEAAgABAAEAAgABAAAAAAAAAAEAAgAAAAEAAAABAAAA//8BAAAAAAABAAEAAAABAAAA//8AAAEAAQAAAAAAAAAAAAAAAAACAAEAAAABAAAAAgABAP//AQAAAAIAAgAAAAEAAAABAAEAAAABAAEAAgABAAEAAAABAAAAAQABAAIAAAABAAEAAAABAAEAAAABAAEAAAABAAAAAgABAAEA/////wAAAAACAAEAAQADAP7///8AAAAA//8CAAAA//8AAP7////9/////v///////f/9//7//f/+/wEA///+/////f/+//7///... (в итоге будет сильно длиннее)"
+          }
+        }
+      },
+      "post_session_info": {
+        "type": "object",
+        "description": "информация о сеансах пациента для добавления в бд",
+        "properties": {
+          "is_reference_session": {
+            "type": "boolean",
+            "example": true,
+            "description": "флаг, указывающий на это, является ли сеанс эталонным"
+          }
+        }
+      },
+      "get_session_info": {
+        "type": "object",
+        "description": "информация о сеансах пациента для отображения на клиенте",
+        "properties": {
           "session_score": {
             "type": "integer",
             "example": 56,
@@ -479,28 +681,28 @@
           "speech_array": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/short_speech_info"
+              "$ref": "#/components/schemas/get_speech_info_array"
             },
             "description": "информация о произнесённой в рамках сеанса речи"
           }
         }
       },
-      "session_patient_info": {
+      "get_session_patient_info": {
         "type": "object",
         "description": "информация о пациенте и его сеансах",
         "properties": {
-          "short_patient_info": {
-            "$ref": "#/components/schemas/short_patient_info"
+          "get_patient_info": {
+            "$ref": "#/components/schemas/get_patient_info"
           },
           "sessions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/session"
+              "$ref": "#/components/schemas/get_session_info"
             }
           }
         }
       },
-      "phrases_info": {
+      "get_phrases_info": {
         "type": "object",
         "description": "информация о фразах и слогах",
         "properties": {
