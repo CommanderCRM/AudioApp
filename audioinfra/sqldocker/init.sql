@@ -1,5 +1,3 @@
--- DDL Generated from https:/databasediagram.com
-
 CREATE TABLE patient_table (
   card_number VARCHAR(12) PRIMARY KEY,
   full_name VARCHAR(255),
@@ -8,8 +6,7 @@ CREATE TABLE patient_table (
   hospital VARCHAR(64),
   temporary_password VARCHAR(128),
   is_password_changed BOOL,
-  date_of_birth DATE,
-  town VARCHAR(64)
+  date_of_birth DATE
 );
 
 CREATE TABLE speech_table (
