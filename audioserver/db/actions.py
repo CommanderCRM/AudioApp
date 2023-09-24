@@ -1,10 +1,10 @@
 from typing import Tuple, List
 from sqlmodel import Session, create_engine, select
-from .tables import PatientTable, DoctorTable, DoctorPatientTable, FullPatientModel
+from .tables import PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo
 
 engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
 
-def convert_full_model_to_table(full_patient_model: FullPatientModel) -> Tuple[PatientTable, List[DoctorPatientTable]]:
+def convert_full_model_to_table(full_patient_model: PostPatientInfo) -> Tuple[PatientTable, List[DoctorPatientTable]]:
     """Перевод полной модели пациента в таблицу пациента
         Также заполнение таблицы доктор/пациент"""
     patient_table = PatientTable(
@@ -21,43 +21,39 @@ def convert_full_model_to_table(full_patient_model: FullPatientModel) -> Tuple[P
     for doctor in full_patient_model.doctor_info:
         doctor_patient = DoctorPatientTable(
             doctor_username=doctor,
-            patient=patient_table
+            patient_card_number=patient_table.card_number
         )
         doctor_patient_list.append(doctor_patient)
     return patient_table, doctor_patient_list
+
+def convert_table_to_model(patient: PatientTable, session: Session) -> GetPatientInfo:
+    """Перевод таблицы пациента и таблицы доктор/пациент в короткую модель пациента"""
+    doctor_patient_records = session.query(DoctorPatientTable).filter_by(patient_card_number = patient.card_number).all()
+    doctor_info = [record.doctor_username for record in doctor_patient_records]
+    return GetPatientInfo(
+        full_name=patient.full_name,
+        date_of_birth=patient.date_of_birth,
+        gender=patient.gender,
+        card_number=patient.card_number,
+        doctor_info=doctor_info
+    )
 
 def insert_patient(patient: PatientTable, doctor_patient_list: List[DoctorPatientTable]):
     """Запись пациента в БД"""
     with Session(engine) as session:
         session.add(patient)
+        session.commit()
         for doctor_patient in doctor_patient_list:
             session.add(doctor_patient)
         session.commit()
         session.refresh(patient)
         return
 
-def insert_doctor(doctor: DoctorTable):
-    """Запись пациента в БД"""
-    with Session(engine) as session:
-        session.add(doctor)
-        session.commit()
-        session.refresh(doctor)
-        return
-
 def select_all_patients():
-    """Получение всех пациентов (короткая модель) из БД"""
+    """Получение всех пациентов из БД (короткая модель)"""
     with Session(engine) as session:
-        patients = session.query(PatientTable).with_entities(PatientTable.full_name,
-                                                             PatientTable.date_of_birth,
-                                                             PatientTable.gender,
-                                                             PatientTable.card_number).all()
-        return patients
-
-def select_all_doctors():
-    """Получение всех докторов из БД"""
-    with Session(engine) as session:
-        doctors = session.query(DoctorTable).all()
-        return doctors
+        patients = session.query(PatientTable).all()
+        return [convert_table_to_model(patient, session) for patient in patients]
 
 def select_patient_by_key(card_number: str):
     """Получение пациента по ключу"""

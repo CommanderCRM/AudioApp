@@ -2,8 +2,8 @@ from enum import Enum
 from fastapi import FastAPI, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from db.tables import DoctorTable, FullPatientModel
-from db.actions import insert_patient, select_all_patients, select_patient_by_key, insert_doctor, select_all_doctors, convert_full_model_to_table
+from db.tables import PostPatientInfo
+from db.actions import insert_patient, select_all_patients, select_patient_by_key, convert_full_model_to_table
 
 app = FastAPI()
 
@@ -31,7 +31,7 @@ async def validation_exception_handler(_, __):
                             status_code=status.HTTP_400_BAD_REQUEST)
 
 @app.post("/patients")
-async def create_patient(patient: FullPatientModel):
+async def create_patient(patient: PostPatientInfo):
     """Создание пациента по запросу POST"""
     patient_table, doctor_patient_list = convert_full_model_to_table(patient)
 
@@ -48,16 +48,6 @@ async def create_patient(patient: FullPatientModel):
                             status_code=status.HTTP_400_BAD_REQUEST)
 
     return insert_patient(patient_table, doctor_patient_list)
-
-@app.post("/doctors")
-async def create_doctor(doctor: DoctorTable):
-    """Создание доктора по запросу POST"""
-    return insert_doctor(doctor)
-
-@app.get("/doctors")
-async def get_doctors():
-    """Получение докторов по запросу GET"""
-    return select_all_doctors()
 
 @app.get("/patients")
 async def get_patients():
