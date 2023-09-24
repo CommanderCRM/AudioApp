@@ -17,8 +17,9 @@ jobs:
         run: docker build -t pydocker ./audioinfra/pydocker
 
       - name: Generate tarball from image
-        run: docker save -o pydocker.tar pydocker
+        run: docker save -o ./pydocker.tar pydocker
 
       - name: Scan Docker image for vulnerabilities
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:latest image --input pydocker.tar
+          ls -lah
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:latest image --input ./pydocker.tar
