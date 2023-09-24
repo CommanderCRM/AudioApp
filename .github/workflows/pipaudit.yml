@@ -1,4 +1,4 @@
-name: Pylint
+name: Pip Audit
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pylint
-    - name: Analysing the code with pylint
+        pip install pip-audit
+    - name: Analysing the requirements with pip-audit
       run: |
-        pylint --fail-under=5.0 $(git ls-files '*.py') 
+        pip-audit -r ./audioinfra/pydocker/requirements.txt
