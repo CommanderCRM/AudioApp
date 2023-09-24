@@ -23,12 +23,12 @@ jobs:
         run: docker pull postgres:15.4
 
       - name: Generate tarball from SQL Docker image
-        run: docker save -o ./postgres.tar postgres:15.4
+        run: docker save -o ./sqldocker.tar postgres:15.4
           
       - name: Scan Python Docker image for vulnerabilities
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:latest image --input ./workdir/pydocker.tar
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:0.45.1 image --input ./workdir/pydocker.tar
           
       - name: Scan SQL Docker image for vulnerabilities
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:latest image --input ./workdir/sqldocker.tar
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:0.45.1 image --input ./workdir/sqldocker.tar
