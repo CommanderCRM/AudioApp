@@ -1,4 +1,4 @@
-name: Trivy for Python docker
+name: Trivy for Python and SQL dockers
 
 on:
   push:
@@ -13,13 +13,22 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Build Docker image
+      - name: Build Python Docker image
         run: docker build -t pydocker ./audioinfra/pydocker
 
-      - name: Generate tarball from image
+      - name: Generate tarball from Python Docker image
         run: docker save -o ./pydocker.tar pydocker
 
-      - name: Scan Docker image for vulnerabilities
+      - name: Download SQL Docker image
+        run: docker pull postgres:15.4
+
+      - name: Generate tarball from SQL Docker image
+        run: docker save -o ./sqldocker.tar postgres:15.4
+          
+      - name: Scan Python Docker image for vulnerabilities
         run: |
-          ls -lah
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:latest image --input ./workdir/pydocker.tar
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:0.45.1 image --input ./workdir/pydocker.tar
+          
+      - name: Scan SQL Docker image for vulnerabilities
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:0.45.1 image --input ./workdir/sqldocker.tar
