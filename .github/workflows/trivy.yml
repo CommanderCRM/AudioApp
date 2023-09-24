@@ -21,4 +21,4 @@ jobs:
 
       - name: Scan Docker image for vulnerabilities
         run: |
-          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:latest trivy image --input pydocker.tar
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:latest image --input pydocker.tar
