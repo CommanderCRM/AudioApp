@@ -1,0 +1,21 @@
+name: Trivy for Python docker
+
+on:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: docker build -t pydocker ./audioinfra/pydocker
+
+      - name: Scan Docker image for vulnerabilities
+        run: |
+          docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/workdir aquasec/trivy:latest --exit-code 1 myapp
