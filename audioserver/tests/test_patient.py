@@ -17,7 +17,7 @@ patient_data = {
 def test_correct_patient_data():
     """Корректные данные"""
     patient = PostPatientInfo(**patient_data)
-    assert patient.dict() == patient_data
+    assert patient.dict() == patient_data # nosec
 
 def test_incorrect_gender():
     """Неверный пол"""
