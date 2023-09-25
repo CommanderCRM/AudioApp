@@ -186,14 +186,10 @@ class DoctorTable(SQLModel, table=True):
         max_length=255
     )
 
-class SpeechInfo(SQLModel):
+class PostSpeechInfo(SQLModel):
     """Модель информации o речи"""
-    session_id: int = Field(
-        title="1",
-        description="Идентификатор сеанса, в рамках которого произнесена речь"
-    )
     speech_type: SpeechType = Field(
-        title="фраза",
+        title="слог",
         description="Биологический тип сигнала"
     )
     base64_value: str = Field(
@@ -215,3 +211,56 @@ class DoctorPatientTable(SQLModel, table=True):
     doctor_patient_id: Optional[int] = Field(default=None, primary_key=True)
     doctor_username: str = Field(foreign_key="doctor_table.username")
     patient_card_number: str = Field(foreign_key="patient_table.card_number")
+
+class PostSessionInfo(SQLModel):
+    """Информация o сессии POST"""
+    is_reference_session: bool = Field(
+        title="true",
+        description="Флаг, указывающий на то, является ли сеанс эталонным"
+    )
+
+class SessionTable(SQLModel, table=True):
+    """Таблица сессии"""
+    __tablename__: str = "session_table"
+    session_id: Optional[int] = Field(default=None, primary_key=True)
+    is_reference_session: bool = Field(
+        title="true",
+        description="Флаг, указывающий на то, является ли сеанс эталонным"
+    )
+    session_score: Optional[float] = Field(
+        title="57.5",
+        description="Оценка сеанса речевой реабилитации"
+    )
+    card_number: str = Field(foreign_key="patient_table.card_number")
+
+class SpeechTable(SQLModel, table=True):
+    """Таблица информации o речи"""
+    __tablename__: str = "speech_table"
+    speech_id: Optional[int] = Field(default=None, primary_key=True)
+    speech_type: SpeechType = Field(
+        title="слог",
+        description="Биологический тип сигнала"
+    )
+    base64_value: str = Field(
+        title="UklGRgYvAABXQVZFZm",
+        description="Записанный звуковой файл, закодированный в base64"
+    )
+    base64_segment_value: Optional[str] = Field(
+        title="UklGRgYvAABXQVZFZm",
+        description="Сегментированное значение речи, закодированное в base64"
+    )
+    speech_score: float = Field(
+        title="50.7",
+        description="Оценка речи"
+    )
+    is_reference_speech: bool = Field(
+        title="true",
+        description="Флаг, указывающий на то, является ли речь эталонной"
+    )
+
+class SpeechSessionTable(SQLModel, table=True):
+    """Таблица отношения речь/сеанс"""
+    __tablename__: str = "speech_session_table"
+    speech_session_id: Optional[int] = Field(default=None, primary_key=True)
+    speech_id: int = Field(foreign_key="speech_table.speech_id")
+    session_id: int = Field(foreign_key="session_table.session_id")

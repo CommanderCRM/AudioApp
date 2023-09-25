@@ -1,6 +1,6 @@
 from typing import Tuple, List
 from sqlmodel import Session, create_engine, select
-from .tables import PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo
+from .tables import PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo, PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable, SpeechSessionTable
 
 engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
 
@@ -60,3 +60,38 @@ def select_patient_by_key(card_number: str):
     with Session(engine) as session:
         patient = session.exec(select(PatientTable).where(PatientTable.card_number == card_number)).first()
         return bool(patient)
+
+def insert_session_info(card_number: str, session_info: PostSessionInfo):
+    """Запись информации o сессии в БД"""
+    session_table = SessionTable(
+        is_reference_session=session_info.is_reference_session,
+        card_number=card_number
+    )
+    with Session(engine) as session:
+        session.add(session_table)
+        session.commit()
+        session.refresh(session_table)
+        return
+
+def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
+    """Запись речи в БД"""
+    with Session(engine) as session:
+        session_record = session.query(SessionTable).filter(SessionTable.session_id == session_id).first()
+        if session_record is not None:
+            is_reference_speech = session_record.is_reference_session
+
+    speech_table = SpeechTable(
+        speech_type=speech_info.speech_type,
+        base64_value=speech_info.base64_value,
+        base64_segment_value=speech_info.base64_value_segment,
+        is_reference_speech=is_reference_speech
+    )
+    with Session(engine) as session:
+        session.add(speech_table)
+        session.commit()
+        speech_session_table = SpeechSessionTable(
+            speech_id=speech_table.speech_id,
+            session_id=session_id
+        )
+        session.add(speech_session_table)
+        session.commit()
