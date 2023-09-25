@@ -2,8 +2,8 @@ from enum import Enum
 from fastapi import FastAPI, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from db.tables import PostPatientInfo
-from db.actions import insert_patient, select_all_patients, select_patient_by_key, convert_full_model_to_table
+from db.tables import PostPatientInfo, PostSessionInfo, PostSpeechInfo
+from db.actions import insert_patient, select_all_patients, select_patient_by_key, convert_full_model_to_table, insert_session_info, insert_speech
 
 app = FastAPI()
 
@@ -54,7 +54,18 @@ async def get_patients():
     """Получение пациентов по запросу GET"""
     return select_all_patients()
 
-@app.post("/patients/{card_number}/speech")
-async def upload_record_speech(_, __):
-    """Загрузить/записать речь"""
-    return
+@app.post("/patients/{card_number}")
+async def post_session_info(card_number: str, session_info: PostSessionInfo):
+    """Добавить информацию o сеансе"""
+    if not select_patient_by_key(card_number):
+        raise HTTPException(status_code=404)
+
+    return insert_session_info(card_number, session_info)
+
+@app.post("/patients/{card_number}/speech/{session_id}")
+async def upload_record_speech(card_number: str, session_id: int, speech_info: PostSpeechInfo):
+    """Загрузить/записать речь в сеанс"""
+    if not select_patient_by_key(card_number):
+        raise HTTPException(status_code=404)
+
+    return insert_speech(card_number, session_id, speech_info)
