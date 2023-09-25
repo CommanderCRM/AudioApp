@@ -264,3 +264,34 @@ class SpeechSessionTable(SQLModel, table=True):
     speech_session_id: Optional[int] = Field(default=None, primary_key=True)
     speech_id: int = Field(foreign_key="speech_table.speech_id")
     session_id: int = Field(foreign_key="session_table.session_id")
+
+class GetInfoSpeechArray(SQLModel):
+    """Информация o речи для отображения на клиенте"""
+    speech_id: int = Field(
+        title="1",
+        description="Идентификатор речи"
+    )
+    speech_score: Optional[float] = Field(
+        title="50.7",
+        description="Оценка речи"
+    )
+    speech_type: SpeechType = Field(
+        title="слог",
+        description="Биологический тип сигнала"
+    )
+    is_reference_speech: bool = Field(
+        title="true",
+        description="Флаг, указывающий на то, является ли речь эталонной"
+    )
+
+class GetSessionInfo(SQLModel):
+    """Информация o сессии"""
+    session_score: Optional[float] = Field(
+        title="57.5",
+        description="Оценка сеанса речевой реабилитации"
+    )
+    is_reference_session: bool = Field(
+        title="true",
+        description="Флаг, указывающий на то, является ли сеанс эталонным"
+    )
+    speech_array: List[GetInfoSpeechArray]

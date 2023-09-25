@@ -1,6 +1,6 @@
 from typing import Tuple, List
 from sqlmodel import Session, create_engine, select
-from .tables import PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo, PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable, SpeechSessionTable
+from .tables import PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo, PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable, SpeechSessionTable, GetInfoSpeechArray, GetSessionInfo
 
 engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
 
@@ -95,3 +95,16 @@ def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
         )
         session.add(speech_session_table)
         session.commit()
+
+def select_session_info(_, session_id):
+    """Получение информации o сеансе и записях речи в нем"""
+    with Session(engine) as session:
+        session_info = session.exec(select(SessionTable).where(SessionTable.session_id == session_id)).first()
+        speech_session_info = session.exec(select(SpeechSessionTable.speech_id).where(SpeechSessionTable.session_id == session_id)).all()
+
+        speech_array = []
+        for speech_id in speech_session_info:
+            speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
+            speech_array.append(GetInfoSpeechArray(**speech_info.__dict__))
+
+        return GetSessionInfo(session_score=session_info.session_score, is_reference_session=session_info.is_reference_session, speech_array=speech_array)
