@@ -3,7 +3,7 @@ from fastapi import FastAPI, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from db.tables import PostPatientInfo, PostSessionInfo, PostSpeechInfo
-from db.actions import insert_patient, select_all_patients, select_patient_by_key, convert_full_model_to_table, insert_session_info, insert_speech
+from db.actions import insert_patient, select_all_patients, select_patient_by_key, convert_full_model_to_table, insert_session_info, insert_speech, select_session_info
 
 app = FastAPI()
 
@@ -69,3 +69,9 @@ async def upload_record_speech(card_number: str, session_id: int, speech_info: P
         raise HTTPException(status_code=404)
 
     return insert_speech(card_number, session_id, speech_info)
+
+@app.get("/patients/{card_number}/session/{session_id}")
+async def get_session_info(card_number: str, session_id: int):
+    """Получить информацию о сессии"""
+
+    return select_session_info(card_number, session_id)
