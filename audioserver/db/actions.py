@@ -1,8 +1,13 @@
 from typing import Tuple, List
 from sqlmodel import Session, create_engine, select
-from .tables import PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo, PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable, SpeechSessionTable, GetInfoSpeechArray, GetSessionInfo
+from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo,
+                     PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable,
+                     SpeechSessionTable, GetInfoSpeechArray, GetSessionInfo,
+                     GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
+                     GetPhrasesInfo)
 
-engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
+engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres",
+                       echo=True)
 
 def convert_full_model_to_table(full_patient_model: PostPatientInfo) -> Tuple[PatientTable, List[DoctorPatientTable]]:
     """Перевод полной модели пациента в таблицу пациента
@@ -26,17 +31,18 @@ def convert_full_model_to_table(full_patient_model: PostPatientInfo) -> Tuple[Pa
         doctor_patient_list.append(doctor_patient)
     return patient_table, doctor_patient_list
 
-def convert_table_to_model(patient: PatientTable, session: Session) -> GetPatientInfo:
+def convert_table_to_model(patient: PatientTable) -> GetPatientInfo:
     """Перевод таблицы пациента и таблицы доктор/пациент в короткую модель пациента"""
-    doctor_patient_records = session.query(DoctorPatientTable).filter_by(patient_card_number = patient.card_number).all()
-    doctor_info = [record.doctor_username for record in doctor_patient_records]
-    return GetPatientInfo(
-        full_name=patient.full_name,
-        date_of_birth=patient.date_of_birth,
-        gender=patient.gender,
-        card_number=patient.card_number,
-        doctor_info=doctor_info
-    )
+    with Session(engine) as session:
+        doctor_patient_records = session.query(DoctorPatientTable).filter_by(patient_card_number = patient.card_number).all()
+        doctor_info = [record.doctor_username for record in doctor_patient_records]
+        return GetPatientInfo(
+            full_name=patient.full_name,
+            date_of_birth=patient.date_of_birth,
+            gender=patient.gender,
+            card_number=patient.card_number,
+            doctor_info=doctor_info
+        )
 
 def insert_patient(patient: PatientTable, doctor_patient_list: List[DoctorPatientTable]):
     """Запись пациента в БД"""
@@ -53,7 +59,7 @@ def select_all_patients():
     """Получение всех пациентов из БД (короткая модель)"""
     with Session(engine) as session:
         patients = session.query(PatientTable).all()
-        return [convert_table_to_model(patient, session) for patient in patients]
+        return [convert_table_to_model(patient) for patient in patients]
 
 def select_patient_by_key(card_number: str):
     """Получение пациента по ключу"""
@@ -107,4 +113,44 @@ def select_session_info(_, session_id):
             speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
             speech_array.append(GetInfoSpeechArray(**speech_info.__dict__))
 
-        return GetSessionInfo(session_score=session_info.session_score, is_reference_session=session_info.is_reference_session, speech_array=speech_array)
+        return GetSessionInfo(session_score=session_info.session_score,
+                              is_reference_session=session_info.is_reference_session,
+                              speech_array=speech_array)
+
+def select_session_by_key(session_number: int):
+    """Получение сеанса по ключу"""
+    with Session(engine) as db_session:
+        session = db_session.exec(select(SessionTable).where(SessionTable.session_id == session_number)).first()
+        return bool(session)
+
+def select_speech_info(_, __, speech_id):
+    """Получение информации o речи"""
+    with Session(engine) as session:
+        speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
+        speech_value = speech_info.base64_value
+        return GetSpeechInfo(base64_value=speech_value)
+
+def select_patient_and_sessions(card_number: str):
+    """Получение информации o пациенте и ero сеансах"""
+    with Session(engine) as session:
+        patient = session.exec(select(PatientTable).where(PatientTable.card_number == card_number)).first()
+        patient_info = convert_table_to_model(patient)
+
+        patient_sessions = session.exec(select(SessionTable).where(SessionTable.card_number == card_number)).all()
+        session_info_list = [select_session_info(card_number, session.session_id) for session in patient_sessions]
+
+        return GetSessionPatientInfo(get_patient_info=patient_info, sessions=session_info_list)
+
+def select_phrases_and_syllables():
+    """Получение информации o фразах и слогах"""
+    with Session(engine) as session:
+        phrases_query = select(SyllablesPhrasesTable).where(SyllablesPhrasesTable.syllable_phrase_type == "phrase")
+        syllables_query = select(SyllablesPhrasesTable).where(SyllablesPhrasesTable.syllable_phrase_type == "syllable")
+
+        phrases_results = session.execute(phrases_query).fetchall()
+        syllables_results = session.execute(syllables_query).fetchall()
+
+        phrases_list = [result[0].value for result in phrases_results]
+        syllables_list = [result[0].value for result in syllables_results]
+
+        return GetPhrasesInfo(phrases=phrases_list, syllables=syllables_list)
