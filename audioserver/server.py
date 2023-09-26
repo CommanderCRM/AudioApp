@@ -3,7 +3,10 @@ from fastapi import FastAPI, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from db.tables import PostPatientInfo, PostSessionInfo, PostSpeechInfo
-from db.actions import insert_patient, select_all_patients, select_patient_by_key, convert_full_model_to_table, insert_session_info, insert_speech, select_session_info
+from db.actions import (insert_patient, select_all_patients, select_patient_by_key,
+                        convert_full_model_to_table, insert_session_info, insert_speech,
+                        select_session_info, select_speech_info, select_session_by_key,
+                        select_patient_and_sessions, select_phrases_and_syllables)
 
 app = FastAPI()
 
@@ -72,6 +75,26 @@ async def upload_record_speech(card_number: str, session_id: int, speech_info: P
 
 @app.get("/patients/{card_number}/session/{session_id}")
 async def get_session_info(card_number: str, session_id: int):
-    """Получить информацию о сессии"""
+    """Получить информацию o сессии"""
 
     return select_session_info(card_number, session_id)
+
+@app.get("/patients/{card_number}/session/{session_id}/speech/{speech_id}")
+async def get_speech_info(card_number: str, session_id: int, speech_id: int):
+    """Получить информацию o речи"""
+    if not select_patient_by_key(card_number) or not select_session_by_key(session_id):
+        raise HTTPException(status_code=404)
+
+    return select_speech_info(card_number, session_id, speech_id)
+
+@app.get("/patients/{card_number}")
+async def get_patient_and_sessions(card_number: str):
+    """Получить информацию о пациенте и его сеансах"""
+
+    return select_patient_and_sessions(card_number)
+
+@app.get("/patients/{card_number}/session/{session_id}/speech")
+async def get_phrases_and_syllables_info():
+    """Получить информацию о фразах и слогах"""
+
+    return select_phrases_and_syllables()

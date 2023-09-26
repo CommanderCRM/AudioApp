@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import date
 from typing import Optional, List
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, Column, String
 
 class Gender(str, Enum):
     """Массив пола"""
@@ -295,3 +295,39 @@ class GetSessionInfo(SQLModel):
         description="Флаг, указывающий на то, является ли сеанс эталонным"
     )
     speech_array: List[GetInfoSpeechArray]
+
+class GetSpeechInfo(SQLModel):
+    """Информация o речи"""
+    base64_value: str = Field(
+        title="UklGRgYvAABXQVZFZm",
+        description="Записанный звуковой файл, закодированный в base64"
+    )
+
+class GetSessionPatientInfo(SQLModel):
+    """Информация o пациенте и его сеансах"""
+    get_patient_info: GetPatientInfo
+    sessions: List[GetSessionInfo]
+
+class GetPhrasesInfo(SQLModel):
+    """Информация o фразах и слогах"""
+    phrases: List[str]
+    syllables: List[str]
+
+class SyllablesPhrasesTable(SQLModel, table=True):
+    """Таблица фраз и слогов"""
+    __tablename__: str = "syllables_phrases_table"
+    syllable_phrase_id: Optional[int] = Field(default=None, primary_key=True)
+    syllable_phrase_type: str = Field(
+        title="phrase",
+        description="Тип (фраза или слог)"
+    )
+    dict_: str = Field(
+        sa_column=Column("dict", String),
+        alias='dict',
+        title="[к]",
+        description="Звук"
+    )
+    value: str = Field(
+        title="День был удивительно хорош",
+        description="Значение фразы либо слога"
+    )
