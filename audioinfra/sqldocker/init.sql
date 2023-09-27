@@ -15,7 +15,8 @@ CREATE TABLE speech_table (
   base64_value VARCHAR,
   base64_segment_value VARCHAR,
   speech_score REAL,
-  is_reference_speech BOOL
+  is_reference_speech BOOL,
+  real_value VARCHAR(50)
 );
 
 CREATE TABLE session_table (
@@ -52,11 +53,12 @@ CREATE TABLE doctor_patient_table (
 
 CREATE TABLE syllables_phrases_table (
   syllable_phrase_id serial PRIMARY KEY,
-  syllable_phrase_type VARCHAR(10),
+  type VARCHAR(10),
   dict VARCHAR(10),
-  value VARCHAR(50)
+  value VARCHAR(50),
+  start_position int,
+  end_position int
 );
-
 
 INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'ba12f65801cc7cec593c311bd1bb4d9a72fcc84059e36e0c642', 'Ilia Krivosh');
 INSERT INTO doctor_table VALUES ('user2', 'logoped onkolog', 'Tomsk NII', 'ba12f65801cc7cec593c311bd1bb4d9a72fcc6', 'Ilia Bebrov');
