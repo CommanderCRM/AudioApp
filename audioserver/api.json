@@ -107,6 +107,18 @@
           "patients"
         ],
         "summary": "Получить список всех пациентов",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 100
+            },
+            "description": "ограничение на количество пациентов, которое клиент запрашивает за раз"
+          }
+        ],
         "description": "Получить список всех пациентов",
         "operationId": "getPatients",
         "responses": {
@@ -181,10 +193,10 @@
             }
           }
         ],
-        "description": "Получить информацию о пациенте и его сенсах",
+        "description": "Создать сеанс",
         "operationId": "postSession",
         "requestBody": {
-          "description": "Создать сеанс",
+          "description": "Информация для создания сеанса",
           "content": {
             "application/json": {
               "schema": {
@@ -348,6 +360,78 @@
         }
       }
     },
+    "/patients/{card_number}/session/{session_1_id}/{session_2_id}": {
+      "post": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Сравнить сеансы",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_1_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            },
+            "description": "идентификатор сеанса, для которого выполняется сравнение (выбранный сеанс)"
+          },
+          {
+            "in": "path",
+            "name": "session_2_id",
+            "example": 1338,
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            },
+            "description": "идентификатор сеанса, с которым планируется сравнить выбранный сеанс"
+          },
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Сеанса не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
     "/patients/{card_number}/session/{session_id}/speech": {
       "get": {
         "tags": [
@@ -471,6 +555,12 @@
         "example": 1337,
         "description": "идентификатор сеанса в базе данных"
       },
+      "session_score": {
+        "type": "integer",
+        "example": 56,
+        "description": "оценка сеанса речевой реабилитации",
+        "nullable": true
+      },
       "post_patient_info": {
         "type": "object",
         "description": "полная информация о пациенте, используется при регистрации",
@@ -575,9 +665,9 @@
               ]
             },
             "example": [
-              1,
-              2,
-              3
+              "doctor 1",
+              "vrach 2",
+              "medic 3"
             ],
             "description": "идентификаторы лечащих врачей, при создании отправляется только один идентификатор врача, который добавляет пациента"
           }
@@ -601,7 +691,7 @@
             "description": "записанный звуковой файл, закодированный в base64",
             "example": "UklGRgYvAABXQVZFZm10IBIAAAABAAEA4C4AAMBdAAACABAAAABkYXRh4C4AAP//AAAAAAEAAAAAAAAAAAD//wAAAAABAAIAAQABAAEAAAAAAAEAAQABAAEA/////wAAAAABAAEA//8BAAEAAAACAAEAAgABAAEAAgABAAAAAAAAAAEAAgAAAAEAAAABAAAA//8BAAAAAAABAAEAAAABAAAA//8AAAEAAQAAAAAAAAAAAAAAAAACAAEAAAABAAAAAgABAP//AQAAAAIAAgAAAAEAAAABAAEAAAABAAEAAgABAAEAAAABAAAAAQABAAIAAAABAAEAAAABAAEAAAABAAEAAAABAAAAAgABAAEA/////wAAAAACAAEAAQADAP7///8AAAAA//8CAAAA//8AAP7////9/////v///////f/9//7//f/+/wEA///+/////f/+//7///... (в итоге будет сильно длиннее)"
           },
-          "base64_value_segment": {
+          "base64_segment_value": {
             "type": "string",
             "description": "сегментированное значение речи, закодированное в base64",
             "example": "примерно такой же, как и в base64_value",
@@ -626,7 +716,7 @@
             "example": 50.5,
             "description": "Оценка качества речи"
           },
-          "type": {
+          "speech_type": {
             "type": "string",
             "enum": [
               "фраза",
@@ -663,15 +753,29 @@
           }
         }
       },
+      "get_session_info_array": {
+        "type": "object",
+        "description": "информация о сеансах пациента для отображения на клиенте в списке всех сеансов",
+        "properties": {
+          "session_id": {
+            "$ref": "#/components/schemas/session_id"
+          },
+          "session_score": {
+            "$ref": "#/components/schemas/session_score"
+          },
+          "is_reference_session": {
+            "type": "boolean",
+            "example": true,
+            "description": "флаг, указывающий на это, является ли сеанс эталонным"
+          }
+        }
+      },
       "get_session_info": {
         "type": "object",
-        "description": "информация о сеансах пациента для отображения на клиенте",
+        "description": "информация о сеансе пациента для отображения на клиенте",
         "properties": {
           "session_score": {
-            "type": "integer",
-            "example": 56,
-            "description": "оценка сеанса речевой реабилитации",
-            "nullable": true
+            "$ref": "#/components/schemas/session_score"
           },
           "is_reference_session": {
             "type": "boolean",
@@ -697,14 +801,14 @@
           "sessions": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/get_session_info"
+              "$ref": "#/components/schemas/get_session_info_array"
             }
           }
         }
       },
       "get_phrases_info": {
         "type": "object",
-        "description": "информация о фразах и слогах",
+        "description": "информация о фразах и слогах, используется при записи/загрузке речи, чтобы выбрать реальное значение",
         "properties": {
           "phrases": {
             "type": "array",
