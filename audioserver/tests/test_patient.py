@@ -1,7 +1,7 @@
 from datetime import date
 import pytest
 from pydantic import ValidationError
-from db.tables import FullPatientModel
+from db.tables import PostPatientInfo
 
 patient_data = {
     'medical_card_number': '111',
@@ -16,11 +16,11 @@ patient_data = {
 
 def test_correct_patient_data():
     """Корректные данные"""
-    patient = FullPatientModel(**patient_data)
-    assert patient.dict() == patient_data
+    patient = PostPatientInfo(**patient_data)
+    assert patient.dict() == patient_data # nosec
 
 def test_incorrect_gender():
     """Неверный пол"""
     patient_data['gender'] = 'invalid_gender'
     with pytest.raises(ValidationError):
-        FullPatientModel(**patient_data)
+        PostPatientInfo(**patient_data)
