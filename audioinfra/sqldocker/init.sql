@@ -30,7 +30,6 @@ CREATE TABLE speech_compare_table (
 CREATE TABLE session_table (
   session_id SERIAL PRIMARY KEY,
   is_reference_session BOOL,
-  session_score REAL,
   session_type VARCHAR(50),
   card_number VARCHAR(12) REFERENCES patient_table(card_number)
 );
