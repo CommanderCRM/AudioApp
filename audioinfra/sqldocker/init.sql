@@ -16,7 +16,6 @@ CREATE TABLE speech_table (
   speech_type VARCHAR(50),
   base64_value VARCHAR,
   base64_segment_value VARCHAR,
-  speech_score REAL,
   is_reference_speech BOOL,
   real_value VARCHAR(50)
 );
@@ -25,7 +24,7 @@ CREATE TABLE speech_compare_table (
   speech_compare_id SERIAL PRIMARY KEY,
   speech_id INT REFERENCES speech_table(speech_id),
   compared_speech_id INT REFERENCES speech_table(speech_id),
-  speech_score INT
+  speech_score REAL
 );
 
 CREATE TABLE session_table (
@@ -40,7 +39,7 @@ CREATE TABLE session_compare_table (
   session_compare_id SERIAL PRIMARY KEY,
   session_id INT REFERENCES session_table(session_id),
   compared_session_id INT REFERENCES session_table(session_id),
-  session_score INT
+  session_score REAL
 );
 
 CREATE TABLE speech_session_table (
