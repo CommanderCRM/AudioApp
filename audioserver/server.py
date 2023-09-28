@@ -6,7 +6,8 @@ from db.tables import PostPatientInfo, PostSessionInfo, PostSpeechInfo
 from db.actions import (insert_patient, select_all_patients, select_patient_by_key,
                         convert_full_model_to_table, insert_session_info, insert_speech,
                         select_session_info, select_speech_info, select_session_by_key,
-                        select_patient_and_sessions, select_phrases_and_syllables)
+                        select_patient_and_sessions, select_phrases_and_syllables,
+                        compare_two_sessions)
 
 app = FastAPI()
 
@@ -98,3 +99,11 @@ async def get_phrases_and_syllables_info():
     """Получить информацию o фразах и слогах"""
 
     return select_phrases_and_syllables()
+
+@app.post("/patients/{card_number}/session/{session_1_id}/{session_2_id}")
+async def compare_sessions(card_number: int, session_1_id: int, session_2_id: int):
+    """Сравнение сеансов (аудиофайлы)"""
+    if not select_session_by_key(session_1_id) or not select_session_by_key(session_2_id):
+        raise HTTPException(status_code=404)
+
+    return compare_two_sessions(card_number, session_1_id, session_2_id)

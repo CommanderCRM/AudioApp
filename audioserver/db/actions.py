@@ -164,3 +164,52 @@ def select_phrases_and_syllables():
         syllables_list = [result[0].value for result in syllables_results]
 
         return GetPhrasesInfo(phrases=phrases_list, syllables=syllables_list)
+
+def get_session_speech_array(session_id: int):
+    """Получение всех записей речи в сеансе"""
+    with Session(engine) as session:
+        speech_session_info = session.exec(select(SpeechSessionTable.speech_id).where(SpeechSessionTable.session_id == session_id)).all()
+
+        speech_array = []
+        for speech_id in speech_session_info:
+            speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
+            speech_array.append(GetInfoSpeechArray(**speech_info.__dict__))
+
+        return speech_array
+
+def get_speech_value(speech_id: int):
+    """Получение base64-значения речи по ee ID"""
+    with Session(engine) as session:
+        speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
+        return speech_info.base64_value
+
+def compare_two_sessions(_, session_1_id: int, session_2_id: int):
+    """Сравнение двух сеансов"""
+    session_1_speeches = get_session_speech_array(session_1_id)
+    session_2_speeches = get_session_speech_array(session_2_id)
+
+    print(session_1_speeches)
+    print(session_2_speeches)
+
+    comparable_speech_ids = {}
+    comparable_key = 0
+
+    for speech_1 in session_1_speeches:
+        for speech_2 in session_2_speeches:
+            if speech_1.speech_type == speech_2.speech_type and speech_1.real_value == speech_2.real_value:
+                comparable_speech_ids[comparable_key] = [speech_1.speech_id, speech_2.speech_id]
+                comparable_key += 1
+
+    print(comparable_speech_ids)
+
+    speech_values_dict = {}
+    speech_value_key = 0
+
+    for comparable_key, speech_ids in comparable_speech_ids.items():
+        speech_1_value = get_speech_value(speech_ids[0])
+        speech_2_value = get_speech_value(speech_ids[1])
+        print(f'speech 1 value, speech ID {speech_ids[0]}:', speech_1_value, f'speech 2 value, speech ID {speech_ids[1]}:', speech_2_value)
+        speech_values_dict[speech_value_key] = [speech_1_value, speech_2_value]
+        speech_value_key += 1
+
+    print(speech_values_dict)
