@@ -865,9 +865,6 @@
         "type": "object",
         "description": "информация о сеансе пациента для отображения на клиенте",
         "properties": {
-          "session_score": {
-            "$ref": "#/components/schemas/session_score"
-          },
           "is_reference_session": {
             "type": "boolean",
             "example": true,
