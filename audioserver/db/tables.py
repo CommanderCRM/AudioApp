@@ -257,6 +257,10 @@ class SpeechTable(SQLModel, table=True):
         title="true",
         description="Флаг, указывающий на то, является ли речь эталонной"
     )
+    real_value: str = Field(
+        title="кась",
+        description="Реальное значение слога или фразы, которое должно было быть произнесено"
+    )
 
 class SpeechSessionTable(SQLModel, table=True):
     """Таблица отношения речь/сеанс"""
@@ -283,6 +287,10 @@ class GetInfoSpeechArray(SQLModel):
         title="true",
         description="Флаг, указывающий на то, является ли речь эталонной"
     )
+    real_value: str = Field(
+        title="кась",
+        description="Реальное значение слога или фразы, которое должно было быть произнесено"
+    )
 
 class GetSessionInfo(SQLModel):
     """Информация o сессии"""
@@ -303,10 +311,25 @@ class GetSpeechInfo(SQLModel):
         description="Записанный звуковой файл, закодированный в base64"
     )
 
+class GetSessionInfoArray(SQLModel):
+    """Информация o сессиях для пациента"""
+    session_id: int = Field(
+        title="1",
+        description="Идентификатор сеанса в базе данных"
+    )
+    session_score: Optional[float] = Field(
+        title="57.5",
+        description="Оценка сеанса речевой реабилитации"
+    )
+    is_reference_session: bool = Field(
+        title="true",
+        description="Флаг, указывающий на то, является ли сеанс эталонным"
+    )
+
 class GetSessionPatientInfo(SQLModel):
     """Информация o пациенте и его сеансах"""
     get_patient_info: GetPatientInfo
-    sessions: List[GetSessionInfo]
+    sessions: List[GetSessionInfoArray]
 
 class GetPhrasesInfo(SQLModel):
     """Информация o фразах и слогах"""

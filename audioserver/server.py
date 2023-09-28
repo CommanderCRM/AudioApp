@@ -53,9 +53,9 @@ async def create_patient(patient: PostPatientInfo):
     return insert_patient(patient_table, doctor_patient_list)
 
 @app.get("/patients")
-async def get_patients():
+async def get_patients(limit: int):
     """Получение пациентов по запросу GET"""
-    return select_all_patients()
+    return select_all_patients(limit)
 
 @app.post("/patients/{card_number}")
 async def post_session_info(card_number: str, session_info: PostSessionInfo):
@@ -89,12 +89,12 @@ async def get_speech_info(card_number: str, session_id: int, speech_id: int):
 
 @app.get("/patients/{card_number}")
 async def get_patient_and_sessions(card_number: str):
-    """Получить информацию о пациенте и его сеансах"""
+    """Получить информацию o пациенте и ero сеансах"""
 
     return select_patient_and_sessions(card_number)
 
 @app.get("/patients/{card_number}/session/{session_id}/speech")
 async def get_phrases_and_syllables_info():
-    """Получить информацию о фразах и слогах"""
+    """Получить информацию o фразах и слогах"""
 
     return select_phrases_and_syllables()

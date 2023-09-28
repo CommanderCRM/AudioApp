@@ -53,11 +53,9 @@ CREATE TABLE doctor_patient_table (
 
 CREATE TABLE syllables_phrases_table (
   syllable_phrase_id serial PRIMARY KEY,
-  type VARCHAR(10),
+  syllable_phrase_type VARCHAR(10),
   dict VARCHAR(10),
-  value VARCHAR(50),
-  start_position int,
-  end_position int
+  value VARCHAR(50)
 );
 
 INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'ba12f65801cc7cec593c311bd1bb4d9a72fcc84059e36e0c642', 'Ilia Krivosh');
