@@ -1,3 +1,5 @@
+-- DDL Generated from https:/databasediagram.com
+
 CREATE TABLE patient_table (
   card_number VARCHAR(12) PRIMARY KEY,
   full_name VARCHAR(255),
@@ -10,7 +12,7 @@ CREATE TABLE patient_table (
 );
 
 CREATE TABLE speech_table (
-  speech_id serial PRIMARY KEY,
+  speech_id SERIAL PRIMARY KEY,
   speech_type VARCHAR(50),
   base64_value VARCHAR,
   base64_segment_value VARCHAR,
@@ -19,15 +21,30 @@ CREATE TABLE speech_table (
   real_value VARCHAR(50)
 );
 
+CREATE TABLE speech_compare_table (
+  speech_compare_id SERIAL PRIMARY KEY,
+  speech_id INT REFERENCES speech_table(speech_id),
+  compared_speech_id INT REFERENCES speech_table(speech_id),
+  speech_score INT
+);
+
 CREATE TABLE session_table (
-  session_id serial PRIMARY KEY,
+  session_id SERIAL PRIMARY KEY,
   is_reference_session BOOL,
   session_score REAL,
+  session_type VARCHAR(50),
   card_number VARCHAR(12) REFERENCES patient_table(card_number)
 );
 
+CREATE TABLE session_compare_table (
+  session_compare_id SERIAL PRIMARY KEY,
+  session_id INT REFERENCES session_table(session_id),
+  compared_session_id INT REFERENCES session_table(session_id),
+  session_score INT
+);
+
 CREATE TABLE speech_session_table (
-  speech_session_id serial PRIMARY KEY,
+  speech_session_id SERIAL PRIMARY KEY,
   speech_id int REFERENCES speech_table(speech_id),
   session_id int REFERENCES session_table(session_id)
 );
@@ -46,18 +63,16 @@ CREATE TABLE specialist_table (
 );
 
 CREATE TABLE doctor_patient_table (
-  doctor_patient_id serial PRIMARY KEY,
+  doctor_patient_id SERIAL PRIMARY KEY,
   doctor_username VARCHAR(255) REFERENCES doctor_table(username),
   patient_card_number VARCHAR(12) REFERENCES patient_table(card_number)
 );
 
 CREATE TABLE syllables_phrases_table (
-  syllable_phrase_id serial PRIMARY KEY,
-  type VARCHAR(10),
+  syllable_phrase_id SERIAL PRIMARY KEY,
+  syllable_phrase_type VARCHAR(10),
   dict VARCHAR(10),
-  value VARCHAR(50),
-  start_position int,
-  end_position int
+  value VARCHAR(50)
 );
 
 INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'ba12f65801cc7cec593c311bd1bb4d9a72fcc84059e36e0c642', 'Ilia Krivosh');

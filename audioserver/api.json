@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Doctors API",
-    "description": " Следующие для добавления методы: POST - сравнить сеансы\n\nTODO: добавить коды ошибок, после добавить запросы на аутентификацию, после этого API для врача будет готов (без учёта доработок) ",
+    "description": "TODO: добавить коды ошибок, после добавить запросы на аутентификацию, после этого API для врача будет готов (без учёта доработок) ",
     "version": "1.1.0"
   },
   "servers": [
@@ -248,7 +248,7 @@
         "tags": [
           "patients"
         ],
-        "summary": "Получить информацию о сеансе",
+        "summary": "Получить информацию о сеансе и записях, записанных в его рамках",
         "parameters": [
           {
             "in": "path",
@@ -267,7 +267,7 @@
             }
           }
         ],
-        "description": "Получить информацию о сеансе",
+        "description": "Получить информацию о сеансе и записях, записанных в его рамках",
         "operationId": "getSession",
         "responses": {
           "200": {
@@ -547,7 +547,7 @@
       },
       "speech_id": {
         "type": "integer",
-        "example": 1337,
+        "example": 1,
         "description": "идентификатор аудиофайла, закодированного в base64, в базе данных"
       },
       "session_id": {
@@ -559,6 +559,71 @@
         "type": "integer",
         "example": 56,
         "description": "оценка сеанса речевой реабилитации",
+        "nullable": true
+      },
+      "speech_score": {
+        "type": "integer",
+        "example": 35,
+        "description": "оценка качества речи",
+        "nullable": true
+      },
+      "session_compares": {
+        "type": "object",
+        "properties": {
+          "compared_session_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/session_id"
+              },
+              {
+                "example": 1338
+              },
+              {
+                "description": "сеанс, с которым выполнялось сравнение"
+              }
+            ]
+          },
+          "session_score": {
+            "$ref": "#/components/schemas/session_score"
+          }
+        },
+        "description": "результат сравнения сеансов",
+        "nullable": true
+      },
+      "speech_compares": {
+        "type": "object",
+        "properties": {
+          "compared_session_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/session_id"
+              },
+              {
+                "example": 1338
+              },
+              {
+                "description": "сеанс, в котором была выбрана речь для сравнения"
+              }
+            ]
+          },
+          "compared_speech_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/speech_id"
+              },
+              {
+                "example": 2
+              },
+              {
+                "description": "речь, с которой выполнялось сравнение"
+              }
+            ]
+          },
+          "speech_score": {
+            "$ref": "#/components/schemas/speech_score"
+          }
+        },
+        "description": "результат сравнения сеансов",
         "nullable": true
       },
       "post_patient_info": {
@@ -658,9 +723,9 @@
           "doctor_info": {
             "type": "array",
             "items": {
-              "oneOf": [
+              "allOf": [
                 {
-                  "type": "integer"
+                  "type": "string"
                 }
               ]
             },
@@ -711,10 +776,12 @@
           "speech_id": {
             "$ref": "#/components/schemas/speech_id"
           },
-          "speech_score": {
-            "type": "number",
-            "example": 50.5,
-            "description": "Оценка качества речи"
+          "speech_compares_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/speech_compares"
+            },
+            "description": "результаты сравнения речи с другой речью"
           },
           "speech_type": {
             "type": "string",
@@ -728,6 +795,11 @@
             "type": "boolean",
             "example": true,
             "description": "флаг, означающий, являелится ли речь эталоном (определяется сервером на основании типа сеанса, в котором произнесена речь, - эталонный он или нет)"
+          },
+          "real_value": {
+            "type": "string",
+            "example": "кась",
+            "description": "реальное значение слога или фразы, которое должно было быть произнесено"
           }
         }
       },
@@ -750,6 +822,14 @@
             "type": "boolean",
             "example": true,
             "description": "флаг, указывающий на это, является ли сеанс эталонным"
+          },
+          "session_type": {
+            "type": "string",
+            "enum": [
+              "фразы",
+              "слоги"
+            ],
+            "description": "тип биологического сигнала, записываемый в рамках одного сеанса"
           }
         }
       },
@@ -760,13 +840,24 @@
           "session_id": {
             "$ref": "#/components/schemas/session_id"
           },
-          "session_score": {
-            "$ref": "#/components/schemas/session_score"
+          "session_compares_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/session_compares"
+            }
           },
           "is_reference_session": {
             "type": "boolean",
             "example": true,
             "description": "флаг, указывающий на это, является ли сеанс эталонным"
+          },
+          "session_type": {
+            "type": "string",
+            "enum": [
+              "фразы",
+              "слоги"
+            ],
+            "description": "тип биологического сигнала, записываемый в рамках одного сеанса"
           }
         }
       },
