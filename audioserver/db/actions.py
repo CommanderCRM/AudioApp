@@ -4,7 +4,7 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable,
                      SpeechSessionTable, GetInfoSpeechArray, GetSessionInfo,
                      GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
-                     GetPhrasesInfo)
+                     GetPhrasesInfo, GetSessionInfoArray)
 
 engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres",
                        echo=True)
@@ -55,10 +55,10 @@ def insert_patient(patient: PatientTable, doctor_patient_list: List[DoctorPatien
         session.refresh(patient)
         return
 
-def select_all_patients():
+def select_all_patients(limit: int):
     """Получение всех пациентов из БД (короткая модель)"""
     with Session(engine) as session:
-        patients = session.query(PatientTable).all()
+        patients = session.query(PatientTable).limit(limit).all()
         return [convert_table_to_model(patient) for patient in patients]
 
 def select_patient_by_key(card_number: str):
@@ -90,7 +90,8 @@ def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
         speech_type=speech_info.speech_type,
         base64_value=speech_info.base64_value,
         base64_segment_value=speech_info.base64_value_segment,
-        is_reference_speech=is_reference_speech
+        is_reference_speech=is_reference_speech,
+        real_value=speech_info.real_value
     )
     with Session(engine) as session:
         session.add(speech_table)
@@ -117,6 +118,15 @@ def select_session_info(_, session_id):
                               is_reference_session=session_info.is_reference_session,
                               speech_array=speech_array)
 
+def select_session_patient_info(session_id):
+    """Получение информации o сеансе для пациента"""
+    with Session(engine) as session:
+        session_info = session.exec(select(SessionTable).where(SessionTable.session_id == session_id)).first()
+
+        return GetSessionInfoArray(session_id=session_info.session_id,
+                                   session_score=session_info.session_score,
+                                   is_reference_session=session_info.is_reference_session)
+
 def select_session_by_key(session_number: int):
     """Получение сеанса по ключу"""
     with Session(engine) as db_session:
@@ -137,7 +147,7 @@ def select_patient_and_sessions(card_number: str):
         patient_info = convert_table_to_model(patient)
 
         patient_sessions = session.exec(select(SessionTable).where(SessionTable.card_number == card_number)).all()
-        session_info_list = [select_session_info(card_number, session.session_id) for session in patient_sessions]
+        session_info_list = [select_session_patient_info(session.session_id) for session in patient_sessions]
 
         return GetSessionPatientInfo(get_patient_info=patient_info, sessions=session_info_list)
 
