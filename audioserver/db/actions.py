@@ -71,6 +71,7 @@ def insert_session_info(card_number: str, session_info: PostSessionInfo):
     """Запись информации o сессии в БД"""
     session_table = SessionTable(
         is_reference_session=session_info.is_reference_session,
+        session_type=session_info.session_type,
         card_number=card_number
     )
     with Session(engine) as session:
@@ -114,8 +115,7 @@ def select_session_info(_, session_id):
             speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
             speech_array.append(GetInfoSpeechArray(**speech_info.__dict__))
 
-        return GetSessionInfo(session_score=session_info.session_score,
-                              is_reference_session=session_info.is_reference_session,
+        return GetSessionInfo(is_reference_session=session_info.is_reference_session,
                               speech_array=speech_array)
 
 def select_session_patient_info(session_id):
@@ -124,7 +124,6 @@ def select_session_patient_info(session_id):
         session_info = session.exec(select(SessionTable).where(SessionTable.session_id == session_id)).first()
 
         return GetSessionInfoArray(session_id=session_info.session_id,
-                                   session_score=session_info.session_score,
                                    is_reference_session=session_info.is_reference_session)
 
 def select_session_by_key(session_number: int):
