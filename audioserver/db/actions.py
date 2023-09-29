@@ -124,7 +124,8 @@ def select_session_patient_info(session_id):
         session_info = session.exec(select(SessionTable).where(SessionTable.session_id == session_id)).first()
 
         return GetSessionInfoArray(session_id=session_info.session_id,
-                                   is_reference_session=session_info.is_reference_session)
+                                   is_reference_session=session_info.is_reference_session,
+                                   session_type=session_info.session_type)
 
 def select_session_by_key(session_number: int):
     """Получение сеанса по ключу"""
