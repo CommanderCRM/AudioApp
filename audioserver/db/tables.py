@@ -19,6 +19,11 @@ class SpeechType(str, Enum):
     PHRASE = "фраза"
     SYLLABLE = "слог"
 
+class SessionType(str, Enum):
+    """Массив типов сессии"""
+    PHRASES = "фразы"
+    SYLLABLES = "слоги"
+
 class PatientTable(SQLModel, table=True):
     """Таблица пациента"""
     __tablename__: str = "patient_table"
@@ -218,6 +223,10 @@ class PostSessionInfo(SQLModel):
         title="true",
         description="Флаг, указывающий на то, является ли сеанс эталонным"
     )
+    session_type: SessionType = Field(
+        title="фразы",
+        description="Тип биологического сигнала, записываемый в рамках одного сеанса"
+    )
 
 class SessionTable(SQLModel, table=True):
     """Таблица сессии"""
@@ -227,9 +236,9 @@ class SessionTable(SQLModel, table=True):
         title="true",
         description="Флаг, указывающий на то, является ли сеанс эталонным"
     )
-    session_score: Optional[float] = Field(
-        title="57.5",
-        description="Оценка сеанса речевой реабилитации"
+    session_type: SessionType = Field(
+        title="фразы",
+        description="Тип биологического сигнала, записываемый в рамках одного сеанса"
     )
     card_number: str = Field(foreign_key="patient_table.card_number")
 
@@ -248,10 +257,6 @@ class SpeechTable(SQLModel, table=True):
     base64_segment_value: Optional[str] = Field(
         title="UklGRgYvAABXQVZFZm",
         description="Сегментированное значение речи, закодированное в base64"
-    )
-    speech_score: float = Field(
-        title="50.7",
-        description="Оценка речи"
     )
     is_reference_speech: bool = Field(
         title="true",
@@ -274,10 +279,6 @@ class GetInfoSpeechArray(SQLModel):
     speech_id: int = Field(
         title="1",
         description="Идентификатор речи"
-    )
-    speech_score: Optional[float] = Field(
-        title="50.7",
-        description="Оценка речи"
     )
     speech_type: SpeechType = Field(
         title="слог",
@@ -317,13 +318,13 @@ class GetSessionInfoArray(SQLModel):
         title="1",
         description="Идентификатор сеанса в базе данных"
     )
-    session_score: Optional[float] = Field(
-        title="57.5",
-        description="Оценка сеанса речевой реабилитации"
-    )
     is_reference_session: bool = Field(
         title="true",
         description="Флаг, указывающий на то, является ли сеанс эталонным"
+    )
+    session_type: SessionType = Field(
+        title="фразы",
+        description="Тип биологического сигнала, записываемый в рамках одного сеанса"
     )
 
 class GetSessionPatientInfo(SQLModel):
