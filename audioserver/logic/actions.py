@@ -1,10 +1,12 @@
 from typing import Tuple, List
+import statistics
 from sqlmodel import Session, create_engine, select
 from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo,
                      PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable,
                      SpeechSessionTable, GetInfoSpeechArray, GetSessionInfo,
                      GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
                      GetPhrasesInfo, GetSessionInfoArray)
+from .actionsaudio import compare_sessions_dtw
 
 engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres",
                        echo=True)
@@ -187,12 +189,10 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
     session_1_speeches = get_session_speech_array(session_1_id)
     session_2_speeches = get_session_speech_array(session_2_id)
 
-    print(session_1_speeches)
-    print(session_2_speeches)
-
     comparable_speech_ids = {}
     comparable_key = 0
 
+    # Получение тех записей речи, которые можно сравнить
     for speech_1 in session_1_speeches:
         for speech_2 in session_2_speeches:
             if speech_1.speech_type == speech_2.speech_type and speech_1.real_value == speech_2.real_value:
@@ -204,11 +204,15 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
     speech_values_dict = {}
     speech_value_key = 0
 
+    # Получение base64 значений сравниваемых записей речи
     for comparable_key, speech_ids in comparable_speech_ids.items():
         speech_1_value = get_speech_value(speech_ids[0])
         speech_2_value = get_speech_value(speech_ids[1])
-        print(f'speech 1 value, speech ID {speech_ids[0]}:', speech_1_value, f'speech 2 value, speech ID {speech_ids[1]}:', speech_2_value)
         speech_values_dict[speech_value_key] = [speech_1_value, speech_2_value]
         speech_value_key += 1
 
-    print(speech_values_dict)
+    # Получение расстояний DTW для каждой пары слогов и общей оценки сеанса (среднее)
+    dtw_distances = compare_sessions_dtw(speech_values_dict)
+    print(dtw_distances)
+    dtw_mean = statistics.mean(dtw_distances.values())
+    print(dtw_mean)

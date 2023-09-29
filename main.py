@@ -1,8 +1,8 @@
-from audiotools.tools import AudioFile
-from audiopreproc.preprocessing import AudioPreprocessor
-from audiopreproc.voiceactivity import VoiceActivityDetector
-from audiometrics.metrics import AudioMetrics
-from audiosegm.segmentation import Segmentation
+from audioserver.logic.audiotools.tools import AudioFile
+from audioserver.logic.audiopreproc.preprocessing import AudioPreprocessor
+from audioserver.logic.audiopreproc.voiceactivity import VoiceActivityDetector
+from audioserver.logic.audiometrics.metrics import AudioMetrics
+from audioserver.logic.audiosegm.segmentation import Segmentation
 
 file = AudioFile('1.wav')
 y, sr = file.load()

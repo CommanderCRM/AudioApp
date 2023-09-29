@@ -2,8 +2,8 @@ from enum import Enum
 from fastapi import FastAPI, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from db.tables import PostPatientInfo, PostSessionInfo, PostSpeechInfo
-from db.actions import (insert_patient, select_all_patients, select_patient_by_key,
+from logic.tables import PostPatientInfo, PostSessionInfo, PostSpeechInfo
+from logic.actions import (insert_patient, select_all_patients, select_patient_by_key,
                         convert_full_model_to_table, insert_session_info, insert_speech,
                         select_session_info, select_speech_info, select_session_by_key,
                         select_patient_and_sessions, select_phrases_and_syllables,
