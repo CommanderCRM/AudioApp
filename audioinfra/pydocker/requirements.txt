@@ -9,3 +9,5 @@ soundfile==0.12.1
 uvicorn[standard]==0.23.2
 sqlmodel==0.0.8
 psycopg2-binary==2.9.7
+Levenshtein==0.22.0
+vosk==0.3.45
