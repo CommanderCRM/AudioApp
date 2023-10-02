@@ -14,6 +14,11 @@ class AudioFile:
         y, sr = librosa.load(self.file, sr=None)
         return y, sr
 
+    def load_in_16k(self):
+        """Загрузка файла в частоте дискретизации 16кГц"""
+        y, sr = librosa.load(self.file, sr=16000)
+        return y,sr
+
     def save(self, y, sr, outfile):
         """Запись аудиофайла в новый"""
         sf.write(outfile, y, sr)
