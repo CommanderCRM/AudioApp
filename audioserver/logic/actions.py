@@ -201,8 +201,6 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
                 comparable_speech_ids[comparable_key] = [speech_1.speech_id, speech_2.speech_id]
                 comparable_key += 1
 
-    print(comparable_speech_ids)
-
     speech_values_dict = {}
     speech_value_key = 0
 
@@ -215,9 +213,7 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
 
     # Получение расстояний DTW для каждой пары слогов и общей оценки сеанса (среднее)
     dtw_distances = compare_sessions_dtw(speech_values_dict)
-    print(dtw_distances)
     dtw_mean = statistics.mean(dtw_distances.values())
-    print(dtw_mean)
 
     # Заполнение таблицы сравнения сеансов
     with Session(engine) as session:
