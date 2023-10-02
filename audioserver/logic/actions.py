@@ -111,6 +111,7 @@ def select_session_info(_, session_id):
     """Получение информации o сеансе и записях речи в нем"""
     with Session(engine) as session:
         session_info = session.exec(select(SessionTable).where(SessionTable.session_id == session_id)).first()
+        session_score = session.exec(select(SessionCompareTable.session_score).where(SessionCompareTable.session_id == session_id)).first()
         speech_session_info = session.exec(select(SpeechSessionTable.speech_id).where(SpeechSessionTable.session_id == session_id)).all()
 
         speech_array = []
@@ -118,7 +119,8 @@ def select_session_info(_, session_id):
             speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
             speech_array.append(GetInfoSpeechArray(**speech_info.__dict__))
 
-        return GetSessionInfo(is_reference_session=session_info.is_reference_session,
+        return GetSessionInfo(session_score=session_score,
+                              is_reference_session=session_info.is_reference_session,
                               speech_array=speech_array)
 
 def select_session_patient_info(session_id):
