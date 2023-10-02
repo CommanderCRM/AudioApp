@@ -1,10 +1,13 @@
 from typing import Tuple, List
+import statistics
 from sqlmodel import Session, create_engine, select
 from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo,
                      PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable,
                      SpeechSessionTable, GetInfoSpeechArray, GetSessionInfo,
                      GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
-                     GetPhrasesInfo, GetSessionInfoArray)
+                     GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
+                     SpeechCompareTable)
+from .actionsaudio import compare_sessions_dtw
 
 engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres",
                        echo=True)
@@ -164,3 +167,72 @@ def select_phrases_and_syllables():
         syllables_list = [result[0].value for result in syllables_results]
 
         return GetPhrasesInfo(phrases=phrases_list, syllables=syllables_list)
+
+def get_session_speech_array(session_id: int):
+    """Получение всех записей речи в сеансе"""
+    with Session(engine) as session:
+        speech_session_info = session.exec(select(SpeechSessionTable.speech_id).where(SpeechSessionTable.session_id == session_id)).all()
+
+        speech_array = []
+        for speech_id in speech_session_info:
+            speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
+            speech_array.append(GetInfoSpeechArray(**speech_info.__dict__))
+
+        return speech_array
+
+def get_speech_value(speech_id: int):
+    """Получение base64-значения речи по ee ID"""
+    with Session(engine) as session:
+        speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
+        return speech_info.base64_value
+
+def compare_two_sessions(_, session_1_id: int, session_2_id: int):
+    """Сравнение двух сеансов"""
+    session_1_speeches = get_session_speech_array(session_1_id)
+    session_2_speeches = get_session_speech_array(session_2_id)
+
+    comparable_speech_ids = {}
+    comparable_key = 0
+
+    # Получение тех записей речи, которые можно сравнить
+    for speech_1 in session_1_speeches:
+        for speech_2 in session_2_speeches:
+            if speech_1.speech_type == speech_2.speech_type and speech_1.real_value == speech_2.real_value:
+                comparable_speech_ids[comparable_key] = [speech_1.speech_id, speech_2.speech_id]
+                comparable_key += 1
+
+    speech_values_dict = {}
+    speech_value_key = 0
+
+    # Получение base64 значений сравниваемых записей речи
+    for comparable_key, speech_ids in comparable_speech_ids.items():
+        speech_1_value = get_speech_value(speech_ids[0])
+        speech_2_value = get_speech_value(speech_ids[1])
+        speech_values_dict[speech_value_key] = [speech_1_value, speech_2_value]
+        speech_value_key += 1
+
+    # Получение расстояний DTW для каждой пары слогов и общей оценки сеанса (среднее)
+    dtw_distances = compare_sessions_dtw(speech_values_dict)
+    dtw_mean = statistics.mean(dtw_distances.values())
+
+    # Заполнение таблицы сравнения сеансов
+    with Session(engine) as session:
+        session_compare = SessionCompareTable(
+            session_id=session_1_id,
+            compared_session_id=session_2_id,
+            session_score=dtw_mean,
+        )
+        session.add(session_compare)
+        session.commit()
+
+
+    # Заполнение таблицы сравнения записей речи
+    with Session(engine) as session:
+        for key, value in comparable_speech_ids.items():
+            speech_compare = SpeechCompareTable(
+                speech_id=value[0],
+                compared_speech_id=value[1],
+                speech_score=dtw_distances[key],
+            )
+            session.add(speech_compare)
+            session.commit()

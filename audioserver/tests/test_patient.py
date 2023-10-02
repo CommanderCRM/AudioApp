@@ -1,7 +1,7 @@
 from datetime import date
 import pytest
 from pydantic import ValidationError
-from db.tables import PostPatientInfo
+from logic.tables import PostPatientInfo
 
 patient_data = {
     'medical_card_number': '111',

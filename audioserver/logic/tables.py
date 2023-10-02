@@ -355,3 +355,25 @@ class SyllablesPhrasesTable(SQLModel, table=True):
         title="День был удивительно хорош",
         description="Значение фразы либо слога"
     )
+
+class SpeechCompareTable(SQLModel, table=True):
+    """Таблица сравнения речи"""
+    __tablename__: str = "speech_compare_table"
+    speech_compare_id: Optional[int] = Field(default=None, primary_key=True)
+    speech_id: int = Field(foreign_key="speech_table.speech_id")
+    compared_speech_id: int = Field(foreign_key="speech_table.speech_id")
+    speech_score: float = Field(
+        title="57.5",
+        description="Оценка речи"
+    )
+
+class SessionCompareTable(SQLModel, table=True):
+    """Таблица сравнения сеансов"""
+    __tablename__: str = "session_compare_table"
+    session_compare_id: Optional[int] = Field(default=None, primary_key=True)
+    session_id: int = Field(foreign_key="session_table.session_id")
+    compared_session_id: int = Field(foreign_key="session_table.session_id")
+    session_score: float = Field(
+        title="57.5",
+        description="Оценка сеанса"
+    )
