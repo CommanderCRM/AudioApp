@@ -5,7 +5,8 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable,
                      SpeechSessionTable, GetInfoSpeechArray, GetSessionInfo,
                      GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
-                     GetPhrasesInfo, GetSessionInfoArray)
+                     GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
+                     SpeechCompareTable)
 from .actionsaudio import compare_sessions_dtw
 
 engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres",
@@ -217,3 +218,25 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
     print(dtw_distances)
     dtw_mean = statistics.mean(dtw_distances.values())
     print(dtw_mean)
+
+    # Заполнение таблицы сравнения сеансов
+    with Session(engine) as session:
+        session_compare = SessionCompareTable(
+            session_id=session_1_id,
+            compared_session_id=session_2_id,
+            session_score=dtw_mean,
+        )
+        session.add(session_compare)
+        session.commit()
+
+
+    # Заполнение таблицы сравнения записей речи
+    with Session(engine) as session:
+        for key, value in comparable_speech_ids.items():
+            speech_compare = SpeechCompareTable(
+                speech_id=value[0],
+                compared_speech_id=value[1],
+                speech_score=dtw_distances[key],
+            )
+            session.add(speech_compare)
+            session.commit()
