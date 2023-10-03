@@ -3,10 +3,10 @@ import statistics
 from sqlmodel import Session, create_engine, select
 from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo,
                      PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable,
-                     SpeechSessionTable, GetInfoSpeechArray, GetSessionInfo,
+                     SpeechSessionTable, GetSpeechInfoArray, GetSessionInfo,
                      GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
                      GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
-                     SpeechCompareTable)
+                     SpeechCompareTable, SpeechCompares, SessionCompares)
 from .actionsaudio import compare_sessions_dtw
 
 engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres",
@@ -114,10 +114,25 @@ def select_session_info(_, session_id):
         session_score = session.exec(select(SessionCompareTable.session_score).where(SessionCompareTable.session_id == session_id)).first()
         speech_session_info = session.exec(select(SpeechSessionTable.speech_id).where(SpeechSessionTable.session_id == session_id)).all()
 
+        # В каждом сеансе может быть несколько записей речи, заполняем информацию о каждой
         speech_array = []
         for speech_id in speech_session_info:
             speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
-            speech_array.append(GetInfoSpeechArray(**speech_info.__dict__))
+            speech_compares = session.exec(select(SpeechCompareTable).where(SpeechCompareTable.speech_id == speech_id)).all()
+
+            # Также каждая запись могла сравниваться с несколькими другими записями, заполнение истории сравнений
+            speech_compares_history = []
+            for speech_compare in speech_compares:
+                compared_session_id = session.exec(select(SpeechSessionTable.session_id).where(SpeechSessionTable.speech_id == speech_compare.compared_speech_id)).first()
+                speech_compares_history.append(SpeechCompares(compared_session_id=compared_session_id,
+                                                              compared_speech_id=speech_compare.compared_speech_id,
+                                                              speech_score=speech_compare.speech_score))
+
+            speech_array.append(GetSpeechInfoArray(speech_id=speech_info.speech_id,
+                                                   speech_compares_history=speech_compares_history,
+                                                   speech_type=speech_info.speech_type,
+                                                   is_reference_speech=speech_info.is_reference_speech,
+                                                   real_value=speech_info.real_value))
 
         return GetSessionInfo(session_score=session_score,
                               is_reference_session=session_info.is_reference_session,
@@ -128,7 +143,22 @@ def select_session_patient_info(session_id):
     with Session(engine) as session:
         session_info = session.exec(select(SessionTable).where(SessionTable.session_id == session_id)).first()
 
+        session_compares = session.exec(
+            select(SessionCompareTable)
+            .where(SessionCompareTable.session_id == session_id)
+        ).all()
+
+        # Сеансы могли сравниваться с несколькими другими, получаем историю сравнений
+        session_compares_history = [
+            SessionCompares(
+                compared_session_id=compare.compared_session_id,
+                session_score=compare.session_score
+            )
+            for compare in session_compares
+        ]
+
         return GetSessionInfoArray(session_id=session_info.session_id,
+                                   session_compares_history=session_compares_history,
                                    is_reference_session=session_info.is_reference_session,
                                    session_type=session_info.session_type)
 
@@ -178,7 +208,7 @@ def get_session_speech_array(session_id: int):
         speech_array = []
         for speech_id in speech_session_info:
             speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
-            speech_array.append(GetInfoSpeechArray(**speech_info.__dict__))
+            speech_array.append(GetSpeechInfoArray(**speech_info.__dict__))
 
         return speech_array
 

@@ -274,12 +274,28 @@ class SpeechSessionTable(SQLModel, table=True):
     speech_id: int = Field(foreign_key="speech_table.speech_id")
     session_id: int = Field(foreign_key="session_table.session_id")
 
-class GetInfoSpeechArray(SQLModel):
+class SpeechCompares(SQLModel):
+    """Данные о сравнении речи"""
+    compared_session_id: int = Field(
+        title="1",
+        description="Сеанс, в котором была выбрана речь для сравнения"
+    )
+    compared_speech_id: int = Field(
+        title="2",
+        description="Речь, с которой выполнялось сравнение"
+    )
+    speech_score: Optional[float] = Field(
+        title="35.55",
+        description="Оценка качества речи"
+    )
+
+class GetSpeechInfoArray(SQLModel):
     """Информация o речи для отображения на клиенте"""
     speech_id: int = Field(
         title="1",
         description="Идентификатор речи"
     )
+    speech_compares_history: Optional[List[SpeechCompares]]
     speech_type: SpeechType = Field(
         title="слог",
         description="Биологический тип сигнала"
@@ -303,7 +319,7 @@ class GetSessionInfo(SQLModel):
         title="true",
         description="Флаг, указывающий на то, является ли сеанс эталонным"
     )
-    speech_array: List[GetInfoSpeechArray]
+    speech_array: List[GetSpeechInfoArray]
 
 class GetSpeechInfo(SQLModel):
     """Информация o речи"""
@@ -312,12 +328,24 @@ class GetSpeechInfo(SQLModel):
         description="Записанный звуковой файл, закодированный в base64"
     )
 
+class SessionCompares(SQLModel):
+    """История сравнения сеансов"""
+    compared_session_id: int = Field(
+        title="1",
+        description="Сеанс, с которым выполнялось сравнение"
+    )
+    session_score: Optional[int] = Field(
+        title="30.33",
+        description="Оценка сеанса речевой реабилитации"
+    )
+
 class GetSessionInfoArray(SQLModel):
     """Информация o сессиях для пациента"""
     session_id: int = Field(
         title="1",
         description="Идентификатор сеанса в базе данных"
     )
+    session_compares_history: Optional[List[SessionCompares]]
     is_reference_session: bool = Field(
         title="true",
         description="Флаг, указывающий на то, является ли сеанс эталонным"
