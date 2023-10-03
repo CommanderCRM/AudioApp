@@ -1,4 +1,3 @@
-import os
 import re
 import wave
 import Levenshtein
@@ -35,5 +34,6 @@ def levenstein(result):
     # Обращение происходит только к первому эталону
     levenstein_distance = Levenshtein.distance(str(result), dict_for_levenstein[0])
     original_length = len(dict_for_levenstein[0])
-    recognition_accuracy = round((levenstein_distance/original_length)*100, 2)
+    recognition_error = round((levenstein_distance/original_length)*100, 2)
+    recognition_accuracy = round((100 - recognition_error), 2)
     return levenstein_distance, original_length, recognition_accuracy
