@@ -67,7 +67,8 @@ def select_all_patients(limit: int):
 def select_patient_by_key(card_number: str):
     """Получение пациента по ключу"""
     with Session(engine) as session:
-        patient = session.exec(select(PatientTable).where(PatientTable.card_number == card_number)).first()
+        patient = session.exec(select(PatientTable)
+                               .where(PatientTable.card_number == card_number)).first()
         return bool(patient)
 
 def insert_session_info(card_number: str, session_info: PostSessionInfo):
@@ -110,20 +111,26 @@ def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
 def select_session_info(_, session_id):
     """Получение информации o сеансе и записях речи в нем"""
     with Session(engine) as session:
-        session_info = session.exec(select(SessionTable).where(SessionTable.session_id == session_id)).first()
-        session_score = session.exec(select(SessionCompareTable.session_score).where(SessionCompareTable.session_id == session_id)).first()
-        speech_session_info = session.exec(select(SpeechSessionTable.speech_id).where(SpeechSessionTable.session_id == session_id)).all()
+        session_info = session.exec(select(SessionTable)
+                                    .where(SessionTable.session_id == session_id)).first()
+        session_score = session.exec(select(SessionCompareTable.session_score)
+                                     .where(SessionCompareTable.session_id == session_id)).first()
+        speech_session_info = session.exec(select(SpeechSessionTable.speech_id)
+                                           .where(SpeechSessionTable.session_id == session_id)).all()
 
         # В каждом сеансе может быть несколько записей речи, заполняем информацию о каждой
         speech_array = []
         for speech_id in speech_session_info:
-            speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
-            speech_compares = session.exec(select(SpeechCompareTable).where(SpeechCompareTable.speech_id == speech_id)).all()
+            speech_info = session.exec(select(SpeechTable)
+                                       .where(SpeechTable.speech_id == speech_id)).first()
+            speech_compares = session.exec(select(SpeechCompareTable)
+                                           .where(SpeechCompareTable.speech_id == speech_id)).all()
 
             # Также каждая запись могла сравниваться с несколькими другими записями, заполнение истории сравнений
             speech_compares_history = []
             for speech_compare in speech_compares:
-                compared_session_id = session.exec(select(SpeechSessionTable.session_id).where(SpeechSessionTable.speech_id == speech_compare.compared_speech_id)).first()
+                compared_session_id = session.exec(select(SpeechSessionTable.session_id)
+                                                   .where(SpeechSessionTable.speech_id == speech_compare.compared_speech_id)).first()
                 speech_compares_history.append(SpeechCompares(compared_session_id=compared_session_id,
                                                               compared_speech_id=speech_compare.compared_speech_id,
                                                               speech_score=speech_compare.speech_score))
@@ -141,7 +148,8 @@ def select_session_info(_, session_id):
 def select_session_patient_info(session_id):
     """Получение информации o сеансе для пациента"""
     with Session(engine) as session:
-        session_info = session.exec(select(SessionTable).where(SessionTable.session_id == session_id)).first()
+        session_info = session.exec(select(SessionTable)
+                                    .where(SessionTable.session_id == session_id)).first()
 
         session_compares = session.exec(
             select(SessionCompareTable)
@@ -165,24 +173,29 @@ def select_session_patient_info(session_id):
 def select_session_by_key(session_number: int):
     """Получение сеанса по ключу"""
     with Session(engine) as db_session:
-        session = db_session.exec(select(SessionTable).where(SessionTable.session_id == session_number)).first()
+        session = db_session.exec(select(SessionTable)
+                                  .where(SessionTable.session_id == session_number)).first()
         return bool(session)
 
 def select_speech_info(_, __, speech_id):
     """Получение информации o речи"""
     with Session(engine) as session:
-        speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
+        speech_info = session.exec(select(SpeechTable)
+                                   .where(SpeechTable.speech_id == speech_id)).first()
         speech_value = speech_info.base64_value
         return GetSpeechInfo(base64_value=speech_value)
 
 def select_patient_and_sessions(card_number: str):
     """Получение информации o пациенте и ero сеансах"""
     with Session(engine) as session:
-        patient = session.exec(select(PatientTable).where(PatientTable.card_number == card_number)).first()
+        patient = session.exec(select(PatientTable)
+                               .where(PatientTable.card_number == card_number)).first()
         patient_info = convert_table_to_model(patient)
 
-        patient_sessions = session.exec(select(SessionTable).where(SessionTable.card_number == card_number)).all()
-        session_info_list = [select_session_patient_info(session.session_id) for session in patient_sessions]
+        patient_sessions = session.exec(select(SessionTable)
+                                        .where(SessionTable.card_number == card_number)).all()
+        session_info_list = [select_session_patient_info(session.session_id)
+                             for session in patient_sessions]
 
         return GetSessionPatientInfo(get_patient_info=patient_info, sessions=session_info_list)
 
@@ -203,11 +216,13 @@ def select_phrases_and_syllables():
 def get_session_speech_array(session_id: int):
     """Получение всех записей речи в сеансе"""
     with Session(engine) as session:
-        speech_session_info = session.exec(select(SpeechSessionTable.speech_id).where(SpeechSessionTable.session_id == session_id)).all()
+        speech_session_info = session.exec(select(SpeechSessionTable.speech_id)
+                                           .where(SpeechSessionTable.session_id == session_id)).all()
 
         speech_array = []
         for speech_id in speech_session_info:
-            speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
+            speech_info = session.exec(select(SpeechTable)
+                                       .where(SpeechTable.speech_id == speech_id)).first()
             speech_array.append(GetSpeechInfoArray(**speech_info.__dict__))
 
         return speech_array
@@ -215,7 +230,8 @@ def get_session_speech_array(session_id: int):
 def get_speech_value(speech_id: int):
     """Получение base64-значения речи по ee ID"""
     with Session(engine) as session:
-        speech_info = session.exec(select(SpeechTable).where(SpeechTable.speech_id == speech_id)).first()
+        speech_info = session.exec(select(SpeechTable)
+                                   .where(SpeechTable.speech_id == speech_id)).first()
         return speech_info.base64_value
 
 def compare_two_sessions(_, session_1_id: int, session_2_id: int):

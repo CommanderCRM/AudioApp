@@ -41,7 +41,8 @@ print(f'Voice activity detection in {file8_name}:', VAD.detect_voice_activity(y8
 
 file8_base64_string = file8.encode_base64()
 AudioFile.decode_base64(file8_base64_string, '888.wav')
-print(f'Difference between {file8_name} and its decoded base64 version:', AudioFile.compare_files('8.wav', '888.wav'))
+print(f'Difference between {file8_name} and its decoded base64 version:',
+      AudioFile.compare_files('8.wav', '888.wav'))
 
 # Пример распознавания речи и расчета расстояния Левенштейна
 file = AudioFile('3.wav')
@@ -52,9 +53,9 @@ file_path = current_path.joinpath('3_16k.wav')
 model_path = os.path.join(os.getcwd(), 'audiorecognition', 'vosk-model-ru-0.22')
 
 
-result = recognize_vosk(file_path, model_path)
-print('Recognition result: ', result)
-levenstein_distance, original_length, recognition_accuracy = levenstein(result)
+RESULT = recognize_vosk(file_path, model_path)
+print('Recognition result: ', RESULT)
+levenstein_distance, original_length, recognition_accuracy = levenstein(RESULT)
 print('Levenstein distance: ', levenstein_distance)
 print('Original phrase length: ', original_length)
 print('Recognition accuracy: ', recognition_accuracy)
