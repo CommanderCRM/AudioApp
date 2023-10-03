@@ -25,11 +25,13 @@ class Segmentation:
         e_st = alpha * e_avg
         e_ut = beta * e_avg
 
-        classification = ['S' if ste < e_st else 'UV' if e_st < ste < e_ut else 'V' for ste in pow_frames]
+        classification = ['S' if ste < e_st else 'UV' if e_st < ste < e_ut else 'V'
+                          for ste in pow_frames]
 
         # где ставить границы
         frame_times = np.arange(num_frames) * overlap / sr
-        border_frames = [i + 1 for i in range(num_frames - 1) if classification[i+1] != classification[i]]
+        border_frames = [i + 1 for i in range(num_frames - 1)
+                         if classification[i+1] != classification[i]]
         borders_exact = [frame_times[i] for i in border_frames]
         borders_exact = np.array(borders_exact)
 
@@ -43,7 +45,8 @@ class Segmentation:
         borders_exact = borders_exact.tolist()
 
         # создание выходной структуры: начало сегмента, конец сегмента, тип сегмента
-        borders_and_classes = [(borders_exact[i - 1] if i > 0 else 'Begin', borders_exact[i], classification_reduced[i]) for i in range(len(borders_exact))]
+        borders_and_classes = [(borders_exact[i - 1] if i > 0 else 'Begin', borders_exact[i], classification_reduced[i])
+                               for i in range(len(borders_exact))]
         borders_and_classes.append((borders_exact[-1], 'End', classification_reduced[-1]))
 
         return borders_and_classes
