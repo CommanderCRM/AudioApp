@@ -27,4 +27,5 @@ services:
       - sql
     volumes:
       - ..:/app
-    command: ./audioinfra/run_server.sh
+    working_dir: /app/audioserver
+    tty: true
