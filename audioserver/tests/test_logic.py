@@ -27,4 +27,4 @@ def test_insert_patient():
     insert_patient(patient_table, [doctor_patient_table])
 
     patient_in_db = test_session.get(PatientTable, patient_table.card_number)
-    assert patient_in_db is not None
+    assert patient_in_db is not None # nosec
