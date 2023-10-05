@@ -4,14 +4,17 @@ from pydantic import ValidationError
 from logic.tables import PostPatientInfo
 
 patient_data = {
-    'medical_card_number': '111',
-    'full_name': 'Иван Иванович Иванов',
-    'gender': 'm',
-    'constant_password': '',
-    'temporary_password': 'cbat',
-    'is_password_changed': False,
-    'date_of_birth': date(1990, 9, 1),
-    'town': 'Tomsk'
+    "full_name": "Иванов Иван Иванович",
+    "date_of_birth": date(1990, 7, 7),
+    "doctor_info": [
+        "user1", "user2"
+    ],
+    "hospital": "Tomsk NII",
+    "gender": "m",
+    "card_number": "111111111111",
+    "constant_password": "",
+    "temporary_password": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+    "is_password_changed": False
     }
 
 def test_correct_patient_data():
