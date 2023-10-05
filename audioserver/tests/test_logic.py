@@ -12,10 +12,10 @@ def test_insert_patient():
         card_number="111111111111",
         full_name="Test User",
         gender="M",
-        constant_password="",
+        constant_password="", # nosec
         hospital="TomskNII1",
-        temporary_password="cbat",
-        is_password_changed=0,
+        temporary_password="cbat", # nosec
+        is_password_changed=0, # nosec
         date_of_birth="2000-01-01"
     )
     doctor_patient_table = DoctorPatientTable(
