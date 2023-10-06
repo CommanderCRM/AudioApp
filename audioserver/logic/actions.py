@@ -1,5 +1,6 @@
 from typing import Tuple, List
 import statistics
+import os
 from sqlmodel import Session, create_engine, select
 from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo,
                      PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable,
@@ -9,8 +10,10 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      SpeechCompareTable, SpeechCompares, SessionCompares)
 from .actionsaudio import compare_sessions_dtw
 
-engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres",
-                       echo=True)
+if os.getenv('TESTING'):
+    engine = create_engine('sqlite:///sqlite3.db')
+else:
+    engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
 
 def convert_full_model_to_table(full_patient_model: PostPatientInfo) -> Tuple[PatientTable, List[DoctorPatientTable]]:
     """Перевод полной модели пациента в таблицу пациента
