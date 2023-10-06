@@ -243,6 +243,79 @@
         }
       }
     },
+    "/patients/{card_number}/session": {
+      "patch": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Оценить сеансы",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Информация для сравнения сеансов",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessions_id": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/session_id"
+                    },
+                    "description": "массив выбранных для оценки сеансов"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Сеанса не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
     "/patients/{card_number}/session/{session_id}": {
       "get": {
         "tags": [
@@ -358,40 +431,27 @@
             "description": "Внутренняя ошибка сервера"
           }
         }
-      }
-    },
-    "/patients/{card_number}/session/{session_1_id}/{session_2_id}": {
-      "post": {
+      },
+      "patch": {
         "tags": [
           "patients"
         ],
-        "summary": "Сравнить сеансы",
+        "summary": "Выполнить сравнение фраз с реальным значением",
         "parameters": [
-          {
-            "in": "path",
-            "name": "session_1_id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/session_id"
-            },
-            "description": "идентификатор сеанса, для которого выполняется сравнение (выбранный сеанс)"
-          },
-          {
-            "in": "path",
-            "name": "session_2_id",
-            "example": 1338,
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/session_id"
-            },
-            "description": "идентификатор сеанса, с которым планируется сравнить выбранный сеанс"
-          },
           {
             "in": "path",
             "name": "card_number",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
             }
           }
         ],
@@ -556,32 +616,36 @@
         "description": "идентификатор сеанса в базе данных"
       },
       "session_score": {
-        "type": "integer",
-        "example": 56,
+        "type": "number",
+        "example": 56.6,
         "description": "оценка сеанса речевой реабилитации",
         "nullable": true
       },
       "speech_score": {
-        "type": "integer",
-        "example": 35,
+        "type": "number",
+        "example": 35.3,
         "description": "оценка качества речи",
         "nullable": true
       },
       "session_compares": {
         "type": "object",
         "properties": {
-          "compared_session_id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/session_id"
-              },
-              {
-                "example": 1338
-              },
-              {
-                "description": "сеанс, с которым выполнялось сравнение"
-              }
-            ]
+          "compared_sessions_id": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/session_id"
+                },
+                {
+                  "example": [
+                    1338,
+                    1339
+                  ]
+                }
+              ]
+            },
+            "description": "сеанс, с которым выполнялось сравнение"
           },
           "session_score": {
             "$ref": "#/components/schemas/session_score"
@@ -607,23 +671,27 @@
             ]
           },
           "compared_speech_id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/speech_id"
-              },
-              {
-                "example": 2
-              },
-              {
-                "description": "речь, с которой выполнялось сравнение"
-              }
-            ]
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/speech_id"
+                },
+                {
+                  "example": [
+                    2,
+                    3
+                  ]
+                }
+              ]
+            },
+            "description": "речь, с которой выполнялось сравнение"
           },
           "speech_score": {
             "$ref": "#/components/schemas/speech_score"
           }
         },
-        "description": "результат сравнения сеансов",
+        "description": "результат сравнения речи",
         "nullable": true
       },
       "post_patient_info": {
@@ -781,7 +849,8 @@
             "items": {
               "$ref": "#/components/schemas/speech_compares"
             },
-            "description": "результаты сравнения речи с другой речью"
+            "description": "результаты сравнения речи с другой речью",
+            "nullable": true
           },
           "speech_type": {
             "type": "string",
@@ -870,12 +939,33 @@
             "example": true,
             "description": "флаг, указывающий на это, является ли сеанс эталонным"
           },
+          "session_type": {
+            "type": "string",
+            "enum": [
+              "фразы",
+              "слоги"
+            ],
+            "description": "тип биологического сигнала, записываемый в рамках одного сеанса"
+          },
           "speech_array": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/get_speech_info_array"
             },
             "description": "информация о произнесённой в рамках сеанса речи"
+          },
+          "session_compares": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/session_compares"
+              },
+              {
+                "description": "информация о сравнениях сеанса с другим или с реальными значениями (если список сеансов для сравнения пустой, то сравнивался с реальными значениями)"
+              },
+              {
+                "nullable": true
+              }
+            ]
           }
         }
       },
