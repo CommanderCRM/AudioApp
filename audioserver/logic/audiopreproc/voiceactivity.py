@@ -7,13 +7,13 @@ class VoiceActivityDetector():
     def detect_voice_activity(self, y, sr):
         """На основе SF, STE"""
         # Сторонние параметры (значения предложены авторами)
-        EPT = 40
-        FPT = 0.185 # кГц
-        SPT = 5
-        FRAME_TIME = 0.01
+        ept = 40
+        fpt = 0.185 # кГц
+        spt = 5
+        frame_time = 0.01
 
         # Количество фреймов в аудиоряде
-        frame_size = int(sr * FRAME_TIME)
+        frame_size = int(sr * frame_time)
         num_frames = len(y) // frame_size
         frame_size_seconds = frame_size / 1000
         frame_duration = frame_size_seconds / sr
@@ -25,14 +25,14 @@ class VoiceActivityDetector():
         frame_sfm = self.__compute_sfm(frame_fft)
 
         # Минимальные значения параметров
-        min_E = min(frame_energy[0:30])
-        min_F = min(frame_freq_f[0:30])
-        min_SF = min(frame_sfm[0:30])
+        min_enrg = min(frame_energy[0:30])
+        min_freq = min(frame_freq_f[0:30])
+        min_sfm = min(frame_sfm[0:30])
 
         # Пороги
-        thr_E = EPT * np.log(min_E)
-        thr_F = FPT
-        thr_SF = SPT
+        thr_enrg = ept * np.log(min_enrg)
+        thr_freq = fpt
+        thr_sfm = spt
 
         # Алгоритм детектирования активности
         silence_count = 0
@@ -43,11 +43,11 @@ class VoiceActivityDetector():
         segments = []
         for i in range(num_frames):
             counter = 0
-            if ((frame_energy[i]-min_E)>=thr_E):
+            if (frame_energy[i]-min_enrg)>=thr_enrg:
                 counter += 1
-            if ((frame_freq_f[i]-min_F)>=thr_F):
+            if (frame_freq_f[i]-min_freq)>=thr_freq:
                 counter += 1
-            if ((frame_sfm[i]-min_SF)>=thr_SF):
+            if (frame_sfm[i]-min_sfm)>=thr_sfm:
                 counter += 1
             if counter > 1:
                 speech_local_count += 1
@@ -64,8 +64,8 @@ class VoiceActivityDetector():
                 silence_local_count += 1
                 speech_local_count = 0
                 if silence_local_count >= ignore_silence:
-                    min_E = ((silence_count*min_E) + frame_energy[i])/(silence_count+1)
-                    thr_E = EPT * np.log(min_E)
+                    min_enrg = ((silence_count*min_enrg) + frame_energy[i])/(silence_count+1)
+                    thr_enrg = ept * np.log(min_enrg)
                     start_time = i * frame_duration
                     end_time = (i + 1) * frame_duration
                     if segments and segments[-1][0] == 'Silence':
@@ -123,9 +123,9 @@ class VoiceActivityDetector():
 
         for fft_result in frame_fft:
             spectrum_magnitudes = np.abs(fft_result)
-            G = gmean(spectrum_magnitudes)
-            A = np.mean(spectrum_magnitudes)
-            SFM = G / A if A != 0 else 0
-            frame_sfm.append(SFM)
+            geom_mean = gmean(spectrum_magnitudes)
+            arithm_mean = np.mean(spectrum_magnitudes)
+            sfm = geom_mean / arithm_mean if arithm_mean != 0 else 0
+            frame_sfm.append(sfm)
 
         return frame_sfm

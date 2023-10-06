@@ -1,6 +1,6 @@
 import noisereduce as nr
 
-class AudioPreprocessor:
+class AudioPreprocessor: # pylint: disable=R0903
     """Предобработка аудио"""
     def reduce_noise(self, y, sr):
         """Удаление шума"""
