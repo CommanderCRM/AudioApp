@@ -23,7 +23,9 @@ CREATE TABLE speech_table (
 CREATE TABLE speech_compare_table (
   speech_compare_id SERIAL PRIMARY KEY,
   speech_id INT REFERENCES speech_table(speech_id),
-  compared_speech_id INT REFERENCES speech_table(speech_id),
+  compared_speech_id_1 INT REFERENCES speech_table(speech_id),
+  compared_speech_id_2 INT REFERENCES speech_table(speech_id),
+  compared_speech_id_3 INT REFERENCES speech_table(speech_id),
   speech_score REAL
 );
 
@@ -36,8 +38,9 @@ CREATE TABLE session_table (
 
 CREATE TABLE session_compare_table (
   session_compare_id SERIAL PRIMARY KEY,
-  session_id INT REFERENCES session_table(session_id),
-  compared_session_id INT REFERENCES session_table(session_id),
+  compared_session_id_1 INT REFERENCES session_table(session_id),
+  compared_session_id_2 INT REFERENCES session_table(session_id),
+  compared_session_id_3 INT REFERENCES session_table(session_id),
   session_score REAL
 );
 
@@ -77,7 +80,7 @@ INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'ba12f65801cc7
 INSERT INTO doctor_table VALUES ('user2', 'logoped onkolog', 'Tomsk NII', 'ba12f65801cc7cec593c311bd1bb4d9a72fcc6', 'Ilia Bebrov');
 
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','Белая пелена лежала на полях');
-INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','В школу приезжали герои	фронта');
+INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','В школу приезжали герои фронта');
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','Белый пар расстилается над лужами');
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','Экипаж танка понял задачу');
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','Этот блок работает хорошо');
