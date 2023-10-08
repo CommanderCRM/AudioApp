@@ -309,7 +309,12 @@
                     "items": {
                       "$ref": "#/components/schemas/session_id"
                     },
-                    "description": "массив выбранных для оценки сеансов"
+                    "description": "массив выбранных для оценки сеансов",
+                    "example": [
+                      1,
+                      2,
+                      3
+                    ]
                   }
                 }
               }
