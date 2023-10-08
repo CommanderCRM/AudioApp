@@ -22,7 +22,6 @@ CREATE TABLE speech_table (
 
 CREATE TABLE speech_compare_table (
   speech_compare_id SERIAL PRIMARY KEY,
-  speech_id INT REFERENCES speech_table(speech_id),
   compared_speech_id_1 INT REFERENCES speech_table(speech_id),
   compared_speech_id_2 INT REFERENCES speech_table(speech_id),
   compared_speech_id_3 INT REFERENCES speech_table(speech_id),
