@@ -14,6 +14,22 @@
     {
       "name": "patients",
       "description": "Все запросы, необходимые для управления пациентами"
+    },
+    {
+      "name": "sessions",
+      "description": "Все запросы, необходимые для управления сеансами"
+    },
+    {
+      "name": "login-endpoint",
+      "description": "Запрос на вход в систему"
+    },
+    {
+      "name": "logout-endpoint",
+      "description": "Запрос на выход из системы"
+    },
+    {
+      "name": "settings",
+      "description": "Запрос на изменение пароля"
     }
   ],
   "paths": {
@@ -180,7 +196,7 @@
       },
       "post": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Создать сеанс",
         "parameters": [
@@ -208,7 +224,29 @@
         },
         "responses": {
           "200": {
-            "description": "Успешное выполнение операции"
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session_id": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/session_id"
+                        },
+                        {
+                          "description": "идентификатор созданного сеанса"
+                        },
+                        {
+                          "example": 1
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Ошибка в запросе клиента",
@@ -243,10 +281,83 @@
         }
       }
     },
+    "/patients/{card_number}/session": {
+      "patch": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Оценить сеансы",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Информация для сравнения сеансов",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "sessions_id": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/session_id"
+                    },
+                    "description": "массив выбранных для оценки сеансов"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Сеанса не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
     "/patients/{card_number}/session/{session_id}": {
       "get": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Получить информацию о сеансе и записях, записанных в его рамках",
         "parameters": [
@@ -290,7 +401,7 @@
       },
       "post": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Загрузить/записать речь",
         "parameters": [
@@ -358,40 +469,27 @@
             "description": "Внутренняя ошибка сервера"
           }
         }
-      }
-    },
-    "/patients/{card_number}/session/{session_1_id}/{session_2_id}": {
-      "post": {
+      },
+      "patch": {
         "tags": [
-          "patients"
+          "sessions"
         ],
-        "summary": "Сравнить сеансы",
+        "summary": "Выполнить сравнение фраз с реальным значением",
         "parameters": [
-          {
-            "in": "path",
-            "name": "session_1_id",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/session_id"
-            },
-            "description": "идентификатор сеанса, для которого выполняется сравнение (выбранный сеанс)"
-          },
-          {
-            "in": "path",
-            "name": "session_2_id",
-            "example": 1338,
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/session_id"
-            },
-            "description": "идентификатор сеанса, с которым планируется сравнить выбранный сеанс"
-          },
           {
             "in": "path",
             "name": "card_number",
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
             }
           }
         ],
@@ -435,7 +533,7 @@
     "/patients/{card_number}/session/{session_id}/speech": {
       "get": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Получить информацию о существующих фразах и слогах",
         "parameters": [
@@ -481,7 +579,7 @@
     "/patients/{card_number}/session/{session_id}/speech/{speech_id}": {
       "get": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Пололучить информацию о речи (используется, чтоюы скачать/прослушать речь)",
         "parameters": [
@@ -534,6 +632,94 @@
           }
         }
       }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "login-endpoint"
+        ],
+        "summary": "Войти в систему",
+        "operationId": "login",
+        "requestBody": {
+          "description": "Данные для входа в систему",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "doctor_login_1",
+                    "description": "логин врача или специалиста",
+                    "nullable": false
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+                    "maxLength": 128,
+                    "nullable": false,
+                    "description": "хэш пароля врача или специалиста"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "logout-endpoint"
+        ],
+        "summary": "Выйти из системы",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/settings": {
+      "patch": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Изменить текущий пароль пользователя",
+        "operationId": "changePassword",
+        "requestBody": {
+          "description": "Данные для изменения текущего пароля пользователя",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/password_change_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -556,32 +742,36 @@
         "description": "идентификатор сеанса в базе данных"
       },
       "session_score": {
-        "type": "integer",
-        "example": 56,
+        "type": "number",
+        "example": 56.6,
         "description": "оценка сеанса речевой реабилитации",
         "nullable": true
       },
       "speech_score": {
-        "type": "integer",
-        "example": 35,
+        "type": "number",
+        "example": 35.3,
         "description": "оценка качества речи",
         "nullable": true
       },
       "session_compares": {
         "type": "object",
         "properties": {
-          "compared_session_id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/session_id"
-              },
-              {
-                "example": 1338
-              },
-              {
-                "description": "сеанс, с которым выполнялось сравнение"
-              }
-            ]
+          "compared_sessions_id": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/session_id"
+                },
+                {
+                  "example": [
+                    1338,
+                    1339
+                  ]
+                }
+              ]
+            },
+            "description": "сеанс, с которым выполнялось сравнение"
           },
           "session_score": {
             "$ref": "#/components/schemas/session_score"
@@ -607,23 +797,27 @@
             ]
           },
           "compared_speech_id": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/speech_id"
-              },
-              {
-                "example": 2
-              },
-              {
-                "description": "речь, с которой выполнялось сравнение"
-              }
-            ]
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/speech_id"
+                },
+                {
+                  "example": [
+                    2,
+                    3
+                  ]
+                }
+              ]
+            },
+            "description": "речь, с которой выполнялось сравнение"
           },
           "speech_score": {
             "$ref": "#/components/schemas/speech_score"
           }
         },
-        "description": "результат сравнения сеансов",
+        "description": "результат сравнения речи",
         "nullable": true
       },
       "post_patient_info": {
@@ -756,12 +950,6 @@
             "description": "записанный звуковой файл, закодированный в base64",
             "example": "UklGRgYvAABXQVZFZm10IBIAAAABAAEA4C4AAMBdAAACABAAAABkYXRh4C4AAP//AAAAAAEAAAAAAAAAAAD//wAAAAABAAIAAQABAAEAAAAAAAEAAQABAAEA/////wAAAAABAAEA//8BAAEAAAACAAEAAgABAAEAAgABAAAAAAAAAAEAAgAAAAEAAAABAAAA//8BAAAAAAABAAEAAAABAAAA//8AAAEAAQAAAAAAAAAAAAAAAAACAAEAAAABAAAAAgABAP//AQAAAAIAAgAAAAEAAAABAAEAAAABAAEAAgABAAEAAAABAAAAAQABAAIAAAABAAEAAAABAAEAAAABAAEAAAABAAAAAgABAAEA/////wAAAAACAAEAAQADAP7///8AAAAA//8CAAAA//8AAP7////9/////v///////f/9//7//f/+/wEA///+/////f/+//7///... (в итоге будет сильно длиннее)"
           },
-          "base64_segment_value": {
-            "type": "string",
-            "description": "сегментированное значение речи, закодированное в base64",
-            "example": "примерно такой же, как и в base64_value",
-            "nullable": true
-          },
           "real_value": {
             "type": "string",
             "example": "кась",
@@ -781,7 +969,8 @@
             "items": {
               "$ref": "#/components/schemas/speech_compares"
             },
-            "description": "результаты сравнения речи с другой речью"
+            "description": "результаты сравнения речи с другой речью",
+            "nullable": true
           },
           "speech_type": {
             "type": "string",
@@ -870,12 +1059,33 @@
             "example": true,
             "description": "флаг, указывающий на это, является ли сеанс эталонным"
           },
+          "session_type": {
+            "type": "string",
+            "enum": [
+              "фразы",
+              "слоги"
+            ],
+            "description": "тип биологического сигнала, записываемый в рамках одного сеанса"
+          },
           "speech_array": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/get_speech_info_array"
             },
             "description": "информация о произнесённой в рамках сеанса речи"
+          },
+          "session_compares": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/session_compares"
+              },
+              {
+                "description": "информация о сравнениях сеанса с другим или с реальными значениями (если список сеансов для сравнения пустой, то сравнивался с реальными значениями)"
+              },
+              {
+                "nullable": true
+              }
+            ]
           }
         }
       },
@@ -929,6 +1139,32 @@
               "илья"
             ],
             "description": "информация о слогах"
+          }
+        }
+      },
+      "password_change_info": {
+        "type": "object",
+        "description": "информация о пациенте, необходимая для смены пароля",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "doctor_login_1",
+            "description": "логин врача или специалиста",
+            "nullable": false
+          },
+          "old_password": {
+            "type": "string",
+            "example": "a52671k07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290rte2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "Хэш текущего пароля"
+          },
+          "new_password": {
+            "type": "string",
+            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "Хэш нового пароля, указанный пользователем"
           }
         }
       },
