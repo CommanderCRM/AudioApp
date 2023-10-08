@@ -1,0 +1,612 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Patients API",
+    "description": "API для пациентов TODO - коды ошибок, параметры для проверки ролевой модели в in header",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://petstore3.swagger.io/api/v3"
+    }
+  ],
+  "tags": [
+    {
+      "name": "sessions",
+      "description": "Все запросы, необходимые для создания сеанса оценки качества речи"
+    },
+    {
+      "name": "login-endpoint",
+      "description": "Запросы на вход в систему"
+    },
+    {
+      "name": "logout-endpoint",
+      "description": "Запрос на выход из системы"
+    },
+    {
+      "name": "settings",
+      "description": "Запрос на смену пароля"
+    },
+    {
+      "name": "info",
+      "description": "Запрос на получение информации о лечащих врачах"
+    }
+  ],
+  "paths": {
+    "/session": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Создать сеанс",
+        "description": "Создать сеанс",
+        "operationId": "postSession",
+        "requestBody": {
+          "description": "Информация для создания сеанса",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/post_session_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session_id": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/session_id"
+                        },
+                        {
+                          "description": "идентификатор созданного сеанса"
+                        },
+                        {
+                          "example": 1
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Пациента не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/session/{session_id}": {
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Загрузить речь",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "description": "Передать информацию о записанной речи на сервер путем записи файла",
+        "operationId": "postSpeech",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/post_speech_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Получить информацию о существующих фразах и слогах",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "description": "Получить информацию о существующих фразах и слогах",
+        "operationId": "getPhrases",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/get_phrases_info"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/login": {
+      "get": {
+        "tags": [
+          "login-endpoint"
+        ],
+        "summary": "Получить информацию о статусе временного пароля пациента",
+        "operationId": "getPasswordStatus",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "card_number",
+            "required": true,
+            "description": "номер личной карты, указанный пациентом",
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "is_password_changed": {
+                      "type": "boolean",
+                      "example": false,
+                      "description": "Флаг, указывающий, изменён ли пароль"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "login-endpoint"
+        ],
+        "summary": "Изменить временный пароль пациента",
+        "operationId": "changeTemporaryPassword",
+        "requestBody": {
+          "description": "Данные для изменения временного пароля",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/temporary_password_change_patient_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "login-endpoint"
+        ],
+        "summary": "Войти в систему",
+        "operationId": "login",
+        "requestBody": {
+          "description": "Данные для входа в систему",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/password_patient_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "logout-endpoint"
+        ],
+        "summary": "Выйти из системы",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/info": {
+      "get": {
+        "tags": [
+          "info"
+        ],
+        "summary": "Получить информацию о лечащих врачах",
+        "operationId": "getDoctorInfo",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_doctors_info"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/settings": {
+      "patch": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Изменить текущий пароль пациента",
+        "operationId": "changePassword",
+        "requestBody": {
+          "description": "Данные для изменения текущего пароля пациента",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/password_change_patient_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "card_number": {
+        "type": "string",
+        "example": 111111111111,
+        "description": "Номер личной карты пациента, используется как логин при входе",
+        "minLength": 12,
+        "maxLength": 12
+      },
+      "session_id": {
+        "type": "integer",
+        "example": 1337,
+        "description": "идентификатор сеанса в базе данных"
+      },
+      "temporary_password_change_patient_info": {
+        "type": "object",
+        "description": "информация о пациенте, необходимая для смены временного пароля",
+        "properties": {
+          "card_number": {
+            "$ref": "#/components/schemas/card_number"
+          },
+          "constant_password": {
+            "type": "string",
+            "example": "a52671k07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290rte2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "Хэш постоянного пароля пациента"
+          },
+          "temporary_password": {
+            "type": "string",
+            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "Хэш временного пароль пациента, заменяется на постоянный при первом входе"
+          }
+        }
+      },
+      "password_change_patient_info": {
+        "type": "object",
+        "description": "информация о пациенте, необходимая для смены пароля",
+        "properties": {
+          "card_number": {
+            "$ref": "#/components/schemas/card_number"
+          },
+          "old_password": {
+            "type": "string",
+            "example": "a52671k07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290rte2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "Хэш текущего пароля пациента"
+          },
+          "new_password": {
+            "type": "string",
+            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "Хэш нового пароля, указанный пациентом"
+          }
+        }
+      },
+      "password_patient_info": {
+        "type": "object",
+        "description": "информация о пациенте, необходимая для входа в систему",
+        "properties": {
+          "card_number": {
+            "$ref": "#/components/schemas/card_number"
+          },
+          "constant_password": {
+            "type": "string",
+            "example": "a52671k07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290rte2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "Хэш постоянного пароля пациента"
+          }
+        }
+      },
+      "get_doctors_info": {
+        "description": "информация о лечащих врачах пациента",
+        "type": "object",
+        "properties": {
+          "doctor_info": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "doctor_name": {
+                  "type": "string",
+                  "example": "Ilia Shabonov"
+                },
+                "doctor_specialization": {
+                  "type": "string",
+                  "example": "Logoped"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post_speech_info": {
+        "type": "object",
+        "description": "информация о произнесённой речи, необходимая для загрузки",
+        "properties": {
+          "speech_type": {
+            "type": "string",
+            "enum": [
+              "фраза",
+              "слог"
+            ],
+            "example": "фраза",
+            "description": "Биологический тип сигнала (слог, фраза, данные стопы и т.п), в нашей предметной области и апи стоп и др. нет, только слог/фраза"
+          },
+          "base64_value": {
+            "type": "string",
+            "description": "записанный звуковой файл, закодированный в base64",
+            "example": "UklGRgYvAABXQVZFZm10IBIAAAABAAEA4C4AAMBdAAACABAAAABkYXRh4C4AAP//AAAAAAEAAAAAAAAAAAD//wAAAAABAAIAAQABAAEAAAAAAAEAAQABAAEA/////wAAAAABAAEA//8BAAEAAAACAAEAAgABAAEAAgABAAAAAAAAAAEAAgAAAAEAAAABAAAA//8BAAAAAAABAAEAAAABAAAA//8AAAEAAQAAAAAAAAAAAAAAAAACAAEAAAABAAAAAgABAP//AQAAAAIAAgAAAAEAAAABAAEAAAABAAEAAgABAAEAAAABAAAAAQABAAIAAAABAAEAAAABAAEAAAABAAEAAAABAAAAAgABAAEA/////wAAAAACAAEAAQADAP7///8AAAAA//8CAAAA//8AAP7////9/////v///////f/9//7//f/+/wEA///+/////f/+//7///... (в итоге будет сильно длиннее)"
+          },
+          "real_value": {
+            "type": "string",
+            "example": "кась",
+            "description": "реальное значение слога или фразы, которое должно было быть произнесено"
+          }
+        }
+      },
+      "post_session_info": {
+        "type": "object",
+        "description": "информация о сеансах пациента для добавления в бд (флаг эталона не указавается, т.к пациент не может создавать эталоны, бэк самостоятельно присваивает флаг, если запрос пришёл от пациента)",
+        "properties": {
+          "session_type": {
+            "type": "string",
+            "enum": [
+              "фразы",
+              "слоги"
+            ],
+            "description": "тип биологического сигнала, записываемый в рамках одного сеанса"
+          }
+        }
+      },
+      "get_phrases_info": {
+        "type": "object",
+        "description": "информация о фразах и слогах, используется при записи/загрузке речи, чтобы выбрать реальное значение",
+        "properties": {
+          "phrases": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "example": [
+              "мама",
+              "папа",
+              "илья"
+            ],
+            "description": "информация о фразах"
+          },
+          "syllables": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "example": [
+              "кась",
+              "тясь",
+              "илья"
+            ],
+            "description": "информация о слогах"
+          }
+        }
+      },
+      "base_result_code_object": {
+        "type": "object",
+        "required": [
+          "result_code"
+        ],
+        "properties": {
+          "result_code": {
+            "type": "integer"
+          }
+        }
+      },
+      "code_1": {
+        "title": "1",
+        "type": "integer",
+        "description": "Такой пациент уже существует",
+        "enum": [
+          1
+        ]
+      },
+      "code_2": {
+        "title": "2",
+        "type": "integer",
+        "description": "Превышено максимальное число пациентов",
+        "enum": [
+          2
+        ]
+      },
+      "code_3": {
+        "title": "3",
+        "type": "integer",
+        "description": "Временный пароль не изменён, но в запросе содержится постоянный пароль",
+        "enum": [
+          3
+        ]
+      },
+      "code_4": {
+        "title": "4",
+        "type": "integer",
+        "description": "Временный пароль изменён, но он содержится в запросе",
+        "enum": [
+          4
+        ]
+      },
+      "code_5": {
+        "title": "5",
+        "type": "integer",
+        "description": "Не удалось добавить пациента",
+        "enum": [
+          5
+        ]
+      },
+      "code_6": {
+        "title": "6",
+        "type": "integer",
+        "description": "Несоответсвие требованиям API",
+        "enum": [
+          6
+        ]
+      }
+    }
+  }
+}

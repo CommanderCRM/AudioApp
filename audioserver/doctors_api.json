@@ -14,6 +14,22 @@
     {
       "name": "patients",
       "description": "Все запросы, необходимые для управления пациентами"
+    },
+    {
+      "name": "sessions",
+      "description": "Все запросы, необходимые для управления сеансами"
+    },
+    {
+      "name": "login-endpoint",
+      "description": "Запрос на вход в систему"
+    },
+    {
+      "name": "logout-endpoint",
+      "description": "Запрос на выход из системы"
+    },
+    {
+      "name": "settings",
+      "description": "Запрос на изменение пароля"
     }
   ],
   "paths": {
@@ -180,7 +196,7 @@
       },
       "post": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Создать сеанс",
         "parameters": [
@@ -208,7 +224,29 @@
         },
         "responses": {
           "200": {
-            "description": "Успешное выполнение операции"
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "session_id": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/session_id"
+                        },
+                        {
+                          "description": "идентификатор созданного сеанса"
+                        },
+                        {
+                          "example": 1
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Ошибка в запросе клиента",
@@ -246,7 +284,7 @@
     "/patients/{card_number}/session": {
       "patch": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Оценить сеансы",
         "parameters": [
@@ -271,7 +309,12 @@
                     "items": {
                       "$ref": "#/components/schemas/session_id"
                     },
-                    "description": "массив выбранных для оценки сеансов"
+                    "description": "массив выбранных для оценки сеансов",
+                    "example": [
+                      1,
+                      2,
+                      3
+                    ]
                   }
                 }
               }
@@ -319,7 +362,7 @@
     "/patients/{card_number}/session/{session_id}": {
       "get": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Получить информацию о сеансе и записях, записанных в его рамках",
         "parameters": [
@@ -363,7 +406,7 @@
       },
       "post": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Загрузить/записать речь",
         "parameters": [
@@ -434,7 +477,7 @@
       },
       "patch": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Выполнить сравнение фраз с реальным значением",
         "parameters": [
@@ -495,7 +538,7 @@
     "/patients/{card_number}/session/{session_id}/speech": {
       "get": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Получить информацию о существующих фразах и слогах",
         "parameters": [
@@ -541,7 +584,7 @@
     "/patients/{card_number}/session/{session_id}/speech/{speech_id}": {
       "get": {
         "tags": [
-          "patients"
+          "sessions"
         ],
         "summary": "Пололучить информацию о речи (используется, чтоюы скачать/прослушать речь)",
         "parameters": [
@@ -588,6 +631,94 @@
           },
           "404": {
             "description": "Речи или пациент не найдены"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "login-endpoint"
+        ],
+        "summary": "Войти в систему",
+        "operationId": "login",
+        "requestBody": {
+          "description": "Данные для входа в систему",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "example": "doctor_login_1",
+                    "description": "логин врача или специалиста",
+                    "nullable": false
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+                    "maxLength": 128,
+                    "nullable": false,
+                    "description": "хэш пароля врача или специалиста"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "logout-endpoint"
+        ],
+        "summary": "Выйти из системы",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/settings": {
+      "patch": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Изменить текущий пароль пользователя",
+        "operationId": "changePassword",
+        "requestBody": {
+          "description": "Данные для изменения текущего пароля пользователя",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/password_change_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -824,12 +955,6 @@
             "description": "записанный звуковой файл, закодированный в base64",
             "example": "UklGRgYvAABXQVZFZm10IBIAAAABAAEA4C4AAMBdAAACABAAAABkYXRh4C4AAP//AAAAAAEAAAAAAAAAAAD//wAAAAABAAIAAQABAAEAAAAAAAEAAQABAAEA/////wAAAAABAAEA//8BAAEAAAACAAEAAgABAAEAAgABAAAAAAAAAAEAAgAAAAEAAAABAAAA//8BAAAAAAABAAEAAAABAAAA//8AAAEAAQAAAAAAAAAAAAAAAAACAAEAAAABAAAAAgABAP//AQAAAAIAAgAAAAEAAAABAAEAAAABAAEAAgABAAEAAAABAAAAAQABAAIAAAABAAEAAAABAAEAAAABAAEAAAABAAAAAgABAAEA/////wAAAAACAAEAAQADAP7///8AAAAA//8CAAAA//8AAP7////9/////v///////f/9//7//f/+/wEA///+/////f/+//7///... (в итоге будет сильно длиннее)"
           },
-          "base64_segment_value": {
-            "type": "string",
-            "description": "сегментированное значение речи, закодированное в base64",
-            "example": "примерно такой же, как и в base64_value",
-            "nullable": true
-          },
           "real_value": {
             "type": "string",
             "example": "кась",
@@ -1019,6 +1144,32 @@
               "илья"
             ],
             "description": "информация о слогах"
+          }
+        }
+      },
+      "password_change_info": {
+        "type": "object",
+        "description": "информация о пациенте, необходимая для смены пароля",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "doctor_login_1",
+            "description": "логин врача или специалиста",
+            "nullable": false
+          },
+          "old_password": {
+            "type": "string",
+            "example": "a52671k07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290rte2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "Хэш текущего пароля"
+          },
+          "new_password": {
+            "type": "string",
+            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "Хэш нового пароля, указанный пользователем"
           }
         }
       },
