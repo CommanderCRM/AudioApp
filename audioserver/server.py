@@ -1,8 +1,8 @@
 from enum import Enum
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, status, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from logic.tables import PostPatientInfo, PostSessionInfo, PostSpeechInfo
+from logic.tables import PostPatientInfo, PostSessionInfo, PostSpeechInfo, CompareSessionsIDs
 from logic.actions import (insert_patient, select_all_patients, select_patient_by_key,
                         convert_full_model_to_table, insert_session_info, insert_speech,
                         select_session_info, select_speech_info, select_session_by_key,
@@ -100,9 +100,15 @@ async def get_phrases_and_syllables_info():
 
     return select_phrases_and_syllables()
 
-@app.post("/patients/{card_number}/session/{session_1_id}/{session_2_id}")
-async def compare_sessions(card_number: int, session_1_id: int, session_2_id: int):
+@app.patch("/patients/{card_number}/session")
+async def compare_sessions(card_number: int, request: Request):
     """Сравнение сеансов (аудиофайлы)"""
+    data = await request.json()
+    session_ids = CompareSessionsIDs(**data)
+
+    session_1_id = session_ids.sessions_id[0]
+    session_2_id = session_ids.sessions_id[1]
+
     if not select_session_by_key(session_1_id) or not select_session_by_key(session_2_id):
         raise HTTPException(status_code=404)
 
