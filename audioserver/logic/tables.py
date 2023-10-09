@@ -280,7 +280,7 @@ class SpeechCompares(SQLModel):
         title="1",
         description="Сеанс, в котором была выбрана речь для сравнения"
     )
-    compared_speech_id: int = Field(
+    compared_speech_id: List[int] = Field(
         title="2",
         description="Речь, с которой выполнялось сравнение"
     )
@@ -309,17 +309,6 @@ class GetSpeechInfoArray(SQLModel):
         description="Реальное значение слога или фразы, которое должно было быть произнесено"
     )
 
-class GetSessionInfo(SQLModel):
-    """Информация o сессии"""
-    session_score: Optional[float] = Field(
-        title="57.5",
-        description="Оценка сеанса речевой реабилитации"
-    )
-    is_reference_session: bool = Field(
-        title="true",
-        description="Флаг, указывающий на то, является ли сеанс эталонным"
-    )
-    speech_array: List[GetSpeechInfoArray]
 
 class GetSpeechInfo(SQLModel):
     """Информация o речи"""
@@ -330,14 +319,27 @@ class GetSpeechInfo(SQLModel):
 
 class SessionCompares(SQLModel):
     """История сравнения сеансов"""
-    compared_session_id: int = Field(
+    compared_sessions_id: List[int] = Field(
         title="1",
         description="Сеанс, с которым выполнялось сравнение"
     )
-    session_score: Optional[int] = Field(
+    session_score: Optional[float] = Field(
         title="30.33",
         description="Оценка сеанса речевой реабилитации"
     )
+
+class GetSessionInfo(SQLModel):
+    """Информация o сессии"""
+    is_reference_session: bool = Field(
+        title="true",
+        description="Флаг, указывающий на то, является ли сеанс эталонным"
+    )
+    session_type: SessionType = Field(
+        title="фразы",
+        description="Тип биологического сигнала, записываемый в рамках одного сеанса"
+    )
+    speech_array: List[GetSpeechInfoArray]
+    session_compares: SessionCompares
 
 class GetSessionInfoArray(SQLModel):
     """Информация o сессиях для пациента"""
@@ -385,23 +387,45 @@ class SyllablesPhrasesTable(SQLModel, table=True):
     )
 
 class SpeechCompareTable(SQLModel, table=True):
-    """Таблица сравнения речи"""
+    """Таблица сравнения речи
+       1, 2 и 3 заполняются при сравнении с 2 эталонами
+       1 и 2 заполняются при сравнении с одним эталоном
+       1 заполняется при сравнении фраз с реальными значениями"""
     __tablename__: str = "speech_compare_table"
     speech_compare_id: Optional[int] = Field(default=None, primary_key=True)
-    speech_id: int = Field(foreign_key="speech_table.speech_id")
-    compared_speech_id: int = Field(foreign_key="speech_table.speech_id")
+    compared_speech_id_1: int = Field(foreign_key="speech_table.speech_id")
+    compared_speech_id_2: Optional[int] = Field(foreign_key="speech_table.speech_id")
+    compared_speech_id_3: Optional[int] = Field(foreign_key="speech_table.speech_id")
     speech_score: float = Field(
         title="57.5",
         description="Оценка речи"
     )
 
 class SessionCompareTable(SQLModel, table=True):
-    """Таблица сравнения сеансов"""
+    """Таблица сравнения сеансов
+       1, 2 и 3 заполняются при сравнении с 2 эталонами
+       1 и 2 заполняются при сравнении с одним эталоном
+       1 заполняется при сравнении фраз с реальными значениями"""
     __tablename__: str = "session_compare_table"
     session_compare_id: Optional[int] = Field(default=None, primary_key=True)
-    session_id: int = Field(foreign_key="session_table.session_id")
-    compared_session_id: int = Field(foreign_key="session_table.session_id")
+    compared_session_id_1: int = Field(foreign_key="session_table.session_id")
+    compared_session_id_2: Optional[int] = Field(foreign_key="session_table.session_id")
+    compared_session_id_3: Optional[int] = Field(foreign_key="session_table.session_id")
     session_score: float = Field(
         title="57.5",
         description="Оценка сеанса"
+    )
+
+class PostSessionInfoReturn(SQLModel):
+    """Возврат ID сеанса при его создании"""
+    session_id: int = Field(
+        title="5",
+        description="ID сеанса"
+    )
+
+class CompareSessionsIDs(SQLModel):
+    """ID сеансов для сравнения"""
+    sessions_id: List[int] = Field(
+        title="[1, 2, 3]",
+        description="Массив выбранных для оценки сеансов"
     )

@@ -7,7 +7,8 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      SpeechSessionTable, GetSpeechInfoArray, GetSessionInfo,
                      GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
                      GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
-                     SpeechCompareTable, SpeechCompares, SessionCompares)
+                     SpeechCompareTable, SpeechCompares, SessionCompares,
+                     PostSessionInfoReturn)
 from .actionsaudio import compare_sessions_dtw
 
 if os.getenv('TESTING'):
@@ -85,7 +86,7 @@ def insert_session_info(card_number: str, session_info: PostSessionInfo):
         session.add(session_table)
         session.commit()
         session.refresh(session_table)
-        return
+        return PostSessionInfoReturn(session_id=session_table.session_id)
 
 def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
     """Запись речи в БД"""
@@ -111,15 +112,38 @@ def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
         session.add(speech_session_table)
         session.commit()
 
+def get_comparison_history(session: Session, comparison_table, session_id):
+    """История сравнений сеансов"""
+    comparison_history = session.exec(
+        select(comparison_table)
+        .where(comparison_table.compared_session_id_1 == session_id)
+    ).all()
+
+    # Сеансы, с которыми можем сравнивать - 2 или 3 (1 - референс)
+    session_compares = []
+    for compare in comparison_history:
+        compared_sessions_ids = [
+            getattr(compare, f'compared_session_id_{i}')
+            for i in range(2, 4)
+            if getattr(compare, f'compared_session_id_{i}', None) is not None
+        ]
+        session_compares.append(
+                SessionCompares(
+                    compared_sessions_id=compared_sessions_ids,
+                    session_score=compare.session_score
+                )
+            )
+
+    return session_compares
+
 def select_session_info(_, session_id):
     """Получение информации o сеансе и записях речи в нем"""
     with Session(engine) as session:
         session_info = session.exec(select(SessionTable)
                                     .where(SessionTable.session_id == session_id)).first()
-        session_score = session.exec(select(SessionCompareTable.session_score)
-                                     .where(SessionCompareTable.session_id == session_id)).first()
         speech_session_info = session.exec(select(SpeechSessionTable.speech_id)
                                            .where(SpeechSessionTable.session_id == session_id)).all()
+        session_compares = get_comparison_history(session, SessionCompareTable, session_id)
 
         # В каждом сеансе может быть несколько записей речи, заполняем информацию о каждой
         speech_array = []
@@ -127,26 +151,39 @@ def select_session_info(_, session_id):
             speech_info = session.exec(select(SpeechTable)
                                        .where(SpeechTable.speech_id == speech_id)).first()
             speech_compares = session.exec(select(SpeechCompareTable)
-                                           .where(SpeechCompareTable.speech_id == speech_id)).all()
+                                           .where(SpeechCompareTable.compared_speech_id_1 == speech_id)).all()
 
             # Также каждая запись могла сравниваться с несколькими другими записями, заполнение истории сравнений
+            # Речи, с которыми можем сравнивать - 2 или 3 (1 - референс)
             speech_compares_history = []
-            for speech_compare in speech_compares:
-                compared_session_id = session.exec(select(SpeechSessionTable.session_id)
-                                                   .where(SpeechSessionTable.speech_id == speech_compare.compared_speech_id)).first()
-                speech_compares_history.append(SpeechCompares(compared_session_id=compared_session_id,
-                                                              compared_speech_id=speech_compare.compared_speech_id,
-                                                              speech_score=speech_compare.speech_score))
+            for compare in speech_compares:
+                compared_speech_ids = [
+                    getattr(compare, f'compared_speech_id_{i}')
+                    for i in range(2, 4)
+                    if getattr(compare, f'compared_speech_id_{i}', None) is not None
+                    ]
 
-            speech_array.append(GetSpeechInfoArray(speech_id=speech_info.speech_id,
+                for compared_speech_id in compared_speech_ids:
+                    compared_session_id = session.exec(
+                        select(SpeechSessionTable.session_id)
+                        .where(SpeechSessionTable.speech_id == compared_speech_id)
+                        ).first()
+                    speech_score = compare.speech_score
+
+                    speech_compares_history.append(SpeechCompares(compared_session_id=compared_session_id,
+                                                              compared_speech_id=compared_speech_id,
+                                                              speech_score=speech_score))
+
+                speech_array.append(GetSpeechInfoArray(speech_id=speech_info.speech_id,
                                                    speech_compares_history=speech_compares_history,
                                                    speech_type=speech_info.speech_type,
                                                    is_reference_speech=speech_info.is_reference_speech,
                                                    real_value=speech_info.real_value))
 
-        return GetSessionInfo(session_score=session_score,
-                              is_reference_session=session_info.is_reference_session,
-                              speech_array=speech_array)
+        return GetSessionInfo(is_reference_session=session_info.is_reference_session,
+                              session_type=session_info.session_type,
+                              speech_array=speech_array,
+                              session_compares=session_compares)
 
 def select_session_patient_info(session_id):
     """Получение информации o сеансе для пациента"""
@@ -154,19 +191,7 @@ def select_session_patient_info(session_id):
         session_info = session.exec(select(SessionTable)
                                     .where(SessionTable.session_id == session_id)).first()
 
-        session_compares = session.exec(
-            select(SessionCompareTable)
-            .where(SessionCompareTable.session_id == session_id)
-        ).all()
-
-        # Сеансы могли сравниваться с несколькими другими, получаем историю сравнений
-        session_compares_history = [
-            SessionCompares(
-                compared_session_id=compare.compared_session_id,
-                session_score=compare.session_score
-            )
-            for compare in session_compares
-        ]
+        session_compares_history = get_comparison_history(session, SessionCompareTable, session_id)
 
         return GetSessionInfoArray(session_id=session_info.session_id,
                                    session_compares_history=session_compares_history,
@@ -269,20 +294,19 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
     # Заполнение таблицы сравнения сеансов
     with Session(engine) as session:
         session_compare = SessionCompareTable(
-            session_id=session_1_id,
-            compared_session_id=session_2_id,
+            compared_session_id_1=session_1_id,
+            compared_session_id_2=session_2_id,
             session_score=dtw_mean,
         )
         session.add(session_compare)
         session.commit()
 
-
     # Заполнение таблицы сравнения записей речи
     with Session(engine) as session:
         for key, value in comparable_speech_ids.items():
             speech_compare = SpeechCompareTable(
-                speech_id=value[0],
-                compared_speech_id=value[1],
+                compared_speech_id_1=value[0],
+                compared_speech_id_2=value[1],
                 speech_score=dtw_distances[key],
             )
             session.add(speech_compare)
