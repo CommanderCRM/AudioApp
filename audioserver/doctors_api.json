@@ -41,6 +41,17 @@
         "summary": "Добавить нового пациента",
         "description": "Добавить нового пациента",
         "operationId": "addPatient",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
+          }
+        ],
         "requestBody": {
           "description": "Добавить нового пациента в систему",
           "content": {
@@ -93,28 +104,7 @@
             }
           },
           "500": {
-            "description": "Внутренняя ошибка сервера",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "#/components/schemas/base_result_code_object"
-                    }
-                  ],
-                  "properties": {
-                    "result_code": {
-                      "type": "integer",
-                      "oneOf": [
-                        {
-                          "$ref": "#/components/schemas/code_5"
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            }
+            "description": "Внутренняя ошибка сервера"
           }
         }
       },
@@ -133,6 +123,15 @@
               "example": 100
             },
             "description": "ограничение на количество пациентов, которое клиент запрашивает за раз"
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "description": "Получить список всех пациентов",
@@ -171,6 +170,15 @@
             "schema": {
               "$ref": "#/components/schemas/card_number"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "description": "Получить информацию о пациенте и его сенсах",
@@ -207,6 +215,15 @@
             "schema": {
               "$ref": "#/components/schemas/card_number"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "description": "Создать сеанс",
@@ -228,22 +245,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "session_id": {
-                      "allOf": [
-                        {
-                          "$ref": "#/components/schemas/session_id"
-                        },
-                        {
-                          "description": "идентификатор созданного сеанса"
-                        },
-                        {
-                          "example": 1
-                        }
-                      ]
-                    }
-                  }
+                  "$ref": "#/components/schemas/post_session_info_return"
                 }
               }
             }
@@ -295,6 +297,15 @@
             "schema": {
               "$ref": "#/components/schemas/card_number"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "requestBody": {
@@ -302,21 +313,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "sessions_id": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/session_id"
-                    },
-                    "description": "массив выбранных для оценки сеансов",
-                    "example": [
-                      1,
-                      2,
-                      3
-                    ]
-                  }
-                }
+                "$ref": "#/components/schemas/sessions_id"
               }
             }
           },
@@ -381,6 +378,15 @@
             "schema": {
               "$ref": "#/components/schemas/session_id"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "description": "Получить информацию о сеансе и записях, записанных в его рамках",
@@ -424,6 +430,15 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/session_id"
+            }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
             }
           }
         ],
@@ -496,6 +511,15 @@
             "schema": {
               "$ref": "#/components/schemas/session_id"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "responses": {
@@ -557,6 +581,15 @@
             "schema": {
               "$ref": "#/components/schemas/session_id"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "description": "Получить информацию о существующих фразах и слогах",
@@ -611,6 +644,15 @@
             "schema": {
               "$ref": "#/components/schemas/session_id"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "description": "Получить информацию о речи, чтобы сформировать звуковой файл для выгрузки/прослушивания",
@@ -650,22 +692,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "username": {
-                    "type": "string",
-                    "example": "doctor_login_1",
-                    "description": "логин врача или специалиста",
-                    "nullable": false
-                  },
-                  "password": {
-                    "type": "string",
-                    "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
-                    "maxLength": 128,
-                    "nullable": false,
-                    "description": "хэш пароля врача или специалиста"
-                  }
-                }
+                "$ref": "#/components/schemas/login_info"
               }
             }
           },
@@ -673,7 +700,14 @@
         },
         "responses": {
           "200": {
-            "description": "Успешное выполнение операции"
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/token_object"
+                }
+              }
+            }
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -705,6 +739,17 @@
         ],
         "summary": "Изменить текущий пароль пользователя",
         "operationId": "changePassword",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
+          }
+        ],
         "requestBody": {
           "description": "Данные для изменения текущего пароля пользователя",
           "content": {
@@ -758,6 +803,10 @@
         "description": "оценка качества речи",
         "nullable": true
       },
+      "token": {
+        "type": "string",
+        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6InBhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.ku6d_nU853g6Ly2XIx6mgggMMDte8eYvCs80Q4NxJx4"
+      },
       "session_compares": {
         "type": "object",
         "properties": {
@@ -785,23 +834,73 @@
         "description": "результат сравнения сеансов",
         "nullable": true
       },
-      "speech_compares": {
+      "token_object": {
         "type": "object",
         "properties": {
-          "compared_session_id": {
+          "token": {
+            "type": "string",
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6InBhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.ku6d_nU853g6Ly2XIx6mgggMMDte8eYvCs80Q4NxJx4"
+          }
+        }
+      },
+      "login_info": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "doctor_login_1",
+            "description": "логин врача или специалиста",
+            "nullable": false
+          },
+          "password": {
+            "type": "string",
+            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "хэш пароля врача или специалиста"
+          }
+        }
+      },
+      "post_session_info_return": {
+        "type": "object",
+        "properties": {
+          "session_id": {
             "allOf": [
               {
                 "$ref": "#/components/schemas/session_id"
               },
               {
-                "example": 1338
+                "description": "идентификатор созданного сеанса"
               },
               {
-                "description": "сеанс, в котором была выбрана речь для сравнения"
+                "example": 1
               }
             ]
-          },
-          "compared_speech_id": {
+          }
+        }
+      },
+      "sessions_id": {
+        "type": "object",
+        "properties": {
+          "sessions_id": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/session_id"
+            },
+            "description": "массив выбранных для оценки сеансов",
+            "example": [
+              1,
+              2,
+              3
+            ]
+          }
+        }
+      },
+      "speech_compares": {
+        "type": "object",
+        "properties": {
+          "compared_speeches_id": {
             "type": "array",
             "items": {
               "allOf": [
@@ -1214,14 +1313,6 @@
         "description": "Временный пароль изменён, но он содержится в запросе",
         "enum": [
           4
-        ]
-      },
-      "code_5": {
-        "title": "5",
-        "type": "integer",
-        "description": "Не удалось добавить пациента",
-        "enum": [
-          5
         ]
       },
       "code_6": {

@@ -41,6 +41,17 @@
         "summary": "Создать сеанс",
         "description": "Создать сеанс",
         "operationId": "postSession",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
+          }
+        ],
         "requestBody": {
           "description": "Информация для создания сеанса",
           "content": {
@@ -125,6 +136,15 @@
             "schema": {
               "$ref": "#/components/schemas/session_id"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "description": "Передать информацию о записанной речи на сервер путем записи файла",
@@ -185,6 +205,15 @@
             "schema": {
               "$ref": "#/components/schemas/session_id"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "description": "Получить информацию о существующих фразах и слогах",
@@ -225,6 +254,15 @@
             "schema": {
               "$ref": "#/components/schemas/card_number"
             }
+          },
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
           }
         ],
         "responses": {
@@ -233,14 +271,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "is_password_changed": {
-                      "type": "boolean",
-                      "example": false,
-                      "description": "Флаг, указывающий, изменён ли пароль"
-                    }
-                  }
+                  "$ref": "#/components/schemas/password_status"
                 }
               }
             }
@@ -256,6 +287,17 @@
         ],
         "summary": "Изменить временный пароль пациента",
         "operationId": "changeTemporaryPassword",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
+          }
+        ],
         "requestBody": {
           "description": "Данные для изменения временного пароля",
           "content": {
@@ -282,6 +324,17 @@
         ],
         "summary": "Войти в систему",
         "operationId": "login",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
+          }
+        ],
         "requestBody": {
           "description": "Данные для входа в систему",
           "content": {
@@ -295,7 +348,14 @@
         },
         "responses": {
           "200": {
-            "description": "Успешное выполнение операции"
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/token_object"
+                }
+              }
+            }
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -326,6 +386,17 @@
           "info"
         ],
         "summary": "Получить информацию о лечащих врачах",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
+          }
+        ],
         "operationId": "getDoctorInfo",
         "responses": {
           "200": {
@@ -350,6 +421,17 @@
           "settings"
         ],
         "summary": "Изменить текущий пароль пациента",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "token",
+            "required": true,
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "schema": {
+              "$ref": "#/components/schemas/token"
+            }
+          }
+        ],
         "operationId": "changePassword",
         "requestBody": {
           "description": "Данные для изменения текущего пароля пациента",
@@ -382,6 +464,10 @@
         "minLength": 12,
         "maxLength": 12
       },
+      "token": {
+        "type": "string",
+        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6InBhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.ku6d_nU853g6Ly2XIx6mgggMMDte8eYvCs80Q4NxJx4"
+      },
       "session_id": {
         "type": "integer",
         "example": 1337,
@@ -407,6 +493,26 @@
             "maxLength": 128,
             "nullable": false,
             "description": "Хэш временного пароль пациента, заменяется на постоянный при первом входе"
+          }
+        }
+      },
+      "token_object": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6InBhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.ku6d_nU853g6Ly2XIx6mgggMMDte8eYvCs80Q4NxJx4"
+          }
+        }
+      },
+      "password_status": {
+        "type": "object",
+        "properties": {
+          "is_password_changed": {
+            "type": "boolean",
+            "example": false,
+            "description": "Флаг, указывающий, изменён ли пароль"
           }
         }
       },
@@ -589,14 +695,6 @@
         "description": "Временный пароль изменён, но он содержится в запросе",
         "enum": [
           4
-        ]
-      },
-      "code_5": {
-        "title": "5",
-        "type": "integer",
-        "description": "Не удалось добавить пациента",
-        "enum": [
-          5
         ]
       },
       "code_6": {
