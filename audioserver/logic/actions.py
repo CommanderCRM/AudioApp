@@ -171,10 +171,10 @@ def select_session_info(_, session_id):
                     speech_score = compare.speech_score
 
                     speech_compares_history.append(SpeechCompares(compared_session_id=compared_session_id,
-                                                              compared_speech_id=compared_speech_id,
+                                                              compared_speech_id=[compared_speech_id],
                                                               speech_score=speech_score))
 
-                speech_array.append(GetSpeechInfoArray(speech_id=speech_info.speech_id,
+            speech_array.append(GetSpeechInfoArray(speech_id=speech_info.speech_id,
                                                    speech_compares_history=speech_compares_history,
                                                    speech_type=speech_info.speech_type,
                                                    is_reference_speech=speech_info.is_reference_speech,

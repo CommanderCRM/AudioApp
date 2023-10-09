@@ -339,7 +339,7 @@ class GetSessionInfo(SQLModel):
         description="Тип биологического сигнала, записываемый в рамках одного сеанса"
     )
     speech_array: List[GetSpeechInfoArray]
-    session_compares: SessionCompares
+    session_compares: List[SessionCompares]
 
 class GetSessionInfoArray(SQLModel):
     """Информация o сессиях для пациента"""
