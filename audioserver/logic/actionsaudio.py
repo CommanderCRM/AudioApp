@@ -2,6 +2,7 @@ import os
 from .audiotools.tools import AudioFile
 from .audiopreproc.preprocessing import AudioPreprocessor
 from .audiometrics.metrics import AudioMetrics
+from .audiorecognition.recognition import recognize_vosk, levenstein
 
 def compare_sessions_dtw(speech_values_dict):
     """Сравнение двух сеансов по DTW"""
@@ -44,3 +45,29 @@ def compare_sessions_dtw(speech_values_dict):
         os.remove(f"speech_{key}_2_reduced.wav")
 
     return dtw_distances
+
+def compare_phrases_levenstein(real_value, base64):
+    """Сравнение фразы с реальным значением и получение расстояния Левенштейна"""
+
+    audio_preprocessor = AudioPreprocessor()
+    AudioFile.decode_base64(base64, "phrase.wav")
+    phrase_file = AudioFile("phrase.wav")
+
+    # Снижение уровня шума
+    y, sr = phrase_file.load_in_16k()
+    y_reduced = audio_preprocessor.reduce_noise(y, sr)
+    phrase_file.save(y_reduced, sr, "phrase_reduced.wav")
+
+    phrase_file_reduced = AudioFile("phrase_reduced.wav")
+    file_path = phrase_file_reduced.get_file_path()
+    model_path = os.path.join(os.getcwd(), 'logic', 'audiorecognition', 'vosk-model-ru-0.22')
+
+    # Получение точности распознавания
+    recognition_result = recognize_vosk(file_path, model_path)
+    original_string = real_value
+    _, __, accuracy = levenstein(recognition_result, original_string)
+
+    os.remove("phrase.wav")
+    os.remove("phrase_reduced.wav")
+
+    return accuracy
