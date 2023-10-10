@@ -7,7 +7,7 @@ from logic.actions import (insert_patient, select_all_patients, select_patient_b
                         convert_full_model_to_table, insert_session_info, insert_speech,
                         select_session_info, select_speech_info, select_session_by_key,
                         select_patient_and_sessions, select_phrases_and_syllables,
-                        compare_two_sessions)
+                        compare_two_sessions, compare_phrases_real)
 
 app = FastAPI()
 
@@ -113,3 +113,9 @@ async def compare_sessions(card_number: int, request: Request):
         raise HTTPException(status_code=404)
 
     return compare_two_sessions(card_number, session_1_id, session_2_id)
+
+@app.patch("/patients/{card_number}/session/{session_id}")
+async def compare_phrases_with_real(card_number: int, session_id: int):
+    """Сравнение фраз с реальными значениями"""
+
+    return compare_phrases_real(card_number, session_id)

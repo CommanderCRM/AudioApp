@@ -5,7 +5,7 @@ from audioserver.logic.audiopreproc.preprocessing import AudioPreprocessor
 from audioserver.logic.audiopreproc.voiceactivity import VoiceActivityDetector
 from audioserver.logic.audiometrics.metrics import AudioMetrics
 from audioserver.logic.audiosegm.segmentation import Segmentation
-from audiorecognition.recognition import recognize_vosk, levenstein
+from audioserver.logic.audiorecognition.recognition import recognize_vosk, levenstein
 
 # Пример загрузки и сохранения файла
 file = AudioFile('1.wav')
@@ -52,10 +52,10 @@ current_path = pathlib.Path(__file__).parent.resolve()
 file_path = current_path.joinpath('3_16k.wav')
 model_path = os.path.join(os.getcwd(), 'audiorecognition', 'vosk-model-ru-0.22')
 
-
 RESULT = recognize_vosk(file_path, model_path)
 print('Recognition result: ', RESULT)
-levenstein_distance, original_length, recognition_accuracy = levenstein(RESULT)
+ORIG_STR = 'белый пар расстилается над лужами'
+levenstein_distance, original_length, recognition_accuracy = levenstein(RESULT, ORIG_STR)
 print('Levenstein distance: ', levenstein_distance)
 print('Original phrase length: ', original_length)
 print('Recognition accuracy: ', recognition_accuracy)

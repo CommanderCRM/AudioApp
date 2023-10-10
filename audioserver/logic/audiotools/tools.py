@@ -27,6 +27,10 @@ class AudioFile:
         """Получение имени аудиофайла"""
         return os.path.basename(self.file)
 
+    def get_file_path(self):
+        """Получение пути до аудиофайла"""
+        return os.path.abspath(self.file)
+
     def encode_base64(self):
         """Кодирование аудиофайла в строку base64"""
         with open(self.file, 'rb') as binary_file:

@@ -9,7 +9,7 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
                      SpeechCompareTable, SpeechCompares, SessionCompares,
                      PostSessionInfoReturn)
-from .actionsaudio import compare_sessions_dtw
+from .actionsaudio import compare_sessions_dtw, compare_phrases_levenstein
 
 if os.getenv('TESTING'):
     engine = create_engine('sqlite:///sqlite3.db')
@@ -124,7 +124,7 @@ def get_comparison_history(session: Session, comparison_table, session_id):
     for compare in comparison_history:
         compared_sessions_ids = [
             getattr(compare, f'compared_session_id_{i}')
-            for i in range(2, 4)
+            for i in range(1, 4)
             if getattr(compare, f'compared_session_id_{i}', None) is not None
         ]
         session_compares.append(
@@ -159,7 +159,7 @@ def select_session_info(_, session_id):
             for compare in speech_compares:
                 compared_speech_ids = [
                     getattr(compare, f'compared_speech_id_{i}')
-                    for i in range(2, 4)
+                    for i in range(1, 4)
                     if getattr(compare, f'compared_speech_id_{i}', None) is not None
                     ]
 
@@ -309,5 +309,48 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
                 compared_speech_id_2=value[1],
                 speech_score=dtw_distances[key],
             )
+            session.add(speech_compare)
+            session.commit()
+
+def compare_phrases_real(_, session_id: int):
+    """Сравнение фраз с реальным значением"""
+    SPEECH_TYPE = 'фраза'
+
+    phrases_info = {}
+
+    # Заполнение инф. о фразе (ID, эталон, base64)
+    session_speeches = get_session_speech_array(session_id)
+    for speech_data in session_speeches:
+        if speech_data.speech_type == SPEECH_TYPE:
+            phrase_base64 = get_speech_value(speech_data.speech_id)
+            phrases_info[speech_data.speech_id] = [speech_data.real_value, phrase_base64]
+
+    phrases_scores = {}
+    # Получение точности сравнения с эталоном
+    for key, value in phrases_info.items():
+        score = compare_phrases_levenstein(value[0], value[1])
+        phrases_scores[key] = score
+
+    # Общая оценка сеанса
+    accuracy_mean = statistics.mean(phrases_scores[i] for i in phrases_scores)
+
+    # Заполнение таблицы сравнения сеансов
+    with Session(engine) as session:
+        session_compare = SessionCompareTable(
+            compared_session_id_1=session_id,
+            session_score=accuracy_mean,
+        )
+        print(session_compare)
+        session.add(session_compare)
+        session.commit()
+
+    # Заполнение таблицы сравнения записей речи
+    with Session(engine) as session:
+        for key, value in phrases_scores.items():
+            speech_compare = SpeechCompareTable(
+                compared_speech_id_1=key,
+                speech_score=value,
+            )
+            print(speech_compare)
             session.add(speech_compare)
             session.commit()
