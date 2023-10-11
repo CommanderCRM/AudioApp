@@ -23,4 +23,4 @@ WORKDIR /app
 
 ENV PATH="/opt/venv/bin:$PATH"
 
-ENTRYPOINT ["python", "-m", "uvicorn", "doctor_server:app", "--host", "0.0.0.0", "--port", "48080"]
+ENTRYPOINT ["python", "-m", "uvicorn", "patient_server:app", "--host", "0.0.0.0", "--port", "50080"]
