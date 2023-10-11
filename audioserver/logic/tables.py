@@ -429,3 +429,10 @@ class CompareSessionsIDs(SQLModel):
         title="[1, 2, 3]",
         description="Массив выбранных для оценки сеансов"
     )
+
+class PasswordStatus(SQLModel):
+    """Статус пароля пациента"""
+    is_password_changed: bool = Field(
+        title="False",
+        description="Флаг, указывающий, изменён ли пароль"
+    )

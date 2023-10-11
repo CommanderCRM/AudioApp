@@ -8,7 +8,7 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
                      GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
                      SpeechCompareTable, SpeechCompares, SessionCompares,
-                     PostSessionInfoReturn)
+                     PostSessionInfoReturn, PasswordStatus)
 from .actionsaudio import compare_sessions_dtw, compare_phrases_levenstein
 
 if os.getenv('TESTING'):
@@ -354,3 +354,10 @@ def compare_phrases_real(_, session_id: int):
             print(speech_compare)
             session.add(speech_compare)
             session.commit()
+
+def select_password_status(card_number: str):
+    """Получение информации о статусе пароля"""
+    with Session(engine) as session:
+        patient = session.exec(select(PatientTable)
+                               .where(PatientTable.card_number == card_number)).first()
+        return PasswordStatus(is_password_changed=patient.is_password_changed)
