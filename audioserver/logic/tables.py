@@ -436,3 +436,23 @@ class PasswordStatus(SQLModel):
         title="False",
         description="Флаг, указывающий, изменён ли пароль"
     )
+
+class TemporaryPasswordChangePatientInfo(SQLModel):
+    """Информация для смены временного пароля на постоянный"""
+    card_number: str = Field(
+        title="111111111111",
+        description="Номер личной карты пациента, используется как логин при входе",
+        min_length=12,
+        max_length=12
+    )
+    constant_password: str = Field(
+        title="a52671k07c88!",
+        description="Постоянный пароль пациента",
+        min_length=8,
+        max_length=128
+    )
+    temporary_password: str = Field(
+        title="c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+        description="Хэш временного пароля пациента, заменяется на постоянный при первом входе",
+        max_length=128
+    )

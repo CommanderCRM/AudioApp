@@ -1,9 +1,10 @@
 from enum import Enum
-from fastapi import FastAPI, status, HTTPException
+from fastapi import FastAPI, status, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from logic.tables import PostSpeechInfo
+from logic.tables import PostSpeechInfo, TemporaryPasswordChangePatientInfo
 from logic.actions import insert_speech, select_phrases_and_syllables, select_password_status
+from logic.actionsauth import change_temporary_password
 
 app = FastAPI()
 
@@ -47,3 +48,12 @@ async def get_password_status(card_number: str):
     """Получить информацию о статусе пароля"""
 
     return select_password_status(card_number)
+
+@app.patch("/login")
+async def temporary_password_change(request: Request):
+    """Изменить временный пароль на постоянный"""
+    data = await request.json()
+    login_info = TemporaryPasswordChangePatientInfo(**data)
+
+    return change_temporary_password(login_info.card_number, login_info.constant_password,
+                                      login_info.temporary_password)
