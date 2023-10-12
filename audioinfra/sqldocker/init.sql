@@ -75,6 +75,14 @@ CREATE TABLE syllables_phrases_table (
   value VARCHAR(50)
 );
 
+CREATE TABLE refresh_token_table (
+  refresh_token_id SERIAL PRIMARY KEY,
+  token UUID,
+  user VARCHAR(255),
+  exp INT,
+  role VARCHAR(20)
+);
+
 INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'ba12f65801cc7cec593c311bd1bb4d9a72fcc84059e36e0c642', 'Ilia Krivosh');
 INSERT INTO doctor_table VALUES ('user2', 'logoped onkolog', 'Tomsk NII', 'ba12f65801cc7cec593c311bd1bb4d9a72fcc6', 'Ilia Bebrov');
 

@@ -21,7 +21,7 @@
     },
     {
       "name": "login-endpoint",
-      "description": "Запрос на вход в систему"
+      "description": "Запрос на доступ в систему"
     },
     {
       "name": "logout-endpoint",
@@ -41,15 +41,9 @@
         "summary": "Добавить нового пациента",
         "description": "Добавить нового пациента",
         "operationId": "addPatient",
-        "parameters": [
+        "security": [
           {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
-            }
+            "bearerAuth": []
           }
         ],
         "requestBody": {
@@ -113,6 +107,11 @@
           "patients"
         ],
         "summary": "Получить список всех пациентов",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "query",
@@ -123,15 +122,6 @@
               "example": 100
             },
             "description": "ограничение на количество пациентов, которое клиент запрашивает за раз"
-          },
-          {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
-            }
           }
         ],
         "description": "Получить список всех пациентов",
@@ -162,6 +152,11 @@
           "patients"
         ],
         "summary": "Получить информацию о пациенте и его сенсах",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -169,15 +164,6 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/card_number"
-            }
-          },
-          {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
             }
           }
         ],
@@ -207,6 +193,11 @@
           "sessions"
         ],
         "summary": "Создать сеанс",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -214,15 +205,6 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/card_number"
-            }
-          },
-          {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
             }
           }
         ],
@@ -289,6 +271,11 @@
           "sessions"
         ],
         "summary": "Оценить сеансы",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -296,15 +283,6 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/card_number"
-            }
-          },
-          {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
             }
           }
         ],
@@ -362,6 +340,11 @@
           "sessions"
         ],
         "summary": "Получить информацию о сеансе и записях, записанных в его рамках",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -377,15 +360,6 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/session_id"
-            }
-          },
-          {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
             }
           }
         ],
@@ -415,6 +389,11 @@
           "sessions"
         ],
         "summary": "Загрузить/записать речь",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -430,15 +409,6 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/session_id"
-            }
-          },
-          {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
             }
           }
         ],
@@ -495,6 +465,11 @@
           "sessions"
         ],
         "summary": "Выполнить сравнение фраз с реальным значением",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -510,15 +485,6 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/session_id"
-            }
-          },
-          {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
             }
           }
         ],
@@ -565,6 +531,11 @@
           "sessions"
         ],
         "summary": "Получить информацию о существующих фразах и слогах",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -580,15 +551,6 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/session_id"
-            }
-          },
-          {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
             }
           }
         ],
@@ -620,6 +582,11 @@
           "sessions"
         ],
         "summary": "Пололучить информацию о речи (используется, чтоюы скачать/прослушать речь)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "parameters": [
           {
             "in": "path",
@@ -643,15 +610,6 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/session_id"
-            }
-          },
-          {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
             }
           }
         ],
@@ -715,12 +673,58 @@
         }
       }
     },
+    "/update_tokens": {
+      "post": {
+        "tags": [
+          "login-endpoint"
+        ],
+        "summary": "Обновить пару токенов",
+        "operationId": "updateTokens",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "refresh_token",
+            "required": true,
+            "description": "токен обновления, полученный при входе в систему",
+            "schema": {
+              "$ref": "#/components/schemas/refresh_token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/token_object"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
     "/logout": {
       "post": {
         "tags": [
           "logout-endpoint"
         ],
         "summary": "Выйти из системы",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "refresh_token",
+            "required": true,
+            "description": "токен обновления, полученный при входе в систему",
+            "schema": {
+              "$ref": "#/components/schemas/refresh_token"
+            }
+          }
+        ],
         "operationId": "logout",
         "responses": {
           "200": {
@@ -739,15 +743,9 @@
         ],
         "summary": "Изменить текущий пароль пользователя",
         "operationId": "changePassword",
-        "parameters": [
+        "security": [
           {
-            "in": "header",
-            "name": "token",
-            "required": true,
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
-            "schema": {
-              "$ref": "#/components/schemas/token"
-            }
+            "bearerAuth": []
           }
         ],
         "requestBody": {
@@ -773,7 +771,18 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
+      "refresh_token": {
+        "type": "string",
+        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV"
+      },
       "card_number": {
         "type": "string",
         "example": 111111111111,
@@ -802,10 +811,6 @@
         "example": 35.3,
         "description": "оценка качества речи",
         "nullable": true
-      },
-      "token": {
-        "type": "string",
-        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6InBhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.ku6d_nU853g6Ly2XIx6mgggMMDte8eYvCs80Q4NxJx4"
       },
       "session_compares": {
         "type": "object",
@@ -837,9 +842,14 @@
       "token_object": {
         "type": "object",
         "properties": {
-          "token": {
+          "access_token": {
             "type": "string",
-            "description": "токен аутентификации - позволяет отслеживать роль и статус аутентификации (аутентифицирован или нет) пользователя",
+            "description": "токен аутентификации - используется при каждом запросе для аутентификации и авторизации пользователя (сохраняется в памяти веб/мобильного приложения)",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6InBhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.ku6d_nU853g6Ly2XIx6mgggMMDte8eYvCs80Q4NxJx4"
+          },
+          "refsresh_token": {
+            "type": "string",
+            "description": "токен обновления - используется для обновления пары токенов (сохраняется в httpOnly cookie)",
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6InBhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.ku6d_nU853g6Ly2XIx6mgggMMDte8eYvCs80Q4NxJx4"
           }
         }
