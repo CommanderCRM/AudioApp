@@ -22,9 +22,9 @@ CREATE TABLE speech_table (
 
 CREATE TABLE speech_compare_table (
   speech_compare_id SERIAL PRIMARY KEY,
-  evaluated_speech_id INT REFERENCES speech_table(speech_id),
   compared_speech_id_1 INT REFERENCES speech_table(speech_id),
   compared_speech_id_2 INT REFERENCES speech_table(speech_id),
+  compared_speech_id_3 INT REFERENCES speech_table(speech_id),
   speech_score REAL
 );
 
@@ -37,9 +37,9 @@ CREATE TABLE session_table (
 
 CREATE TABLE session_compare_table (
   session_compare_id SERIAL PRIMARY KEY,
-  evaluated_session_id INT REFERENCES session_table(session_id),
   compared_session_id_1 INT REFERENCES session_table(session_id),
   compared_session_id_2 INT REFERENCES session_table(session_id),
+  compared_session_id_3 INT REFERENCES session_table(session_id),
   session_score REAL
 );
 
