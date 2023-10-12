@@ -262,10 +262,10 @@
         "tags": [
           "login-endpoint"
         ],
-        "summary": "Изменить временный пароль пациента",
+        "summary": "Изменить временный пароль пациента на постоянный",
         "operationId": "changeTemporaryPassword",
         "requestBody": {
-          "description": "Данные для изменения временного пароля",
+          "description": "Данные для изменения временного пароля на постоянный",
           "content": {
             "application/json": {
               "schema": {
@@ -277,7 +277,14 @@
         },
         "responses": {
           "200": {
-            "description": "Успешное выполнение операции"
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/token_object"
+                }
+              }
+            }
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -478,17 +485,17 @@
           },
           "constant_password": {
             "type": "string",
-            "example": "a52671k07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290rte2",
+            "example": "super_boralek_1337_!",
             "maxLength": 128,
             "nullable": false,
-            "description": "Хэш постоянного пароля пациента"
+            "description": "постоянный пароль пациента"
           },
           "temporary_password": {
             "type": "string",
-            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "example": "boralek123!",
             "maxLength": 128,
             "nullable": false,
-            "description": "Хэш временного пароль пациента, заменяется на постоянный при первом входе"
+            "description": "временный пароль пациента, заданный врачом при регистрации пациента, заменяется на постоянный при первом входе"
           }
         }
       },
@@ -526,17 +533,17 @@
           },
           "old_password": {
             "type": "string",
-            "example": "a52671k07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290rte2",
+            "example": "super_boralek_1337_!",
             "maxLength": 128,
             "nullable": false,
-            "description": "Хэш текущего пароля пациента"
+            "description": "текущий пароль пациента"
           },
           "new_password": {
             "type": "string",
-            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "example": "boralek_1337_!",
             "maxLength": 128,
             "nullable": false,
-            "description": "Хэш нового пароля, указанный пациентом"
+            "description": "новый пароль, указанный пациентом"
           }
         }
       },
@@ -549,10 +556,10 @@
           },
           "constant_password": {
             "type": "string",
-            "example": "a52671k07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290rte2",
+            "example": "super_boralek_1337_!",
             "maxLength": 128,
             "nullable": false,
-            "description": "Хэш постоянного пароля пациента"
+            "description": "постоянный пароль пациента"
           }
         }
       },
