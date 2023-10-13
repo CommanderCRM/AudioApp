@@ -10,6 +10,7 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      SpeechCompareTable, SpeechCompares, SessionCompares,
                      PostSessionInfoReturn, PasswordStatus)
 from .actionsaudio import compare_sessions_dtw, compare_phrases_levenstein
+from .actionsauth import hash_gost_3411, validate_pass
 
 if os.getenv('TESTING'):
     engine = create_engine('sqlite:///sqlite3.db')
@@ -54,6 +55,9 @@ def convert_table_to_model(patient: PatientTable) -> GetPatientInfo:
 def insert_patient(patient: PatientTable, doctor_patient_list: List[DoctorPatientTable]):
     """Запись пациента в БД"""
     with Session(engine) as session:
+        if validate_pass(patient.temporary_password):
+            patient.temporary_password = hash_gost_3411(patient.temporary_password)
+
         session.add(patient)
         session.commit()
         for doctor_patient in doctor_patient_list:

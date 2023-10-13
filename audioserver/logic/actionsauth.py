@@ -1,52 +1,85 @@
-import os
+import uuid
+import datetime
+import base64
+import hmac
+import hashlib
+import json
 from pygost.gost34112012 import GOST34112012
-from sqlmodel import Session, create_engine, select
-from .actions import select_patient_by_key
-from .tables import PatientTable
 
-if os.getenv('TESTING'):
-    engine = create_engine('sqlite:///sqlite3.db')
-else:
-    engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
+JWT_KEY = "8694c19e-17d7-4479-88eb-402c07fea387"
 
-def validate_const_pass(constant_password):
-    """Валидация постоянного пароля"""
+def validate_pass(password):
+    """Валидация пароля"""
     special_chars=r"!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
     numbers="01234567890"
 
-    if (any(c in special_chars for c in constant_password)
-        and any(c in numbers for c in constant_password)):
+    if (any(c in special_chars for c in password)
+        and any(c in numbers for c in password)):
         return True
 
     return False
 
-def check_temp_pass_equality(card_number, temporary_password):
-    """Проверка совпадения временного и постоянного паролей"""
-    with Session(engine) as session:
-        patient = session.exec(select(PatientTable)
-                               .where(PatientTable.card_number == card_number)).first()
-
-        return temporary_password == patient.temporary_password
-
-def hash_const_pass(constant_password):
-    """Хэширование постоянного пароля по ГОСТ 34.11-2018 (256 бит)"""
+def hash_gost_3411(password):
+    """Хэширование пароля по ГОСТ 34.11-2018 (256 бит)"""
     m = GOST34112012(digest_size=256)
-    pass_bytes = str.encode(constant_password)
+    pass_bytes = str.encode(password)
     m.update(pass_bytes)
 
     return m.hexdigest()
 
-def change_temporary_password(card_number, constant_password, temporary_password):
-    """Смена временного пароля на постоянный"""
-    if (select_patient_by_key(card_number) and constant_password != temporary_password
-    and check_temp_pass_equality(card_number, temporary_password)
-    and validate_const_pass(constant_password)):
-        hashed_const = hash_const_pass(constant_password)
+def generate_exp_date(exp_type):
+    """Расчет даты от текущего момента (короткий, длинный периоды)"""
+    current_datetime = datetime.datetime.now()
 
-        with Session(engine) as session:
-            patient = session.query(PatientTable).filter(PatientTable.card_number == card_number).first()
-            if patient:
-                patient.temporary_password = ""
-                patient.constant_password = hashed_const
-                patient.is_password_changed = 1
-                session.commit()
+    if exp_type == 'short':
+        datetime_in_30_min = current_datetime + datetime.timedelta(minutes=30)
+        formatted_datetime_in_30_min = datetime_in_30_min.strftime('%Y%m%d%H%M')
+        return formatted_datetime_in_30_min
+
+    if exp_type == 'long':
+        datetime_in_30_days = current_datetime + datetime.timedelta(days=30)
+        formatted_datetime_in_30_days = datetime_in_30_days.strftime('%Y%m%d%H%M')
+        return formatted_datetime_in_30_days
+
+    return False
+
+def encode_and_sign_jwt(header, payload, secret):
+    """Кодирование тела JWT и его подпись"""
+    byte_header = json.dumps(header).encode()
+    byte_payload = json.dumps(payload).encode()
+
+    encoded_header = base64.urlsafe_b64encode(byte_header).rstrip(b'=').decode()
+    encoded_payload = base64.urlsafe_b64encode(byte_payload).rstrip(b'=').decode()
+
+    message = f'{encoded_header}.{encoded_payload}'.encode()
+    signature = hmac.new(secret, message, hashlib.sha256).digest()
+    encoded_signature = base64.urlsafe_b64encode(signature).rstrip(b'=').decode()
+
+    return encoded_header, encoded_payload, encoded_signature
+
+def generate_jwt(user, role, exp_type):
+    """Генерация JWT токена"""
+
+    # Заголовок
+    alg = 'HS256'
+    typ = 'JWT'
+    header = {"alg": alg, "typ": typ}
+
+    # Полезные данные
+    jwt_uuid = str(uuid.uuid4())
+    jwt_user = user
+    jwt_role = role
+    if exp_type == 'short':
+        jwt_exp = generate_exp_date('short')
+    elif exp_type == 'long':
+        jwt_exp = generate_exp_date('long')
+    payload = {"uuid": jwt_uuid, "user": jwt_user, "role": jwt_role, "exp": jwt_exp}
+
+    # Секрет
+    secret = bytes(JWT_KEY, encoding='UTF-8')
+
+    # base64 заголовок, тело + подпись
+    encoded_header, encoded_payload, encoded_signature = encode_and_sign_jwt(header, payload, secret)
+
+    jwt = f"{encoded_header}.{encoded_payload}.{encoded_signature}"
+    return jwt

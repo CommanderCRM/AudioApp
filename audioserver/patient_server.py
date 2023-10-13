@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from logic.tables import PostSpeechInfo, TemporaryPasswordChangePatientInfo
 from logic.actions import insert_speech, select_phrases_and_syllables, select_password_status
-from logic.actionsauth import change_temporary_password
+from logic.actionspatientauth import change_temporary_password
 
 app = FastAPI()
 

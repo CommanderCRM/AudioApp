@@ -456,3 +456,14 @@ class TemporaryPasswordChangePatientInfo(SQLModel):
         description="Хэш временного пароля пациента, заменяется на постоянный при первом входе",
         max_length=128
     )
+
+class TokenObject(SQLModel):
+    """Обьект с парой токенов"""
+    access_token: str = Field(
+        title="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ etc",
+        description="Токен доступа"
+    )
+    refresh_token: str = Field(
+        title="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ etc",
+        description="Токен обновления"
+    )
