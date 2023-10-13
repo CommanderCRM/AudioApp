@@ -836,8 +836,8 @@
             "$ref": "#/components/schemas/session_score"
           }
         },
-        "description": "результат сравнения сеансов",
-        "nullable": true
+        "nullable": true,
+        "description": "информация о сравнениях сеанса с другим или с реальными значениями (если список сеансов для сравнения пустой, то сравнивался с реальными значениями)"
       },
       "token_object": {
         "type": "object",
@@ -865,10 +865,10 @@
           },
           "password": {
             "type": "string",
-            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "example": "ivanguy_top1!",
             "maxLength": 128,
             "nullable": false,
-            "description": "хэш пароля врача или специалиста"
+            "description": "пароль врача или специалиста"
           }
         }
       },
@@ -986,14 +986,14 @@
             "example": null,
             "maxLength": 128,
             "nullable": true,
-            "description": "Хэш постоянного пароля пациента"
+            "description": "постоянный пароль пациента, по умолчанию null"
           },
           "temporary_password": {
             "type": "string",
-            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "example": "patient11111!",
             "maxLength": 128,
             "nullable": true,
-            "description": "Хэш временного пароль пациента, заменяется на постоянный при первом входе"
+            "description": "временный пароль пациента, заменяется на постоянный при первом входе пациента в систему"
           },
           "is_password_changed": {
             "type": "boolean",
@@ -1189,17 +1189,7 @@
             "description": "информация о произнесённой в рамках сеанса речи"
           },
           "session_compares": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/session_compares"
-              },
-              {
-                "description": "информация о сравнениях сеанса с другим или с реальными значениями (если список сеансов для сравнения пустой, то сравнивался с реальными значениями)"
-              },
-              {
-                "nullable": true
-              }
-            ]
+            "$ref": "#/components/schemas/session_compares"
           }
         }
       },
@@ -1268,17 +1258,17 @@
           },
           "old_password": {
             "type": "string",
-            "example": "a52671k07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290rte2",
+            "example": "doctor_24215_doctor_!",
             "maxLength": 128,
             "nullable": false,
-            "description": "Хэш текущего пароля"
+            "description": "текущий пароль пользователя"
           },
           "new_password": {
             "type": "string",
-            "example": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+            "example": "doctor_24215_doctor_!!",
             "maxLength": 128,
             "nullable": false,
-            "description": "Хэш нового пароля, указанный пользователем"
+            "description": "новый пароль, указанный пользователем"
           }
         }
       },
