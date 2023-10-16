@@ -3,8 +3,10 @@ from fastapi import FastAPI, status, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from logic.tables import PostSpeechInfo, TemporaryPasswordChangePatientInfo
-from logic.actions import insert_speech, select_phrases_and_syllables, select_password_status
-from logic.actionspatientauth import change_temporary_password
+from logic.actions import (insert_speech, select_phrases_and_syllables,
+                           select_password_status, get_doctors_list)
+from logic.actionspatientauth import (change_temporary_password, check_access_token,
+                                      get_username_from_token)
 
 app = FastAPI()
 
@@ -30,6 +32,21 @@ async def validation_exception_handler(_, __):
     """Обработка ошибки валидации данных"""
     return JSONResponse(content={"result_code": ErrorCode.API_VALIDATION_ERROR.value},
                             status_code=status.HTTP_400_BAD_REQUEST)
+
+async def get_token_from_header(request: Request):
+    """Получение токена доступа из заголовка"""
+    auth_header = request.headers.get('Authorization')
+
+    if auth_header:
+        access_token = auth_header.replace("Bearer ", "")
+
+    return access_token
+
+async def send_token_for_check(request: Request):
+    """Отправка токена доступа на проверку"""
+    access_token = await get_token_from_header(request)
+
+    return check_access_token(access_token)
 
 @app.post("/session/{session_id}")
 async def upload_record_speech(session_id: int, speech_info: PostSpeechInfo):
@@ -57,3 +74,11 @@ async def temporary_password_change(request: Request):
 
     return change_temporary_password(login_info.card_number, login_info.constant_password,
                                       login_info.temporary_password)
+
+@app.get("/info")
+async def get_doctors_info(request: Request):
+    """Получение информации о лечащих врачах"""
+    if await send_token_for_check(request):
+        access_token = await get_token_from_header(request)
+        username = get_username_from_token(access_token)
+        return get_doctors_list(username)

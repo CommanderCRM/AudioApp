@@ -24,6 +24,12 @@ class SessionType(str, Enum):
     PHRASES = "фразы"
     SYLLABLES = "слоги"
 
+class Role(str, Enum):
+    """Массив возможных ролей"""
+    PATIENT = 'patient'
+    DOCTOR = 'doctor'
+    SPECIALIST = 'specialist'
+
 class PatientTable(SQLModel, table=True):
     """Таблица пациента"""
     __tablename__: str = "patient_table"
@@ -467,3 +473,40 @@ class TokenObject(SQLModel):
         title="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ etc",
         description="Токен обновления"
     )
+
+class RefreshTokenTable(SQLModel, table=True):
+    """Таблица токена обновления"""
+    __tablename__: str = "refresh_token_table"
+    refresh_token_id: Optional[int] = Field(default=None, primary_key=True)
+    token: str = Field(
+        title = 'UUID токена',
+        description = 'ba12f65801cc7cec593'
+    )
+    username: str = Field(
+        title = 'Логин пользователя',
+        description = 'user1',
+        max_length = 255
+    )
+    exp: int = Field(
+        title = 'UNIX-время истечения',
+        description = '1000000'
+    )
+    role: Role = Field(
+        title = 'patient',
+        description = 'Роль пользователя',
+        max_length = 20
+    )
+
+class DoctorInfo(SQLModel):
+    """Информация о лечащем враче"""
+    doctor_name: str = Field(
+        title = 'Иван Иванов',
+        description= 'Имя лечащего врача'
+    )
+    doctor_specialization: str = Field(
+        title = 'logoped',
+        description = 'Специализация лечащего врача'
+    )
+class GetDoctorsInfo(SQLModel):
+    """Информация о лечащих врачах"""
+    doctor_info: List[DoctorInfo]
