@@ -2,7 +2,6 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Doctors API",
-    "description": "TODO: добавить коды ошибок, после добавить запросы на аутентификацию, после этого API для врача будет готов (без учёта доработок) ",
     "version": "1.1.0"
   },
   "servers": [
@@ -89,6 +88,15 @@
                         },
                         {
                           "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_14"
                         }
                       ]
                     }
@@ -140,6 +148,36 @@
               }
             }
           },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
           "500": {
             "description": "Внутрненняя ошибка сервера"
           }
@@ -182,6 +220,39 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Такого пациента не существует"
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -247,7 +318,16 @@
                       "type": "integer",
                       "oneOf": [
                         {
+                          "$ref": "#/components/schemas/code_2"
+                        },
+                        {
                           "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
                         }
                       ]
                     }
@@ -257,7 +337,7 @@
             }
           },
           "404": {
-            "description": "Пациента не существует"
+            "description": "Пациента, для которого создаётся сеанс не существует"
           },
           "500": {
             "description": "Внутренняя ошибка сервера"
@@ -317,6 +397,18 @@
                       "oneOf": [
                         {
                           "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_8"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_9"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
                         }
                       ]
                     }
@@ -326,7 +418,7 @@
             }
           },
           "404": {
-            "description": "Сеанса не существует"
+            "description": "Сеанса или пациента не существует"
           },
           "500": {
             "description": "Внутренняя ошибка сервера"
@@ -378,6 +470,39 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Сеанса или пациента не существует"
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -443,7 +568,19 @@
                       "type": "integer",
                       "oneOf": [
                         {
+                          "$ref": "#/components/schemas/code_2"
+                        },
+                        {
                           "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_7"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
                         }
                       ]
                     }
@@ -453,7 +590,7 @@
             }
           },
           "404": {
-            "description": "Пациента не существует"
+            "description": "Пациента или сеанса не существует"
           },
           "500": {
             "description": "Внутренняя ошибка сервера"
@@ -508,6 +645,15 @@
                       "oneOf": [
                         {
                           "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_8"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
                         }
                       ]
                     }
@@ -517,7 +663,7 @@
             }
           },
           "404": {
-            "description": "Сеанса не существует"
+            "description": "Сеанса или пациента не существует"
           },
           "500": {
             "description": "Внутренняя ошибка сервера"
@@ -569,6 +715,39 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Сеанса или пациента не существует"
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -627,10 +806,37 @@
             }
           },
           "400": {
-            "description": "Ошибка в запросе клиента"
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "404": {
-            "description": "Речи или пациент не найдены"
+            "description": "Сеанса, пациента или речи не существует"
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -663,6 +869,33 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/token_object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_11"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -702,6 +935,30 @@
               }
             }
           },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
           "500": {
             "description": "Внутрненняя ошибка сервера"
           }
@@ -729,6 +986,30 @@
         "responses": {
           "200": {
             "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -762,6 +1043,39 @@
         "responses": {
           "200": {
             "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_14"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -1286,7 +1600,7 @@
       "code_1": {
         "title": "1",
         "type": "integer",
-        "description": "Такой пациент уже существует",
+        "description": "Объект такого типа уже существует",
         "enum": [
           1
         ]
@@ -1294,7 +1608,7 @@
       "code_2": {
         "title": "2",
         "type": "integer",
-        "description": "Превышено максимальное число пациентов",
+        "description": "Превышено максимальное число объектов этого типа",
         "enum": [
           2
         ]
@@ -1318,9 +1632,65 @@
       "code_6": {
         "title": "6",
         "type": "integer",
-        "description": "Несоответсвие требованиям API",
+        "description": "Несоответсвие требованиям API (например: указаны не все данные в запросе, неверный тип данных, невалидное значение атрибута)",
         "enum": [
           6
+        ]
+      },
+      "code_7": {
+        "title": "7",
+        "type": "integer",
+        "description": "Ошибка обработки файла",
+        "enum": [
+          7
+        ]
+      },
+      "code_8": {
+        "title": "8",
+        "type": "integer",
+        "description": "Тип сеанса/сеансов не позволяет выполнить запрос",
+        "enum": [
+          8
+        ]
+      },
+      "code_9": {
+        "title": "9",
+        "type": "integer",
+        "description": "В сеансах разное количество записей",
+        "enum": [
+          9
+        ]
+      },
+      "code_11": {
+        "title": "11",
+        "type": "integer",
+        "description": "Неверный логин или пароль",
+        "enum": [
+          11
+        ]
+      },
+      "code_12": {
+        "title": "12",
+        "type": "integer",
+        "description": "Время жизни токена доступа истекло",
+        "enum": [
+          12
+        ]
+      },
+      "code_13": {
+        "title": "13",
+        "type": "integer",
+        "description": "Время жизни токена обновления истекло",
+        "enum": [
+          13
+        ]
+      },
+      "code_14": {
+        "title": "14",
+        "type": "integer",
+        "description": "Ошибка валидации пароля",
+        "enum": [
+          14
         ]
       }
     }
