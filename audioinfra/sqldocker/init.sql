@@ -78,7 +78,7 @@ CREATE TABLE syllables_phrases_table (
 CREATE TABLE refresh_token_table (
   refresh_token_id SERIAL PRIMARY KEY,
   token UUID,
-  user VARCHAR(255),
+  username VARCHAR(255),
   exp INT,
   role VARCHAR(20)
 );
