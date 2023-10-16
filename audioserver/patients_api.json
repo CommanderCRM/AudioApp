@@ -98,7 +98,16 @@
                       "type": "integer",
                       "oneOf": [
                         {
+                          "$ref": "#/components/schemas/code_2"
+                        },
+                        {
                           "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
                         }
                       ]
                     }
@@ -106,9 +115,6 @@
                 }
               }
             }
-          },
-          "404": {
-            "description": "Пациента не существует"
           },
           "500": {
             "description": "Внутренняя ошибка сервера"
@@ -168,7 +174,19 @@
                       "type": "integer",
                       "oneOf": [
                         {
+                          "$ref": "#/components/schemas/code_2"
+                        },
+                        {
                           "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_7"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
                         }
                       ]
                     }
@@ -176,6 +194,9 @@
                 }
               }
             }
+          },
+          "404": {
+            "description": "Сеанса не существует"
           },
           "500": {
             "description": "Внутренняя ошибка сервера"
@@ -218,6 +239,39 @@
               }
             }
           },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Сеанса не существует"
+          },
           "500": {
             "description": "Внутрненняя ошибка сервера"
           }
@@ -249,6 +303,30 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/password_status"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -286,6 +364,36 @@
               }
             }
           },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_11"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_14"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
           "500": {
             "description": "Внутрненняя ошибка сервера"
           }
@@ -315,6 +423,33 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/token_object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_11"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -354,6 +489,30 @@
               }
             }
           },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
           "500": {
             "description": "Внутрненняя ошибка сервера"
           }
@@ -382,6 +541,30 @@
           "200": {
             "description": "Успешное выполнение операции"
           },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
           "500": {
             "description": "Внутрненняя ошибка сервера"
           }
@@ -407,6 +590,36 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/get_doctors_info"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -443,6 +656,39 @@
         "responses": {
           "200": {
             "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_14"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "500": {
             "description": "Внутрненняя ошибка сервера"
@@ -673,44 +919,60 @@
           }
         }
       },
-      "code_1": {
-        "title": "1",
-        "type": "integer",
-        "description": "Такой пациент уже существует",
-        "enum": [
-          1
-        ]
-      },
       "code_2": {
         "title": "2",
         "type": "integer",
-        "description": "Превышено максимальное число пациентов",
+        "description": "Превышено максимальное число объектов этого типа",
         "enum": [
           2
-        ]
-      },
-      "code_3": {
-        "title": "3",
-        "type": "integer",
-        "description": "Временный пароль не изменён, но в запросе содержится постоянный пароль",
-        "enum": [
-          3
-        ]
-      },
-      "code_4": {
-        "title": "4",
-        "type": "integer",
-        "description": "Временный пароль изменён, но он содержится в запросе",
-        "enum": [
-          4
         ]
       },
       "code_6": {
         "title": "6",
         "type": "integer",
-        "description": "Несоответсвие требованиям API",
+        "description": "Несоответсвие требованиям API (например: указаны не все данные в запросе, неверный тип данных, невалидное значение атрибута)",
         "enum": [
           6
+        ]
+      },
+      "code_7": {
+        "title": "7",
+        "type": "integer",
+        "description": "Ошибка обработки файла",
+        "enum": [
+          7
+        ]
+      },
+      "code_11": {
+        "title": "11",
+        "type": "integer",
+        "description": "Неверный логин или пароль",
+        "enum": [
+          11
+        ]
+      },
+      "code_12": {
+        "title": "12",
+        "type": "integer",
+        "description": "Время жизни токена доступа истекло",
+        "enum": [
+          12
+        ]
+      },
+      "code_13": {
+        "title": "13",
+        "type": "integer",
+        "description": "Время жизни токена обновления истекло",
+        "enum": [
+          13
+        ]
+      },
+      "code_14": {
+        "title": "14",
+        "type": "integer",
+        "description": "Ошибка валидации пароля",
+        "enum": [
+          14
         ]
       }
     }
