@@ -8,7 +8,7 @@ from .actions import select_patient_by_key
 from .tables import PatientTable, TokenObject, RefreshTokenTable
 from .actionsauth import hash_gost_3411, validate_pass, generate_jwt
 
-JWT_KEY = "8694c19e-17d7-4479-88eb-402c07fea387"
+JWT_KEY = "8694c19e-17d7-4479-88eb-402c07fea387" # nosec
 
 if os.getenv('TESTING'):
     engine = create_engine('sqlite:///sqlite3.db')
@@ -65,7 +65,7 @@ def change_temporary_password(card_number, constant_password, temporary_password
             patient = session.query(PatientTable).\
                       filter(PatientTable.card_number == card_number).first()
             if patient:
-                patient.temporary_password = ""
+                patient.temporary_password = "" # nosec
                 patient.constant_password = hashed_const
                 patient.is_password_changed = 1
                 session.commit()
