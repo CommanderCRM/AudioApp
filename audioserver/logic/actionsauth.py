@@ -1,4 +1,3 @@
-import uuid
 import datetime
 import jwt
 from pygost.gost34112012 import GOST34112012
@@ -38,11 +37,11 @@ def generate_exp_date(exp_type):
 
     return False
 
-def generate_jwt(user, role, exp_type):
+def generate_jwt(generated_uuid, user, role, exp_type):
     """Генерация JWT токена"""
 
     # Полезные данные
-    jwt_uuid = str(uuid.uuid4())
+    jwt_uuid = generated_uuid
     jwt_user = user
     jwt_role = role
 

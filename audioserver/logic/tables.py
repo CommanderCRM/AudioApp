@@ -510,3 +510,46 @@ class DoctorInfo(SQLModel):
 class GetDoctorsInfo(SQLModel):
     """Информация о лечащих врачах"""
     doctor_info: List[DoctorInfo]
+
+class PasswordPatientInfo(SQLModel):
+    """Информация о логине/пароле для входа пациента"""
+    card_number: str = Field(
+        title="111111111111",
+        description="Номер личной карты пациента, используется как логин при входе",
+        min_length=12,
+        max_length=12
+    )
+    constant_password: str = Field(
+        title="a52671k07c88!",
+        description="Постоянный пароль пациента",
+        min_length=8,
+        max_length=128
+    )
+
+class PostSessionInfoPatient(SQLModel):
+    """Информация o сессии от пациента, POST"""
+    session_type: SessionType = Field(
+        title="фразы",
+        description="Тип биологического сигнала, записываемый в рамках одного сеанса"
+    )
+
+class PasswordChangePatientInfo(SQLModel):
+    """Информация о постоянном пароле для смены на новый"""
+    card_number: str = Field(
+        title="111111111111",
+        description="Номер личной карты пациента, используется как логин при входе",
+        min_length=12,
+        max_length=12
+    )
+    old_password: str = Field(
+        title="a52671k07c88!",
+        description="Старый пароль пациента",
+        min_length=8,
+        max_length=128
+    )
+    new_password: str = Field(
+        title="a52671k07c89!",
+        description="Новый пароль пациента",
+        min_length=8,
+        max_length=128
+    )
