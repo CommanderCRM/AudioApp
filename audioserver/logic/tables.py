@@ -24,6 +24,12 @@ class SessionType(str, Enum):
     PHRASES = "фразы"
     SYLLABLES = "слоги"
 
+class Role(str, Enum):
+    """Массив возможных ролей"""
+    PATIENT = 'patient'
+    DOCTOR = 'doctor'
+    SPECIALIST = 'specialist'
+
 class PatientTable(SQLModel, table=True):
     """Таблица пациента"""
     __tablename__: str = "patient_table"
@@ -435,4 +441,115 @@ class PasswordStatus(SQLModel):
     is_password_changed: bool = Field(
         title="False",
         description="Флаг, указывающий, изменён ли пароль"
+    )
+
+class TemporaryPasswordChangePatientInfo(SQLModel):
+    """Информация для смены временного пароля на постоянный"""
+    card_number: str = Field(
+        title="111111111111",
+        description="Номер личной карты пациента, используется как логин при входе",
+        min_length=12,
+        max_length=12
+    )
+    constant_password: str = Field(
+        title="a52671k07c88!",
+        description="Постоянный пароль пациента",
+        min_length=8,
+        max_length=128
+    )
+    temporary_password: str = Field(
+        title="c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
+        description="Хэш временного пароля пациента, заменяется на постоянный при первом входе",
+        max_length=128
+    )
+
+class TokenObject(SQLModel):
+    """Обьект с парой токенов"""
+    access_token: str = Field(
+        title="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ etc",
+        description="Токен доступа"
+    )
+    refresh_token: str = Field(
+        title="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ etc",
+        description="Токен обновления"
+    )
+
+class RefreshTokenTable(SQLModel, table=True):
+    """Таблица токена обновления"""
+    __tablename__: str = "refresh_token_table"
+    refresh_token_id: Optional[int] = Field(default=None, primary_key=True)
+    token: str = Field(
+        title = 'UUID токена',
+        description = 'ba12f65801cc7cec593'
+    )
+    username: str = Field(
+        title = 'Логин пользователя',
+        description = 'user1',
+        max_length = 255
+    )
+    exp: int = Field(
+        title = 'UNIX-время истечения',
+        description = '1000000'
+    )
+    role: Role = Field(
+        title = 'patient',
+        description = 'Роль пользователя',
+        max_length = 20
+    )
+
+class DoctorInfo(SQLModel):
+    """Информация о лечащем враче"""
+    doctor_name: str = Field(
+        title = 'Иван Иванов',
+        description= 'Имя лечащего врача'
+    )
+    doctor_specialization: str = Field(
+        title = 'logoped',
+        description = 'Специализация лечащего врача'
+    )
+class GetDoctorsInfo(SQLModel):
+    """Информация о лечащих врачах"""
+    doctor_info: List[DoctorInfo]
+
+class PasswordPatientInfo(SQLModel):
+    """Информация о логине/пароле для входа пациента"""
+    card_number: str = Field(
+        title="111111111111",
+        description="Номер личной карты пациента, используется как логин при входе",
+        min_length=12,
+        max_length=12
+    )
+    constant_password: str = Field(
+        title="a52671k07c88!",
+        description="Постоянный пароль пациента",
+        min_length=8,
+        max_length=128
+    )
+
+class PostSessionInfoPatient(SQLModel):
+    """Информация o сессии от пациента, POST"""
+    session_type: SessionType = Field(
+        title="фразы",
+        description="Тип биологического сигнала, записываемый в рамках одного сеанса"
+    )
+
+class PasswordChangePatientInfo(SQLModel):
+    """Информация о постоянном пароле для смены на новый"""
+    card_number: str = Field(
+        title="111111111111",
+        description="Номер личной карты пациента, используется как логин при входе",
+        min_length=12,
+        max_length=12
+    )
+    old_password: str = Field(
+        title="a52671k07c88!",
+        description="Старый пароль пациента",
+        min_length=8,
+        max_length=128
+    )
+    new_password: str = Field(
+        title="a52671k07c89!",
+        description="Новый пароль пациента",
+        min_length=8,
+        max_length=128
     )

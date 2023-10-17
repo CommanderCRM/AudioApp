@@ -8,8 +8,10 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
                      GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
                      SpeechCompareTable, SpeechCompares, SessionCompares,
-                     PostSessionInfoReturn, PasswordStatus)
+                     PostSessionInfoReturn, PasswordStatus, DoctorInfo,
+                     DoctorTable, GetDoctorsInfo)
 from .actionsaudio import compare_sessions_dtw, compare_phrases_levenstein
+from .actionsauth import hash_gost_3411, validate_pass
 
 if os.getenv('TESTING'):
     engine = create_engine('sqlite:///sqlite3.db')
@@ -54,6 +56,9 @@ def convert_table_to_model(patient: PatientTable) -> GetPatientInfo:
 def insert_patient(patient: PatientTable, doctor_patient_list: List[DoctorPatientTable]):
     """Запись пациента в БД"""
     with Session(engine) as session:
+        if validate_pass(patient.temporary_password):
+            patient.temporary_password = hash_gost_3411(patient.temporary_password)
+
         session.add(patient)
         session.commit()
         for doctor_patient in doctor_patient_list:
@@ -361,3 +366,23 @@ def select_password_status(card_number: str):
         patient = session.exec(select(PatientTable)
                                .where(PatientTable.card_number == card_number)).first()
         return PasswordStatus(is_password_changed=patient.is_password_changed)
+
+def get_doctors_list(username):
+    """Получение списка лечащих врачей пациента"""
+    with Session(engine) as session:
+        # Получаем все возможные записи о лечащих врачах пациента в таблице отношений
+        doctor_patient_statement = select(DoctorPatientTable).where(DoctorPatientTable.patient_card_number == username)
+        doctor_patient_results = session.exec(doctor_patient_statement)
+
+        doctors_info = []
+
+        # Добавляем информацию о каждом враче в общий список
+        for doctor_patient in doctor_patient_results:
+            doctor_info_statement = select(DoctorTable).where(DoctorTable.username == doctor_patient.doctor_username)
+            doctor_info_result = session.exec(doctor_info_statement).first()
+
+            if doctor_info_result:
+                doctor_info = DoctorInfo(doctor_name=doctor_info_result.full_name, doctor_specialization=doctor_info_result.specialization)
+                doctors_info.append(doctor_info)
+
+        return GetDoctorsInfo(doctor_info=doctors_info)
