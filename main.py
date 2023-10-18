@@ -61,7 +61,7 @@ print('Levenstein distance: ', levenstein_distance)
 print('Original phrase length: ', original_length)
 print('Recognition accuracy: ', recognition_accuracy)
 
-# Пример хэширования пароля по ГОСТ 34.11-2018 "Стрибог"
+# Пример хэширования пароля по ГОСТ 34.11-2012 "Стрибог"
 example_str = "boralekkrutoi123!"
 another_example_str = "boralekochenkrutoi345!!"
 
