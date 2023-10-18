@@ -51,7 +51,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/post_session_info"
+                "$ref": "#/components/schemas/post_patient_session_info"
               }
             }
           },
@@ -732,14 +732,14 @@
           "constant_password": {
             "type": "string",
             "example": "super_boralek_1337_!",
-            "maxLength": 128,
+            "minLength": 8,
             "nullable": false,
             "description": "постоянный пароль пациента"
           },
           "temporary_password": {
             "type": "string",
             "example": "boralek123!",
-            "maxLength": 128,
+            "minLength": 8,
             "nullable": false,
             "description": "временный пароль пациента, заданный врачом при регистрации пациента, заменяется на постоянный при первом входе"
           }
@@ -780,14 +780,14 @@
           "old_password": {
             "type": "string",
             "example": "super_boralek_1337_!",
-            "maxLength": 128,
+            "minLength": 8,
             "nullable": false,
             "description": "текущий пароль пациента"
           },
           "new_password": {
             "type": "string",
             "example": "boralek_1337_!",
-            "maxLength": 128,
+            "minLength": 8,
             "nullable": false,
             "description": "новый пароль, указанный пациентом"
           }
@@ -803,7 +803,7 @@
           "constant_password": {
             "type": "string",
             "example": "super_boralek_1337_!",
-            "maxLength": 128,
+            "minLength": 8,
             "nullable": false,
             "description": "постоянный пароль пациента"
           }
@@ -856,7 +856,7 @@
           }
         }
       },
-      "post_session_info": {
+      "post_patient_session_info": {
         "type": "object",
         "description": "информация о сеансах пациента для добавления в бд (флаг эталона не указавается, т.к пациент не может создавать эталоны, бэк самостоятельно присваивает флаг, если запрос пришёл от пациента)",
         "properties": {
