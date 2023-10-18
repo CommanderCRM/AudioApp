@@ -6,6 +6,7 @@ from audioserver.logic.audiopreproc.voiceactivity import VoiceActivityDetector
 from audioserver.logic.audiometrics.metrics import AudioMetrics
 from audioserver.logic.audiosegm.segmentation import Segmentation
 from audioserver.logic.audiorecognition.recognition import recognize_vosk, levenstein
+from audioserver.logic.secactions import hash_gost_3411
 
 # Пример загрузки и сохранения файла
 file = AudioFile('1.wav')
@@ -59,3 +60,13 @@ levenstein_distance, original_length, recognition_accuracy = levenstein(RESULT, 
 print('Levenstein distance: ', levenstein_distance)
 print('Original phrase length: ', original_length)
 print('Recognition accuracy: ', recognition_accuracy)
+
+# Пример хэширования пароля по ГОСТ 34.11-2018 "Стрибог"
+example_str = "boralekkrutoi123!"
+another_example_str = "boralekochenkrutoi345!!"
+
+example_hash = hash_gost_3411(example_str)
+another_example_hash = hash_gost_3411(another_example_str)
+
+print('Пример хэша: ', example_hash)
+print('Еще пример хэша: ', another_example_hash)

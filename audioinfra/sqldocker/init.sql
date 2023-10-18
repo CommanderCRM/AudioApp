@@ -83,8 +83,8 @@ CREATE TABLE refresh_token_table (
   role VARCHAR(20)
 );
 
-INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'ba12f65801cc7cec593c311bd1bb4d9a72fcc84059e36e0c642', 'Ilia Krivosh');
-INSERT INTO doctor_table VALUES ('user2', 'logoped onkolog', 'Tomsk NII', 'ba12f65801cc7cec593c311bd1bb4d9a72fcc6', 'Ilia Bebrov');
+INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'e2fb95ed6eab55bec760d47cae055a38b7753459e4151dd546c01e0f1af7fafe84c61f4051e783091517c0054c7655fdada36cd631c38971e3f46797e81890ce', 'Ilia Krivosh');
+INSERT INTO doctor_table VALUES ('user2', 'logoped onkolog', 'Tomsk NII', 'd55efc9dd983fcb3911dff5ea08776cdab9cf6275b8bcc04ab4297d7b93f862808a9843daa377a3de7a404c15042c416f847a0889fc5af4362e5d4a2826a9f0e', 'Ilia Bebrov');
 
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','Белая пелена лежала на полях');
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','В школу приезжали герои фронта');
