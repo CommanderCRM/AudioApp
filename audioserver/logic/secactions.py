@@ -16,8 +16,8 @@ def validate_pass(password):
     return False
 
 def hash_gost_3411(password):
-    """Хэширование пароля по ГОСТ 34.11-2018 (256 бит)"""
-    m = GOST34112012(digest_size=256)
+    """Хэширование пароля по ГОСТ 34.11-2018 (512 бит / 64 байта)"""
+    m = GOST34112012(digest_size=64)
     pass_bytes = str.encode(password)
     m.update(pass_bytes)
 
