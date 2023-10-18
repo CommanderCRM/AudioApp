@@ -7,10 +7,10 @@ from logic.tables import (PostSpeechInfo, TemporaryPasswordChangePatientInfo, To
                           PasswordChangePatientInfo)
 from logic.actions import (insert_speech, select_phrases_and_syllables,
                            select_password_status, get_doctors_list, insert_session_info)
-from logic.actionspatientauth import (change_temporary_password, check_token,
-                                      get_username_from_token, create_two_tokens,
-                                      delete_refresh_token, get_uuid_from_token,
-                                      check_patient_and_login, change_const_patient_password)
+from logic.actionspatientauth import change_temporary_password
+from logic.actionsauth import (check_token, get_username_from_token, get_uuid_from_token,
+                               check_data_and_login, change_const_password, delete_refresh_token,
+                               create_two_tokens)
 
 app = FastAPI()
 
@@ -56,13 +56,13 @@ async def send_access_token_for_check(request: Request):
     """Отправка токена доступа на проверку"""
     access_token = await get_token_from_header(request)
 
-    return check_token(access_token)
+    return check_token(access_token, 'patient')
 
 async def send_refresh_token_for_check(request: Request):
     """Отправка токена обновления на проверку"""
     refresh_token = await get_token_from_cookie(request)
 
-    return check_token(refresh_token)
+    return check_token(refresh_token, 'patient')
 
 @app.post("/session")
 async def create_speech_session(request: Request):
@@ -125,7 +125,7 @@ async def update_tokens(request: Request):
 
         delete_refresh_token(token_uuid)
 
-        short_jwt, long_jwt = create_two_tokens(username)
+        short_jwt, long_jwt = create_two_tokens(username, 'patient')
 
         return TokenObject(access_token=short_jwt, refresh_token=long_jwt)
 
@@ -135,7 +135,7 @@ async def login_patient(request: Request):
     data = await request.json()
     login_info = PasswordPatientInfo(**data)
 
-    return check_patient_and_login(login_info.card_number, login_info.constant_password)
+    return check_data_and_login(login_info.card_number, login_info.constant_password, 'patient')
 
 @app.patch("/settings")
 async def change_patient_password(request: Request):
@@ -144,8 +144,9 @@ async def change_patient_password(request: Request):
         data = await request.json()
         change_info = PasswordChangePatientInfo(**data)
 
-        return change_const_patient_password(change_info.card_number,
-                                             change_info.old_password, change_info.new_password)
+        return change_const_password(change_info.card_number,
+                                             change_info.old_password, change_info.new_password,
+                                             'patient')
 
 @app.get("/logout")
 async def logout_patient(request: Request):

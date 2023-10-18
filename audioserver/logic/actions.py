@@ -11,7 +11,7 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      PostSessionInfoReturn, PasswordStatus, DoctorInfo,
                      DoctorTable, GetDoctorsInfo)
 from .actionsaudio import compare_sessions_dtw, compare_phrases_levenstein
-from .actionsauth import hash_gost_3411, validate_pass
+from .secactions import hash_gost_3411, validate_pass
 
 if os.getenv('TESTING'):
     engine = create_engine('sqlite:///sqlite3.db')
@@ -78,6 +78,13 @@ def select_patient_by_key(card_number: str):
     with Session(engine) as session:
         patient = session.exec(select(PatientTable)
                                .where(PatientTable.card_number == card_number)).first()
+        return bool(patient)
+
+def select_doctor_by_key(username: str):
+    """Получение врача по ключу"""
+    with Session(engine) as session:
+        patient = session.exec(select(DoctorTable)
+                               .where(DoctorTable.username == username)).first()
         return bool(patient)
 
 def insert_session_info(card_number: str, session_info: PostSessionInfo):
