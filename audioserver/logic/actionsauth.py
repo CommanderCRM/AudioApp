@@ -1,57 +1,148 @@
+import os
 import datetime
+import calendar
+import uuid
 import jwt
-from pygost.gost34112012 import GOST34112012
+from sqlmodel import Session, create_engine
+from .actions import select_patient_by_key, select_doctor_by_key
+from .tables import PatientTable, TokenObject, RefreshTokenTable, DoctorTable
+from .secactions import hash_gost_3411, generate_jwt
 
-JWT_KEY = "8694c19e-17d7-4479-88eb-402c07fea387"
+JWT_KEY = "8694c19e-17d7-4479-88eb-402c07fea387" # nosec
 
-def validate_pass(password):
-    """Валидация пароля"""
-    special_chars=r"!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
-    numbers="01234567890"
+if os.getenv('TESTING'):
+    engine = create_engine('sqlite:///sqlite3.db')
+else:
+    engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
 
-    if (any(c in special_chars for c in password)
-        and any(c in numbers for c in password)):
-        return True
+def create_two_tokens(card_number, role):
+    """Создание пары токенов"""
+    generated_uuid = str(uuid.uuid4())
+    short_jwt = generate_jwt(generated_uuid, card_number, role, 'short')
+    long_jwt = generate_jwt(generated_uuid, card_number, role, 'long')
+
+    # Сохранение токена обновления в БД
+    with Session(engine) as session:
+        decoded_long_jwt = jwt.decode(long_jwt, JWT_KEY, algorithms="HS256")
+        refresh_token_table = RefreshTokenTable(
+            token=decoded_long_jwt['uuid'],
+            username=decoded_long_jwt['user'],
+            exp=decoded_long_jwt['exp'],
+            role=decoded_long_jwt['role']
+        )
+        session.add(refresh_token_table)
+        session.commit()
+
+    return short_jwt, long_jwt
+
+def delete_refresh_token(token_uuid):
+    """Удаление токена обновления из БД"""
+    with Session(engine) as session:
+        token_to_delete = session.query(RefreshTokenTable).\
+                                  filter(RefreshTokenTable.token == token_uuid).first()
+        session.delete(token_to_delete)
+        session.commit()
+
+def check_token(token_for_check, role):
+    """Проверка токена"""
+    decoded_jwt = jwt.decode(token_for_check, JWT_KEY, algorithms="HS256")
+
+    token=decoded_jwt['uuid']
+    username = decoded_jwt['user']
+
+    current_datetime = datetime.datetime.utcnow()
+    current_utcstamp = calendar.timegm(current_datetime.utctimetuple())
+
+    with Session(engine) as session:
+        refresh_token = session.query(RefreshTokenTable).\
+                                filter(RefreshTokenTable.token == token).first()
+        if refresh_token:
+            refresh_token_exp = refresh_token.exp
+
+    if role == 'patient':
+        if (select_patient_by_key(username) and decoded_jwt['role'] == 'patient'
+            and current_utcstamp <= refresh_token_exp):
+            return True
+    elif role == 'doctor':
+        if (select_doctor_by_key(username) and decoded_jwt['role'] == 'doctor'
+            and current_utcstamp <= refresh_token_exp):
+            return True
 
     return False
 
-def hash_gost_3411(password):
-    """Хэширование пароля по ГОСТ 34.11-2018 (256 бит)"""
-    m = GOST34112012(digest_size=256)
-    pass_bytes = str.encode(password)
-    m.update(pass_bytes)
+def get_username_from_token(token):
+    """Получение имени пользователя из токена"""
+    decoded_jwt = jwt.decode(token, JWT_KEY, algorithms="HS256")
 
-    return m.hexdigest()
+    username = decoded_jwt['user']
 
-def generate_exp_date(exp_type):
-    """Расчет даты от текущего момента (короткий, длинный периоды)"""
-    current_datetime = datetime.datetime.now()
+    return username
 
-    if exp_type == 'short':
-        datetime_in_30_min = current_datetime + datetime.timedelta(minutes=30)
-        return datetime_in_30_min
+def get_uuid_from_token(token):
+    """Получение UUID из токена"""
+    decoded_jwt = jwt.decode(token, JWT_KEY, algorithms="HS256")
 
-    if exp_type == 'long':
-        datetime_in_30_days = current_datetime + datetime.timedelta(days=30)
-        return datetime_in_30_days
+    token_uuid = decoded_jwt['uuid']
+
+    return token_uuid
+
+def check_data_and_login(username, constant_password, role):
+    """Проверка данных и логин пользователя"""
+    if select_patient_by_key(username):
+        constant_password_hash = hash_gost_3411(constant_password)
+
+    with Session(engine) as session:
+        if role == 'patient':
+            patient_const_pass = session.query(PatientTable).\
+                                        filter(PatientTable.card_number == username,
+                                                PatientTable.constant_password == constant_password_hash).\
+                                        first()
+            if patient_const_pass:
+                short_jwt, long_jwt = create_two_tokens(username, 'patient')
+                return TokenObject(access_token=short_jwt, refresh_token=long_jwt)
+        elif role == 'doctor':
+            doctor_const_pass = session.query(DoctorTable).\
+                                        filter(DoctorTable.username == username,
+                                                DoctorTable.password == constant_password_hash).\
+                                        first()
+            if doctor_const_pass:
+                short_jwt, long_jwt = create_two_tokens(username, 'doctor')
+                return TokenObject(access_token=short_jwt, refresh_token=long_jwt)
 
     return False
 
-def generate_jwt(generated_uuid, user, role, exp_type):
-    """Генерация JWT токена"""
+def change_const_password(username, old_password, new_password, role):
+    """Смена постоянного пароля на новый"""
+    if role == 'patient':
+        if select_patient_by_key(username):
+            old_pwd_hash = hash_gost_3411(old_password)
+            new_pwd_hash = hash_gost_3411(new_password)
+    elif role == 'doctor':
+        if select_doctor_by_key(username):
+            old_pwd_hash = hash_gost_3411(old_password)
+            new_pwd_hash = hash_gost_3411(new_password)
 
-    # Полезные данные
-    jwt_uuid = generated_uuid
-    jwt_user = user
-    jwt_role = role
-
-    if exp_type == 'short':
-        jwt_exp = generate_exp_date('short')
-    elif exp_type == 'long':
-        jwt_exp = generate_exp_date('long')
-
-    payload = {"uuid": jwt_uuid, "user": jwt_user, "role": jwt_role, "exp": jwt_exp}
-
-    token = jwt.encode(payload, JWT_KEY, algorithm='HS256')
-
-    return token
+    with Session(engine) as session:
+        if role == 'patient':
+            patient_const_pass = session.query(PatientTable).\
+                                        filter(PatientTable.card_number == username,
+                                                PatientTable.constant_password == old_pwd_hash).first()
+            if patient_const_pass:
+                session.query(PatientTable).\
+                    filter(PatientTable.card_number == username,
+                        PatientTable.constant_password == old_pwd_hash).\
+                    update({'constant_password': new_pwd_hash})
+                session.commit()
+                return
+        elif role == 'doctor':
+            doctor_const_pass = session.query(DoctorTable).\
+                                        filter(DoctorTable.username == username,
+                                                DoctorTable.password == old_pwd_hash).\
+                                        first()
+            if doctor_const_pass:
+                session.query(DoctorTable).\
+                    filter(DoctorTable.username == username,
+                        DoctorTable.password == old_pwd_hash).\
+                    update({'password': new_pwd_hash})
+                session.commit()
+                return
