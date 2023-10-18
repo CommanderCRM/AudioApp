@@ -553,3 +553,35 @@ class PasswordChangePatientInfo(SQLModel):
         min_length=8,
         max_length=128
     )
+
+class LoginInfo(SQLModel):
+    """Информация для входа врача или специалиста в систему"""
+    username: str = Field(
+        title = "doctor_login_1",
+        description = "Логин врача или специалиста",
+    )
+    password: str = Field(
+        title = "a52671k07c89!",
+        description = "Пароль врача или специалиста",
+        min_length=8,
+        max_length=128
+    )
+
+class PasswordChangeInfo(SQLModel):
+    """Информация для смены пароля врача/специалиста"""
+    username: str = Field(
+        title = "doctor_login_1",
+        description = "Логин врача или специалиста",
+    )
+    old_password: str = Field(
+        title="a52671k07c88!",
+        description="Старый пароль врача/специалиста",
+        min_length=8,
+        max_length=128
+    )
+    new_password: str = Field(
+        title="a52671k07c89!",
+        description="Новый пароль врача/специалиста",
+        min_length=8,
+        max_length=128
+    )

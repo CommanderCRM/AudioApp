@@ -88,8 +88,12 @@ def get_uuid_from_token(token):
 
 def check_data_and_login(username, constant_password, role):
     """Проверка данных и логин пользователя"""
-    if select_patient_by_key(username):
-        constant_password_hash = hash_gost_3411(constant_password)
+    if role == 'patient':
+        if select_patient_by_key(username):
+            constant_password_hash = hash_gost_3411(constant_password)
+    elif role == 'doctor':
+        if select_doctor_by_key(username):
+            constant_password_hash = hash_gost_3411(constant_password)
 
     with Session(engine) as session:
         if role == 'patient':
