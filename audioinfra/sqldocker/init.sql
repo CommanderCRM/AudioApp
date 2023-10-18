@@ -83,8 +83,9 @@ CREATE TABLE refresh_token_table (
   role VARCHAR(20)
 );
 
-INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'e2fb95ed6eab55bec760d47cae055a38b7753459e4151dd546c01e0f1af7fafe84c61f4051e783091517c0054c7655fdada36cd631c38971e3f46797e81890ce', 'Ilia Krivosh');
-INSERT INTO doctor_table VALUES ('user2', 'logoped onkolog', 'Tomsk NII', 'd55efc9dd983fcb3911dff5ea08776cdab9cf6275b8bcc04ab4297d7b93f862808a9843daa377a3de7a404c15042c416f847a0889fc5af4362e5d4a2826a9f0e', 'Ilia Bebrov');
+INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'f42d8ccc9d8a783bd8d5cf417afa8953dbc92c338c7ea92ae88785fe50271714', 'Ilia Krivosh');
+INSERT INTO doctor_table VALUES ('user2', 'logoped onkolog', 'Tomsk NII', '31f2fd3efdf395d9d2d958367b74ace5b8539b31c45e8b1b39a622a07d5b8097', 'Ilia Bebrov');
+INSERT INTO specialist_table VALUES ('user3', '75b9eb6eb3b5f5ddeb3176ecd1de99b12821a838144374cce0537f03c0500e52');
 
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','Белая пелена лежала на полях');
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','В школу приезжали герои фронта');
