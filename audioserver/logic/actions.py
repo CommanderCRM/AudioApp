@@ -9,7 +9,7 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
                      SpeechCompareTable, SpeechCompares, SessionCompares,
                      PostSessionInfoReturn, PasswordStatus, DoctorInfo,
-                     DoctorTable, GetDoctorsInfo)
+                     DoctorTable, GetDoctorsInfo, SpecialistTable)
 from .actionsaudio import compare_sessions_dtw, compare_phrases_levenstein
 from .secactions import hash_gost_3411, validate_pass
 
@@ -86,6 +86,13 @@ def select_doctor_by_key(username: str):
         patient = session.exec(select(DoctorTable)
                                .where(DoctorTable.username == username)).first()
         return bool(patient)
+
+def select_specialist_by_key(username: str):
+    """Получение специалиста по ключу"""
+    with Session(engine) as session:
+        specialist = session.exec(select(SpecialistTable)
+                               .where(SpecialistTable.username == username)).first()
+        return bool(specialist)
 
 def insert_session_info(card_number: str, session_info: PostSessionInfo):
     """Запись информации o сессии в БД"""
