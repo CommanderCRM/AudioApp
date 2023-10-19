@@ -4,8 +4,8 @@ import calendar
 import uuid
 import jwt
 from sqlmodel import Session, create_engine
-from .actions import select_patient_by_key, select_doctor_by_key
-from .tables import PatientTable, TokenObject, RefreshTokenTable, DoctorTable
+from .actions import select_patient_by_key, select_doctor_by_key, select_specialist_by_key
+from .tables import PatientTable, TokenObject, RefreshTokenTable, DoctorTable, SpecialistTable
 from .secactions import hash_gost_3411, generate_jwt
 
 JWT_KEY = "8694c19e-17d7-4479-88eb-402c07fea387" # nosec
@@ -43,12 +43,13 @@ def delete_refresh_token(token_uuid):
         session.delete(token_to_delete)
         session.commit()
 
-def check_token(token_for_check, role):
+def check_token(token_for_check):
     """Проверка токена"""
     decoded_jwt = jwt.decode(token_for_check, JWT_KEY, algorithms="HS256")
 
-    token=decoded_jwt['uuid']
+    token = decoded_jwt['uuid']
     username = decoded_jwt['user']
+    role = decoded_jwt['role']
 
     current_datetime = datetime.datetime.utcnow()
     current_utcstamp = calendar.timegm(current_datetime.utctimetuple())
@@ -60,11 +61,15 @@ def check_token(token_for_check, role):
             refresh_token_exp = refresh_token.exp
 
     if role == 'patient':
-        if (select_patient_by_key(username) and decoded_jwt['role'] == 'patient'
+        if (select_patient_by_key(username)
             and current_utcstamp <= refresh_token_exp):
             return True
     elif role == 'doctor':
-        if (select_doctor_by_key(username) and decoded_jwt['role'] == 'doctor'
+        if (select_doctor_by_key(username)
+            and current_utcstamp <= refresh_token_exp):
+            return True
+    elif role == 'specialist':
+        if (select_specialist_by_key(username)
             and current_utcstamp <= refresh_token_exp):
             return True
 
@@ -86,14 +91,25 @@ def get_uuid_from_token(token):
 
     return token_uuid
 
-def check_data_and_login(username, constant_password, role):
+def get_role_from_token(token):
+    """Получение роли из токена"""
+    decoded_jwt = jwt.decode(token, JWT_KEY, algorithms="HS256")
+
+    role = decoded_jwt['role']
+
+    return role
+
+def check_data_and_login(username, constant_password):
     """Проверка данных и логин пользователя"""
-    if role == 'patient':
-        if select_patient_by_key(username):
-            constant_password_hash = hash_gost_3411(constant_password)
-    elif role == 'doctor':
-        if select_doctor_by_key(username):
-            constant_password_hash = hash_gost_3411(constant_password)
+    if select_patient_by_key(username):
+        constant_password_hash = hash_gost_3411(constant_password)
+        role = 'patient'
+    elif select_doctor_by_key(username):
+        constant_password_hash = hash_gost_3411(constant_password)
+        role = 'doctor'
+    elif select_specialist_by_key(username):
+        constant_password_hash = hash_gost_3411(constant_password)
+        role = 'specialist'
 
     with Session(engine) as session:
         if role == 'patient':
@@ -112,6 +128,14 @@ def check_data_and_login(username, constant_password, role):
             if doctor_const_pass:
                 short_jwt, long_jwt = create_two_tokens(username, 'doctor')
                 return TokenObject(access_token=short_jwt, refresh_token=long_jwt)
+        elif role == 'specialist':
+            specialist_const_pass = session.query(SpecialistTable).\
+                                        filter(SpecialistTable.username == username,
+                                                SpecialistTable.password == constant_password_hash).\
+                                        first()
+            if specialist_const_pass:
+                short_jwt, long_jwt = create_two_tokens(username, 'specialist')
+                return TokenObject(access_token=short_jwt, refresh_token=long_jwt)
 
     return False
 
@@ -123,6 +147,10 @@ def change_const_password(username, old_password, new_password, role):
             new_pwd_hash = hash_gost_3411(new_password)
     elif role == 'doctor':
         if select_doctor_by_key(username):
+            old_pwd_hash = hash_gost_3411(old_password)
+            new_pwd_hash = hash_gost_3411(new_password)
+    elif role == 'specialist':
+        if select_specialist_by_key(username):
             old_pwd_hash = hash_gost_3411(old_password)
             new_pwd_hash = hash_gost_3411(new_password)
 
@@ -147,6 +175,18 @@ def change_const_password(username, old_password, new_password, role):
                 session.query(DoctorTable).\
                     filter(DoctorTable.username == username,
                         DoctorTable.password == old_pwd_hash).\
+                    update({'password': new_pwd_hash})
+                session.commit()
+                return
+        elif role == 'specialist':
+            specialist_const_pass = session.query(SpecialistTable).\
+                                        filter(SpecialistTable.username == username,
+                                                SpecialistTable.password == old_pwd_hash).\
+                                        first()
+            if specialist_const_pass:
+                session.query(SpecialistTable).\
+                    filter(SpecialistTable.username == username,
+                        SpecialistTable.password == old_pwd_hash).\
                     update({'password': new_pwd_hash})
                 session.commit()
                 return

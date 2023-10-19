@@ -64,9 +64,12 @@ print('Recognition accuracy: ', recognition_accuracy)
 # Пример хэширования пароля по ГОСТ 34.11-2012 "Стрибог"
 example_str = "boralekkrutoi123!"
 another_example_str = "boralekochenkrutoi345!!"
+more_example_str = "boralekcooper567!!"
 
 example_hash = hash_gost_3411(example_str)
 another_example_hash = hash_gost_3411(another_example_str)
+more_example_hash = hash_gost_3411(more_example_str)
 
 print('Пример хэша: ', example_hash)
 print('Еще пример хэша: ', another_example_hash)
+print('Еще один пример хэша: ', more_example_hash)

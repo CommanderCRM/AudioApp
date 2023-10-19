@@ -585,3 +585,19 @@ class PasswordChangeInfo(SQLModel):
         min_length=8,
         max_length=128
     )
+
+class SpecialistTable(SQLModel, table=True):
+    """Таблица специалиста"""
+    __tablename__: str = "specialist_table"
+    username: str = Field(
+        default = None,
+        primary_key = True,
+        title = "specialist_login_1",
+        description = "Логин специалиста",
+    )
+    password: str = Field(
+        title="a52671k07c88!",
+        description="Пароль специалиста",
+        min_length=8,
+        max_length=128
+    )

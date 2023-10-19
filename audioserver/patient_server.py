@@ -10,7 +10,7 @@ from logic.actions import (insert_speech, select_phrases_and_syllables,
 from logic.actionspatientauth import change_temporary_password
 from logic.actionsauth import (check_token, get_username_from_token, get_uuid_from_token,
                                check_data_and_login, change_const_password, delete_refresh_token,
-                               create_two_tokens)
+                               create_two_tokens, get_role_from_token)
 
 app = FastAPI()
 
@@ -56,13 +56,13 @@ async def send_access_token_for_check(request: Request):
     """Отправка токена доступа на проверку"""
     access_token = await get_token_from_header(request)
 
-    return check_token(access_token, 'patient')
+    return check_token(access_token)
 
 async def send_refresh_token_for_check(request: Request):
     """Отправка токена обновления на проверку"""
     refresh_token = await get_token_from_cookie(request)
 
-    return check_token(refresh_token, 'patient')
+    return check_token(refresh_token)
 
 @app.post("/session")
 async def create_speech_session(request: Request):
@@ -74,22 +74,32 @@ async def create_speech_session(request: Request):
 
         access_token = await get_token_from_header(request)
         username = get_username_from_token(access_token)
+        role = get_role_from_token(access_token)
 
-        session_info = PostSessionInfo(is_reference_session=False, session_type=session_type)
+        if role == 'patient':
+            session_info = PostSessionInfo(is_reference_session=False, session_type=session_type)
 
-        return insert_session_info(username, session_info)
+            return insert_session_info(username, session_info)
 
 @app.post("/session/{session_id}")
 async def upload_record_speech(request: Request, session_id: int, speech_info: PostSpeechInfo):
     """Загрузить/записать речь в сеанс"""
     if await send_access_token_for_check(request):
-        return insert_speech(None, session_id, speech_info)
+        access_token = await get_token_from_header(request)
+        role = get_role_from_token(access_token)
+
+        if role == 'patient':
+            return insert_speech(None, session_id, speech_info)
 
 @app.get("/session/{session_id}")
 async def get_phrases_and_syllables_info(request: Request):
     """Получить информацию o фразах и слогах"""
     if await send_access_token_for_check(request):
-        return select_phrases_and_syllables()
+        access_token = await get_token_from_header(request)
+        role = get_role_from_token(access_token)
+
+        if role == 'patient':
+            return select_phrases_and_syllables()
 
 @app.get("/login")
 async def get_password_status(card_number: str):
@@ -112,8 +122,10 @@ async def get_doctors_info(request: Request):
     if await send_access_token_for_check(request):
         access_token = await get_token_from_header(request)
         username = get_username_from_token(access_token)
+        role = get_role_from_token(access_token)
 
-        return get_doctors_list(username)
+        if role == 'patient':
+            return get_doctors_list(username)
 
 @app.post("/update_tokens")
 async def update_tokens(request: Request):
@@ -122,12 +134,14 @@ async def update_tokens(request: Request):
         refresh_token = await get_token_from_cookie(request)
         username = get_username_from_token(refresh_token)
         token_uuid = get_uuid_from_token(refresh_token)
+        role = get_role_from_token(refresh_token)
 
-        delete_refresh_token(token_uuid)
+        if role == 'patient':
+            delete_refresh_token(token_uuid)
 
-        short_jwt, long_jwt = create_two_tokens(username, 'patient')
+            short_jwt, long_jwt = create_two_tokens(username, role)
 
-        return TokenObject(access_token=short_jwt, refresh_token=long_jwt)
+            return TokenObject(access_token=short_jwt, refresh_token=long_jwt)
 
 @app.post("/login")
 async def login_patient(request: Request):
@@ -135,18 +149,22 @@ async def login_patient(request: Request):
     data = await request.json()
     login_info = PasswordPatientInfo(**data)
 
-    return check_data_and_login(login_info.card_number, login_info.constant_password, 'patient')
+    return check_data_and_login(login_info.card_number, login_info.constant_password)
 
 @app.patch("/settings")
 async def change_patient_password(request: Request):
     """Смена постоянного пароля пациента на другой постоянный"""
     if await send_access_token_for_check(request):
-        data = await request.json()
-        change_info = PasswordChangePatientInfo(**data)
+        access_token = await get_token_from_header(request)
+        role = get_role_from_token(access_token)
 
-        return change_const_password(change_info.card_number,
-                                             change_info.old_password, change_info.new_password,
-                                             'patient')
+        if role == 'patient':
+            data = await request.json()
+            change_info = PasswordChangePatientInfo(**data)
+
+            return change_const_password(change_info.card_number,
+                                                change_info.old_password, change_info.new_password,
+                                                role)
 
 @app.get("/logout")
 async def logout_patient(request: Request):
@@ -155,4 +173,7 @@ async def logout_patient(request: Request):
         refresh_token = await get_token_from_cookie(request)
         token_uuid = get_uuid_from_token(refresh_token)
 
-        delete_refresh_token(token_uuid)
+        role = get_role_from_token(refresh_token)
+
+        if role == 'patient':
+            delete_refresh_token(token_uuid)
