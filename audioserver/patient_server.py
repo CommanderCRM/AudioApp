@@ -2,6 +2,7 @@ from enum import Enum
 from fastapi import FastAPI, status, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from logic.tables import (PostSpeechInfo, TemporaryPasswordChangePatientInfo, TokenObject,
                           PasswordPatientInfo, PostSessionInfoPatient, PostSessionInfo,
                           PasswordChangePatientInfo)
@@ -13,6 +14,9 @@ from logic.actionsauth import (check_token, get_username_from_token, get_uuid_fr
                                create_two_tokens, get_role_from_token)
 
 app = FastAPI()
+
+# Перенаправляем весь трафик на HTTPS
+app.add_middleware(HTTPSRedirectMiddleware)
 
 class ErrorCode(Enum):
     """Типы ошибок"""
