@@ -42,6 +42,7 @@ services:
     ports:
       - "50080:50080"
     depends_on:
+      - doctor
       - sql
     volumes:
       - ..:/app
