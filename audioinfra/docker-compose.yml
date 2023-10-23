@@ -23,6 +23,7 @@ services:
     container_name: doctor_server
     environment:
      - TESTING=${TESTING}
+     - LOG_LEVEL=${LOG_LEVEL}
     ports:
       - "48080:48080"
     depends_on:
@@ -39,6 +40,7 @@ services:
     container_name: patient_server
     environment:
      - TESTING=${TESTING}
+     - LOG_LEVEL=${LOG_LEVEL}
     ports:
       - "50080:50080"
     depends_on:

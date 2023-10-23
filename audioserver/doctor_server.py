@@ -1,15 +1,17 @@
 from enum import Enum
+import os
 from fastapi import FastAPI, status, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from loguru import logger
 from logic.tables import (PostPatientInfo, PostSessionInfo, PostSpeechInfo,
                           CompareSessionsIDs, TokenObject, PasswordChangeInfo, LoginInfo)
 from logic.actions import (insert_patient, select_all_patients, select_patient_by_key,
                         convert_full_model_to_table, insert_session_info, insert_speech,
                         select_session_info, select_speech_info, select_session_by_key,
                         select_patient_and_sessions, select_phrases_and_syllables,
-                        compare_two_sessions, compare_phrases_real)
+                        compare_two_sessions, compare_phrases_real, get_doctor_info)
 from logic.actionsauth import (check_token, get_username_from_token, get_uuid_from_token,
                                check_data_and_login, change_const_password, delete_refresh_token,
                                create_two_tokens, get_role_from_token)
@@ -18,6 +20,14 @@ app = FastAPI()
 
 # Перенаправляем весь трафик на HTTPS
 app.add_middleware(HTTPSRedirectMiddleware)
+
+# Инициализируем логгер
+if os.environ.get('LOG_LEVEL') == 'DEBUG':
+    LEVEL = 'DEBUG'
+else:
+    LEVEL = 'INFO'
+
+logger.add("doctor_server.log", rotation="5 MB", format="{time} {level} {message}", level=LEVEL)
 
 class ErrorCode(Enum):
     """Типы ошибок"""
@@ -47,7 +57,9 @@ async def get_token_from_header(request: Request):
     auth_header = request.headers.get('Authorization')
 
     if auth_header:
+        logger.debug(f'В запросе есть заголовок аутентификации {auth_header}')
         access_token = auth_header.replace("Bearer ", "")
+        logger.debug(f'Получен токен доступа {access_token}')
 
     return access_token
 
@@ -60,6 +72,7 @@ async def get_token_from_cookie(request: Request):
 async def send_access_token_for_check(request: Request):
     """Отправка токена доступа на проверку"""
     access_token = await get_token_from_header(request)
+    logger.debug(f'Отправляем токен доступа {access_token} на проверку')
 
     return check_token(access_token)
 
@@ -102,6 +115,20 @@ async def get_patients(limit: int, request: Request):
 
         if role in {'doctor', 'specialist'}:
             return select_all_patients(limit)
+
+@app.get("/doctors")
+async def get_doctor(request: Request):
+    """Получение информации о враче по запросу GET"""
+    if await send_access_token_for_check(request):
+        access_token = await get_token_from_header(request)
+        role = get_role_from_token(access_token)
+        username = get_username_from_token(access_token)
+        logger.debug(f'Получена роль {role}')
+        logger.debug(f'Получено имя {username}')
+
+        if role == 'doctor':
+            logger.debug(f'Доступ разрешен, запрашиваем информацию о враче {username}')
+            return get_doctor_info(username)
 
 @app.post("/patients/{card_number}")
 async def post_session_info(card_number: str, session_info: PostSessionInfo, request: Request):
@@ -222,6 +249,7 @@ async def login(request: Request):
     """Вход врача/специалиста в систему"""
     data = await request.json()
     login_info = LoginInfo(**data)
+    logger.debug(f'Информация о логине врача/специалиста: {login_info}')
 
     return check_data_and_login(login_info.username, login_info.password)
 

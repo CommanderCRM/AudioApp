@@ -2,6 +2,7 @@ from typing import Tuple, List
 import statistics
 import os
 from sqlmodel import Session, create_engine, select
+from loguru import logger
 from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo,
                      PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable,
                      SpeechSessionTable, GetSpeechInfoArray, GetSessionInfo,
@@ -9,7 +10,7 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
                      SpeechCompareTable, SpeechCompares, SessionCompares,
                      PostSessionInfoReturn, PasswordStatus, DoctorInfo,
-                     DoctorTable, GetDoctorsInfo, SpecialistTable)
+                     DoctorTable, GetDoctorsInfo, SpecialistTable, GetDoctorInfo)
 from .actionsaudio import compare_sessions_dtw, compare_phrases_levenstein
 from .secactions import hash_gost_3411, validate_pass
 
@@ -17,6 +18,12 @@ if os.getenv('TESTING'):
     engine = create_engine('sqlite:///sqlite3.db')
 else:
     engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
+
+# Инициализируем логгер
+if os.environ.get('LOG_LEVEL') == 'DEBUG':
+    LEVEL = 'DEBUG'
+else:
+    LEVEL = 'INFO'
 
 def convert_full_model_to_table(full_patient_model: PostPatientInfo) -> Tuple[PatientTable, List[DoctorPatientTable]]:
     """Перевод полной модели пациента в таблицу пациента
@@ -83,9 +90,9 @@ def select_patient_by_key(card_number: str):
 def select_doctor_by_key(username: str):
     """Получение врача по ключу"""
     with Session(engine) as session:
-        patient = session.exec(select(DoctorTable)
+        doctor = session.exec(select(DoctorTable)
                                .where(DoctorTable.username == username)).first()
-        return bool(patient)
+        return bool(doctor)
 
 def select_specialist_by_key(username: str):
     """Получение специалиста по ключу"""
@@ -93,6 +100,16 @@ def select_specialist_by_key(username: str):
         specialist = session.exec(select(SpecialistTable)
                                .where(SpecialistTable.username == username)).first()
         return bool(specialist)
+
+def get_doctor_info(username: str):
+    """Получение информации о враче по логину"""
+    with Session(engine) as session:
+        doctor = session.exec(select(DoctorTable)
+                               .where(DoctorTable.username == username)).first()
+        doctor_info = GetDoctorInfo(doctor_login=doctor.username, hospital=doctor.hospital)
+        logger.debug(f'Получена информация о враче: {doctor_info}, возвращаем')
+
+        return doctor_info
 
 def insert_session_info(card_number: str, session_info: PostSessionInfo):
     """Запись информации o сессии в БД"""
