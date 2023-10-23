@@ -601,3 +601,13 @@ class SpecialistTable(SQLModel, table=True):
         min_length=8,
         max_length=128
     )
+
+class GetDoctorInfo(SQLModel):
+    """Информация о враче"""
+    doctor_login: str = Field(
+        title = "user1",
+        description = "Логин врача",
+    )
+    hospital: Hospital = Field(
+        title="Tomsk NII",
+        description="Больница")
