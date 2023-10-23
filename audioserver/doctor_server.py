@@ -11,7 +11,8 @@ from logic.actions import (insert_patient, select_all_patients, select_patient_b
                         convert_full_model_to_table, insert_session_info, insert_speech,
                         select_session_info, select_speech_info, select_session_by_key,
                         select_patient_and_sessions, select_phrases_and_syllables,
-                        compare_two_sessions, compare_phrases_real, get_doctor_info)
+                        compare_two_sessions, compare_phrases_real, get_doctor_info,
+                        compare_three_sessions)
 from logic.actionsauth import (check_token, get_username_from_token, get_uuid_from_token,
                                check_data_and_login, change_const_password, delete_refresh_token,
                                create_two_tokens, get_role_from_token)
@@ -136,11 +137,15 @@ async def post_session_info(card_number: str, session_info: PostSessionInfo, req
     if await send_access_token_for_check(request):
         access_token = await get_token_from_header(request)
         role = get_role_from_token(access_token)
+        logger.debug(f'Получена роль {role}')
 
         if role in {'doctor', 'specialist'}:
+            logger.debug('Доступ врача/специалиста успешный')
             if not select_patient_by_key(card_number):
+                logger.debug(f'Нет пациента {card_number}')
                 raise HTTPException(status_code=404)
 
+            logger.debug('Вызываем создание сеанса в БД')
             return insert_session_info(card_number, session_info)
 
 @app.post("/patients/{card_number}/speech/{session_id}")
@@ -149,11 +154,15 @@ async def upload_record_speech(card_number: str, session_id: int, speech_info: P
     if await send_access_token_for_check(request):
         access_token = await get_token_from_header(request)
         role = get_role_from_token(access_token)
+        logger.debug(f'Получена роль {role}')
 
         if role in {'doctor', 'specialist'}:
+            logger.debug('Доступ врача/специалиста успешный')
             if not select_patient_by_key(card_number):
+                logger.debug(f'Нет пациента {card_number}')
                 raise HTTPException(status_code=404)
 
+            logger.debug('Вызываем загрузку речи в БД')
             return insert_speech(card_number, session_id, speech_info)
 
 @app.get("/patients/{card_number}/session/{session_id}")
@@ -205,18 +214,41 @@ async def compare_sessions(card_number: int, request: Request):
     if await send_access_token_for_check(request):
         access_token = await get_token_from_header(request)
         role = get_role_from_token(access_token)
+        logger.debug(f'Получена роль {role}')
 
         if role in {'doctor', 'specialist'}:
             data = await request.json()
             session_ids = CompareSessionsIDs(**data)
+            logger.debug(f'Доступ разрешен, получены ID сессий {session_ids}')
 
-            session_1_id = session_ids.sessions_id[0]
-            session_2_id = session_ids.sessions_id[1]
+            if len(session_ids.sessions_id) == 2:
+                logger.debug('Получено 2 ID, будем сравнивать сеанс с 1 эталонным')
+                session_1_id = session_ids.sessions_id[0]
+                session_2_id = session_ids.sessions_id[1]
+            elif len(session_ids.sessions_id) == 3:
+                logger.debug('Получено 3 ID, будем сравнивать сеанс с 2 эталонными')
+                session_1_id = session_ids.sessions_id[0]
+                session_2_id = session_ids.sessions_id[1]
+                session_3_id = session_ids.sessions_id[2]
 
-            if not select_session_by_key(session_1_id) or not select_session_by_key(session_2_id):
+            if len(session_ids.sessions_id) == 2 and (not select_session_by_key(session_1_id)
+                                          or not select_session_by_key(session_2_id)):
+                logger.debug('При 2 ID один из сеансов не существует')
                 raise HTTPException(status_code=404)
 
-            return compare_two_sessions(card_number, session_1_id, session_2_id)
+            if len(session_ids.sessions_id) == 3 and (not select_session_by_key(session_1_id)
+                                          or not select_session_by_key(session_2_id)
+                                          or not select_session_by_key(session_3_id)):
+                logger.debug('При 3 ID один из сеансов не существует')
+                raise HTTPException(status_code=404)
+
+            if len(session_ids.sessions_id) == 2:
+                logger.debug('Вызываем сравнение двух сеансов')
+                return compare_two_sessions(card_number, session_1_id, session_2_id)
+
+            if len(session_ids.sessions_id) == 3:
+                logger.debug('Вызываем сравнение трех сеансов')
+                return compare_three_sessions(card_number, session_1_id, session_2_id, session_3_id)
 
 @app.patch("/patients/{card_number}/session/{session_id}")
 async def compare_phrases_with_real(card_number: int, session_id: int, request: Request):
