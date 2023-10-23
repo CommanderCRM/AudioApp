@@ -190,6 +190,89 @@
         }
       }
     },
+    "/doctors": {
+      "get": {
+        "tags": [
+          "patients"
+        ],
+        "operationId": "getDoctorsInfo",
+        "summary": "Получить информацию о враче",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/get_doctor_info"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_1"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_2"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_3"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_4"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_14"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Такого врача не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
     "/patients/{card_number}": {
       "get": {
         "tags": [
@@ -1219,6 +1302,26 @@
           }
         }
       },
+      "get_doctor_info": {
+        "type": "object",
+        "properties": {
+          "doctor_login": {
+            "type": "string",
+            "example": "boralek",
+            "description": "уникальный идентификатор пациента - логин"
+          },
+          "hospital": {
+            "type": "string",
+            "enum": [
+              "Tomsk NII",
+              "Moscow NII_1",
+              "Moscow NII_2"
+            ],
+            "description": "Больница врача"
+          }
+        },
+        "description": "Информация о враче, добавляющем пациента. Полученная информация используется в POST /patients"
+      },
       "post_session_info_return": {
         "type": "object",
         "properties": {
@@ -1301,12 +1404,12 @@
             "items": {
               "type": "string",
               "example": [
-                "Илиа Кривошеин",
-                "Никита Шабонов",
-                "Алексей Боров"
+                "boralek123",
+                "shaban456",
+                "krivosh789"
               ]
             },
-            "description": "идентификаторы лечащих врачей, при создании отправляется только один идентификатор врача, который добавляет пациента"
+            "description": "идентификаторы лечащих врачей, при создании отправляется только один идентификатор врача, который добавляет пациента (используется логин)"
           },
           "hospital": {
             "type": "string",
