@@ -11,7 +11,7 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      SpeechCompareTable, SpeechCompares, SessionCompares,
                      PostSessionInfoReturn, PasswordStatus, DoctorInfo,
                      DoctorTable, GetDoctorsInfo, SpecialistTable, GetDoctorInfo)
-from .actionsaudio import compare_sessions_dtw, compare_phrases_levenstein
+from .actionsaudio import compare_two_sessions_dtw, compare_phrases_levenstein, compare_three_sessions_dtw
 from .secactions import hash_gost_3411, validate_pass
 
 if os.getenv('TESTING'):
@@ -119,6 +119,7 @@ def insert_session_info(card_number: str, session_info: PostSessionInfo):
         card_number=card_number
     )
     with Session(engine) as session:
+        logger.debug(f'Добавляем в БД информацию о сеансе {session_table}')
         session.add(session_table)
         session.commit()
         session.refresh(session_table)
@@ -130,6 +131,7 @@ def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
         session_record = session.query(SessionTable).filter(SessionTable.session_id == session_id).first()
         if session_record is not None:
             is_reference_speech = session_record.is_reference_session
+            logger.debug(f'Тип речи для записи в БД (эталон или нет): {is_reference_speech}')
 
     speech_table = SpeechTable(
         speech_type=speech_info.speech_type,
@@ -139,12 +141,15 @@ def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
         real_value=speech_info.real_value
     )
     with Session(engine) as session:
+        logger.debug('Запишем в БД основную информацию о речи (base64 не логируется)')
+        logger.debug(f'{speech_table.speech_type}, {speech_table.is_reference_speech}, {speech_table.real_value}')
         session.add(speech_table)
         session.commit()
         speech_session_table = SpeechSessionTable(
             speech_id=speech_table.speech_id,
             session_id=session_id
         )
+        logger.debug(f'Запишем в таблицу отношения речи/сеанса {speech_session_table}')
         session.add(speech_session_table)
         session.commit()
 
@@ -324,7 +329,7 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
         speech_value_key += 1
 
     # Получение расстояний DTW для каждой пары слогов и общей оценки сеанса (среднее)
-    dtw_distances = compare_sessions_dtw(speech_values_dict)
+    dtw_distances = compare_two_sessions_dtw(speech_values_dict)
     dtw_mean = statistics.mean(dtw_distances.values())
 
     # Заполнение таблицы сравнения сеансов
@@ -345,6 +350,67 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
                 compared_speech_id_2=value[1],
                 speech_score=dtw_distances[key],
             )
+            session.add(speech_compare)
+            session.commit()
+
+def compare_three_sessions(_, session_1_id: int, session_2_id: int, session_3_id: int):
+    """Сравнение трех сеансов"""
+    session_1_speeches = get_session_speech_array(session_1_id)
+    session_2_speeches = get_session_speech_array(session_2_id)
+    session_3_speeches = get_session_speech_array(session_3_id)
+
+    comparable_speech_ids = {}
+    comparable_key = 0
+
+    # Получение тех записей речи, которые можно сравнить
+    for speech_1 in session_1_speeches:
+        for speech_2 in session_2_speeches:
+            for speech_3 in session_3_speeches:
+                if speech_1.speech_type == speech_2.speech_type == speech_3.speech_type and \
+                   speech_1.real_value == speech_2.real_value == speech_3.real_value:
+                    comparable_speech_ids[comparable_key] = [speech_1.speech_id, speech_2.speech_id, speech_3.speech_id]
+                    logger.debug(f'Заполняем словарь по ключу {comparable_key} ID {comparable_speech_ids}')
+                    comparable_key += 1
+
+    speech_values_dict = {}
+    speech_value_key = 0
+
+    # Получение base64 значений сравниваемых записей речи
+    for comparable_key, speech_ids in comparable_speech_ids.items():
+        speech_1_value = get_speech_value(speech_ids[0])
+        speech_2_value = get_speech_value(speech_ids[1])
+        speech_3_value = get_speech_value(speech_ids[2])
+        speech_values_dict[speech_value_key] = [speech_1_value, speech_2_value, speech_3_value]
+        speech_value_key += 1
+
+    # Получение расстояний DTW по формуле сравнения сеанса с 2 эталонами и общей оценки сеанса (среднее)
+    dtw_distances = compare_three_sessions_dtw(speech_values_dict)
+    logger.debug(f'Получены расстояния DTW {dtw_distances}')
+    dtw_mean = statistics.mean(dtw_distances.values())
+    logger.debug(f'Получено среднее значение DTW {dtw_mean}')
+
+    # Заполнение таблицы сравнения сеансов
+    with Session(engine) as session:
+        session_compare = SessionCompareTable(
+            compared_session_id_1=session_1_id,
+            compared_session_id_2=session_2_id,
+            compared_session_id_3=session_3_id,
+            session_score=dtw_mean,
+        )
+        logger.debug(f'Передаем в таблицу сравнения сеансов {session_compare}')
+        session.add(session_compare)
+        session.commit()
+
+    # Заполнение таблицы сравнения записей речи
+    with Session(engine) as session:
+        for key, value in comparable_speech_ids.items():
+            speech_compare = SpeechCompareTable(
+                compared_speech_id_1=value[0],
+                compared_speech_id_2=value[1],
+                compared_speech_id_3=value[2],
+                speech_score=dtw_distances[key],
+            )
+            logger.debug(f'Передаем в таблицу сравнения речи {speech_compare}')
             session.add(speech_compare)
             session.commit()
 
