@@ -7,6 +7,7 @@ from audioserver.logic.audiometrics.metrics import AudioMetrics
 from audioserver.logic.audiosegm.segmentation import Segmentation
 from audioserver.logic.audiorecognition.recognition import recognize_vosk, levenstein
 from audioserver.logic.secactions import hash_gost_3411
+from audioserver.logic.audiometrics.envelopes import AudioEnvelopes
 
 # Пример загрузки и сохранения файла
 file = AudioFile('1.wav')
@@ -73,3 +74,21 @@ more_example_hash = hash_gost_3411(more_example_str)
 print('Пример хэша: ', example_hash)
 print('Еще пример хэша: ', another_example_hash)
 print('Еще один пример хэша: ', more_example_hash)
+
+# Пример использования огибающих
+file = AudioFile('8.wav')
+y, sr = file.load()
+print('Значения ориг. аудиоряда: ', y)
+
+AE = AudioEnvelopes()
+abs_envelope = AE.absolute_envelope(y)
+print('Огибающая по абсолютным значениям : ', abs_envelope)
+
+ste_envelope = AE.short_time_energy_envelope(y)
+print('Огибающая по мгновенной энергии: ', ste_envelope)
+
+hilbert_envelope = AE.hilbert_envelope(y)
+print('Огибающая Гильберта: ', hilbert_envelope)
+
+fft_envelope = AE.fft_envelope(y)
+print('Огибающая FFT: ', fft_envelope)
