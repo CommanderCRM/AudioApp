@@ -3,6 +3,7 @@ from loguru import logger
 from .audiotools.tools import AudioFile
 from .audiopreproc.preprocessing import AudioPreprocessor
 from .audiometrics.metrics import AudioMetrics
+from .audiometrics.envelopes import AudioEnvelopes
 from .audiorecognition.recognition import recognize_vosk, levenstein
 
 # Инициализируем логгер
@@ -25,6 +26,7 @@ def load_and_reduce_noise(audio_file):
 def compare_two_sessions_dtw(speech_values_dict):
     """Сравнение двух сеансов по DTW"""
     audio_metrics = AudioMetrics()
+    audio_envelopes = AudioEnvelopes()
     dtw_distances = {}
 
     for key, speech_values in speech_values_dict.items():
@@ -44,8 +46,12 @@ def compare_two_sessions_dtw(speech_values_dict):
         y1, _ = AudioFile(f"speech_{key}_1_reduced.wav").load()
         y2, _ = AudioFile(f"speech_{key}_2_reduced.wav").load()
 
+        logger.debug('Рассчитываем огибающую Гильберта на .wav файлы')
+        y1_hilbert = audio_envelopes.hilbert_envelope(y1)
+        y2_hilbert = audio_envelopes.hilbert_envelope(y2)
+
         logger.debug('Получаем расстояния между 2 .wav файлами')
-        dtw_distance = audio_metrics.get_audio_dtw(y1, y2)
+        dtw_distance = audio_metrics.get_audio_dtw(y1_hilbert, y2_hilbert)
         logger.debug(f'DTW между Ei и R1i: {dtw_distance}')
 
         dtw_distances[key] = dtw_distance
@@ -60,6 +66,7 @@ def compare_two_sessions_dtw(speech_values_dict):
 def compare_three_sessions_dtw(speech_values_dict):
     """Сравнение трех сеансов по DTW"""
     audio_metrics = AudioMetrics()
+    audio_envelopes = AudioEnvelopes()
     dtw_distances = {}
 
     for key, speech_values in speech_values_dict.items():
@@ -80,12 +87,17 @@ def compare_three_sessions_dtw(speech_values_dict):
         y2, _ = AudioFile(f"speech_{key}_2_reduced.wav").load()
         y3, _ = AudioFile(f"speech_{key}_3_reduced.wav").load()
 
+        logger.debug('Рассчитываем огибающую Гильберта на .wav файлы')
+        y1_hilbert = audio_envelopes.hilbert_envelope(y1)
+        y2_hilbert = audio_envelopes.hilbert_envelope(y2)
+        y3_hilbert = audio_envelopes.hilbert_envelope(y3)
+
         logger.debug('Получаем расстояния между 3 .wav файлами')
-        dtw_distance_12 = audio_metrics.get_audio_dtw(y1, y2)
+        dtw_distance_12 = audio_metrics.get_audio_dtw(y1_hilbert, y2_hilbert)
         logger.debug(f'DTW между Ei и R1i: {dtw_distance_12}')
-        dtw_distance_13 = audio_metrics.get_audio_dtw(y1, y3)
+        dtw_distance_13 = audio_metrics.get_audio_dtw(y1_hilbert, y3_hilbert)
         logger.debug(f'DTW между Ei и R2i: {dtw_distance_13}')
-        dtw_distance_23 = audio_metrics.get_audio_dtw(y2, y3)
+        dtw_distance_23 = audio_metrics.get_audio_dtw(y2_hilbert, y3_hilbert)
         logger.debug(f'DTW между R1i и R2i: {dtw_distance_23}')
 
         logger.debug('Рассчитываем оценку речи по формуле (обычная с 2 эталонами)')
