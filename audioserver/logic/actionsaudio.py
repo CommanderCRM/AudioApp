@@ -11,117 +11,106 @@ if os.environ.get('LOG_LEVEL') == 'DEBUG':
 else:
     LEVEL = 'INFO'
 
+def load_and_reduce_noise(audio_file):
+    """Загрузка файла в память и снижение шума"""
+    audio_preprocessor = AudioPreprocessor()
+
+    y, sr = audio_file.load()
+    logger.debug('Аудиофайл загружен, снижаем шум')
+
+    y_reduced = audio_preprocessor.reduce_noise(y, sr)
+    logger.debug('Шум снижен')
+    return y_reduced, sr
+
 def compare_two_sessions_dtw(speech_values_dict):
     """Сравнение двух сеансов по DTW"""
-    audio_preprocessor = AudioPreprocessor()
     audio_metrics = AudioMetrics()
     dtw_distances = {}
 
     for key, speech_values in speech_values_dict.items():
-        speech_1_base64, speech_2_base64 = speech_values
+        speech_base64_list = speech_values
 
-        AudioFile.decode_base64(speech_1_base64, f"speech_{key}_1.wav")
-        AudioFile.decode_base64(speech_2_base64, f"speech_{key}_2.wav")
+        logger.debug('Декодируем base64 в .wav файлы')
+        for i, speech_base64 in enumerate(speech_base64_list, 1):
+            AudioFile.decode_base64(speech_base64, f"speech_{key}_{i}.wav")
 
-    for key in speech_values_dict:
-        speech_1_file = AudioFile(f"speech_{key}_1.wav")
-        speech_2_file = AudioFile(f"speech_{key}_2.wav")
+        logger.debug('Снижаем шум в .wav файлах')
+        for i in range(1, 3):
+            speech_file = AudioFile(f"speech_{key}_{i}.wav")
+            y, sr = load_and_reduce_noise(speech_file)
+            speech_file.save(y, sr, f"speech_{key}_{i}_reduced.wav")
 
-        y1, sr1 = speech_1_file.load()
-        y2, sr2 = speech_2_file.load()
+        logger.debug('Загружаем .wav файлы со сниженным шумом в память')
+        y1, _ = AudioFile(f"speech_{key}_1_reduced.wav").load()
+        y2, _ = AudioFile(f"speech_{key}_2_reduced.wav").load()
 
-        y1_reduced = audio_preprocessor.reduce_noise(y1, sr1)
-        y2_reduced = audio_preprocessor.reduce_noise(y2, sr2)
-
-        speech_1_file.save(y1_reduced, sr1, f"speech_{key}_1_reduced.wav")
-        speech_2_file.save(y2_reduced, sr2, f"speech_{key}_2_reduced.wav")
-
-    for key in speech_values_dict:
-        speech_1_file = AudioFile(f"speech_{key}_1_reduced.wav")
-        speech_2_file = AudioFile(f"speech_{key}_2_reduced.wav")
-
-        y1, sr1 = speech_1_file.load()
-        y2, sr2 = speech_2_file.load()
+        logger.debug('Получаем расстояния между 2 .wav файлами')
         dtw_distance = audio_metrics.get_audio_dtw(y1, y2)
+        logger.debug(f'DTW между Ei и R1i: {dtw_distance}')
+
         dtw_distances[key] = dtw_distance
 
-    for key in speech_values_dict:
-        os.remove(f"speech_{key}_1.wav")
-        os.remove(f"speech_{key}_2.wav")
-        os.remove(f"speech_{key}_1_reduced.wav")
-        os.remove(f"speech_{key}_2_reduced.wav")
+        logger.debug('Удаляем файлы')
+        for i in range(1, 3):
+            os.remove(f"speech_{key}_{i}.wav")
+            os.remove(f"speech_{key}_{i}_reduced.wav")
 
     return dtw_distances
 
 def compare_three_sessions_dtw(speech_values_dict):
     """Сравнение трех сеансов по DTW"""
-    audio_preprocessor = AudioPreprocessor()
     audio_metrics = AudioMetrics()
     dtw_distances = {}
 
     for key, speech_values in speech_values_dict.items():
-        speech_1_base64, speech_2_base64, speech_3_base64 = speech_values
+        speech_base64_list = speech_values
 
-        logger.debug('Декодируем base64 в 3 .wav файла')
-        AudioFile.decode_base64(speech_1_base64, f"speech_{key}_1.wav")
-        AudioFile.decode_base64(speech_2_base64, f"speech_{key}_2.wav")
-        AudioFile.decode_base64(speech_3_base64, f"speech_{key}_3.wav")
+        logger.debug('Декодируем base64 в .wav файлы')
+        for i, speech_base64 in enumerate(speech_base64_list, 1):
+            AudioFile.decode_base64(speech_base64, f"speech_{key}_{i}.wav")
 
-    for key in speech_values_dict:
-        speech_1_file = AudioFile(f"speech_{key}_1.wav")
-        speech_2_file = AudioFile(f"speech_{key}_2.wav")
-        speech_3_file = AudioFile(f"speech_{key}_3.wav")
+        logger.debug('Снижаем шум в .wav файлах')
+        for i in range(1, 4):
+            speech_file = AudioFile(f"speech_{key}_{i}.wav")
+            y, sr = load_and_reduce_noise(speech_file)
+            speech_file.save(y, sr, f"speech_{key}_{i}_reduced.wav")
 
-        logger.debug('Загружаем 3 .wav файла в память')
-        y1, sr1 = speech_1_file.load()
-        y2, sr2 = speech_2_file.load()
-        y3, sr3 = speech_3_file.load()
-
-        logger.debug('Снижаем 3 шум в 3 .wav файлах')
-        y1_reduced = audio_preprocessor.reduce_noise(y1, sr1)
-        y2_reduced = audio_preprocessor.reduce_noise(y2, sr2)
-        y3_reduced = audio_preprocessor.reduce_noise(y3, sr3)
-
-        logger.debug('Сохраняем 3 .wav файла со сниженным шумом')
-        speech_1_file.save(y1_reduced, sr1, f"speech_{key}_1_reduced.wav")
-        speech_2_file.save(y2_reduced, sr2, f"speech_{key}_2_reduced.wav")
-        speech_3_file.save(y3_reduced, sr3, f"speech_{key}_3_reduced.wav")
-
-    for key in speech_values_dict:
-        speech_1_file = AudioFile(f"speech_{key}_1_reduced.wav")
-        speech_2_file = AudioFile(f"speech_{key}_2_reduced.wav")
-        speech_3_file = AudioFile(f"speech_{key}_3_reduced.wav")
-
-        logger.debug('Загружаем 3 .wav файла со сниженным шумом в память')
-        y1, sr1 = speech_1_file.load()
-        y2, sr2 = speech_2_file.load()
-        y3, sr3 = speech_3_file.load()
+        logger.debug('Загружаем .wav файлы со сниженным шумом в память')
+        y1, _ = AudioFile(f"speech_{key}_1_reduced.wav").load()
+        y2, _ = AudioFile(f"speech_{key}_2_reduced.wav").load()
+        y3, _ = AudioFile(f"speech_{key}_3_reduced.wav").load()
 
         logger.debug('Получаем расстояния между 3 .wav файлами')
         dtw_distance_12 = audio_metrics.get_audio_dtw(y1, y2)
+        logger.debug(f'DTW между Ei и R1i: {dtw_distance_12}')
         dtw_distance_13 = audio_metrics.get_audio_dtw(y1, y3)
+        logger.debug(f'DTW между Ei и R2i: {dtw_distance_13}')
         dtw_distance_23 = audio_metrics.get_audio_dtw(y2, y3)
+        logger.debug(f'DTW между R1i и R2i: {dtw_distance_23}')
 
         logger.debug('Рассчитываем оценку речи по формуле (обычная с 2 эталонами)')
 
         if (dtw_distance_12+dtw_distance_13) == 0:
-            logger.debug('Знаменатель в формуле оценки 0, считаем что оценка 0')
-            dtw_distances[key] = 0
+            logger.debug('Знаменатель в формуле оценки 0, считаем что оценка 1')
+            dtw_distances[key] = 1
+        elif (2*dtw_distance_23) == 0:
+            logger.debug('Расстояние между 2 эталонами слишком маленькое, считаем что числитель 1')
+            dtw_distances[key] = 1/(dtw_distance_12+dtw_distance_13)
+            logger.debug(f'Формула: 1 / ({dtw_distance_12} + {dtw_distance_13})')
+            logger.debug(f'Оценка: {dtw_distances[key]}')
         else:
             dtw_distances[key] = (2*dtw_distance_23)/(dtw_distance_12+dtw_distance_13)
+            logger.debug(f'Формула: 2 * {dtw_distance_23} / ({dtw_distance_12} + {dtw_distance_13})')
+            logger.debug(f'Оценка: {dtw_distances[key]}')
 
         if dtw_distances[key] > 1:
             logger.debug('Оценка получилась больше 1, считаем что 1')
             dtw_distances[key] = 1
 
-    for key in speech_values_dict:
-        logger.debug('Удаляем файлы .wav')
-        os.remove(f"speech_{key}_1.wav")
-        os.remove(f"speech_{key}_2.wav")
-        os.remove(f"speech_{key}_3.wav")
-        os.remove(f"speech_{key}_1_reduced.wav")
-        os.remove(f"speech_{key}_2_reduced.wav")
-        os.remove(f"speech_{key}_3_reduced.wav")
+        logger.debug('Удаляем файлы')
+        for i in range(1, 4):
+            os.remove(f"speech_{key}_{i}.wav")
+            os.remove(f"speech_{key}_{i}_reduced.wav")
 
     return dtw_distances
 
