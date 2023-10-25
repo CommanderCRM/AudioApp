@@ -383,11 +383,11 @@ def compare_three_sessions(_, session_1_id: int, session_2_id: int, session_3_id
         speech_values_dict[speech_value_key] = [speech_1_value, speech_2_value, speech_3_value]
         speech_value_key += 1
 
-    # Получение расстояний DTW по формуле сравнения сеанса с 2 эталонами и общей оценки сеанса (среднее)
+    # Получение оценок по формуле сравнения сеанса с 2 эталонами и общей оценки сеанса (среднее)
     dtw_distances = compare_three_sessions_dtw(speech_values_dict)
-    logger.debug(f'Получены расстояния DTW {dtw_distances}')
+    logger.debug(f'Получены оценки {dtw_distances}')
     dtw_mean = statistics.mean(dtw_distances.values())
-    logger.debug(f'Получено среднее значение DTW {dtw_mean}')
+    logger.debug(f'Получена средняя оценка {dtw_mean}')
 
     # Заполнение таблицы сравнения сеансов
     with Session(engine) as session:
