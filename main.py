@@ -92,3 +92,64 @@ print('Огибающая Гильберта: ', hilbert_envelope)
 
 fft_envelope = AE.fft_envelope(y)
 print('Огибающая FFT: ', fft_envelope)
+
+# Пример использования DTW: получение расстояния и трансформированных последовательностей (одинаковая длина)
+y8, sr8 = AudioFile('8.wav').load()
+y9, sr9 = AudioFile('9.wav').load()
+
+AM = AudioMetrics()
+distance, indices1, indices2 = AM.get_dtw_with_indices(y8, y9)
+
+print('Расстояние DTW: ', distance)
+print('y1: ', y8)
+print('y2: ', y9)
+print('Сопоставляемый ряд y1: ', indices1)
+print('Сопоставляемый ряд y2: ', indices2)
+print('Длина y1: ', len(y8))
+print('Длина y2: ', len(y9))
+print('Длина сопост. y1: ', len(indices1))
+print('Длина сопост. y2: ', len(indices2))
+
+# Пример использования DTW: получение расстояния и индексов трансформированных последовательностей (разная длина)
+y8, sr8 = AudioFile('8.wav').load()
+y9, sr9 = AudioFile('15.wav').load()
+
+AM = AudioMetrics()
+distance, indices1, indices2 = AM.get_dtw_with_indices(y8, y9)
+
+print('Расстояние DTW: ', distance)
+print('y1: ', y8)
+print('y2: ', y9)
+print('Сопоставляемый ряд y1: ', indices1)
+print('Сопоставляемый ряд y2: ', indices2)
+print('Длина y1: ', len(y8))
+print('Длина y2: ', len(y9))
+print('Длина сопост. y1: ', len(indices1))
+print('Длина сопост. y2: ', len(indices2))
+
+# Пример получения расстояния DTW по всей длине последовательности с последовательностями разной длины
+y8, sr8 = AudioFile('8.wav').load()
+y15, sr15 = AudioFile('15.wav').load()
+
+AM = AudioMetrics()
+distance = AM.get_dtw_unbound(y8, y15)
+
+print('Расстояние DTW: ', distance)
+print('Длина y1: ', len(y8))
+print('Длина y2: ', len(y15))
+
+# Пример получения трансформированных DTW последовательностей
+# Тут лучше запускать скрипт через python3 main.py > main.txt (с перенаправлением)
+# т.к. трансформированные ряды не усекаются
+y8, sr8 = AudioFile('8.wav').load()
+y15, sr15 = AudioFile('15.wav').load()
+
+AM = AudioMetrics()
+y1_transformed, y2_transformed = AM.get_dtw_transformed_sequences(y8, y15)
+
+print('Исходный ряд y1: ', y8)
+print('Исходный ряд y2: ', y15)
+print('Трансформированный ряд y1: ', y1_transformed)
+print('Трансформированный ряд y2: ', y2_transformed)
+print('Длины рядов y1, y2: ', len(y8), len(y15))
+print('Длины трансформированных y1, y2: ', len(y1_transformed), len(y2_transformed))

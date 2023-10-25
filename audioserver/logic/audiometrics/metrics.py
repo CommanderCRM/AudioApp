@@ -1,5 +1,6 @@
 import math
 import numpy as np
+from dtw import dtw
 
 class AudioMetrics:
     """Расчет расстояний между аудиофайлами"""
@@ -78,7 +79,6 @@ class AudioMetrics:
 
         return(start_index_y1, end_index_y1, start_index_y2, end_index_y2)
 
-
     def get_audio_dtw(self, y1, y2):
         """Получение DTW между двумя аудиофайлами (1000 эл.)"""
         start_index_y1, end_index_y1, start_index_y2, end_index_y2 = self.get_boundaries(y1, y2)
@@ -96,3 +96,34 @@ class AudioMetrics:
         start_index_y1, end_index_y1, start_index_y2, end_index_y2 = self.get_boundaries(y1, y2)
         distance = self.edr(y1[start_index_y1:end_index_y1], y2[start_index_y2:end_index_y2],0.001)
         return distance
+
+    def get_dtw_with_indices(self, y1, y2):
+        """Получение DTW между двумя аудиофайлами (вся длина),
+           также рядов с индексами изначальных рядов"""
+        dtw_class = dtw(y1, y2)
+
+        dtw_distance = dtw_class.distance
+        dtw_indices1 = dtw_class.index1
+        dtw_indices2 = dtw_class.index2
+
+        return dtw_distance, dtw_indices1, dtw_indices2
+
+    def get_dtw_unbound(self, y1, y2):
+        """Получение DTW расстояния между двумя аудиофайлами (вся длина)"""
+        dtw_class = dtw(y1, y2)
+
+        dtw_distance = dtw_class.distance
+
+        return dtw_distance
+
+    def get_dtw_transformed_sequences(self, y1, y2):
+        """Получение трансформированных DTW рядов по изначальным"""
+        dtw_class = dtw(y1, y2)
+
+        dtw_indices1 = dtw_class.index1
+        dtw_indices2 = dtw_class.index2
+
+        y1_transformed = [y1[i] for i in dtw_indices1]
+        y2_transformed = [y2[i] for i in dtw_indices2]
+
+        return y1_transformed, y2_transformed
