@@ -3,7 +3,6 @@ import os
 from fastapi import FastAPI, status, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from loguru import logger
 from logic.tables import (PostPatientInfo, PostSessionInfo, PostSpeechInfo,
                           CompareSessionsIDs, TokenObject, PasswordChangeInfo, LoginInfo)
@@ -18,9 +17,6 @@ from logic.actionsauth import (check_token, get_username_from_token, get_uuid_fr
                                create_two_tokens, get_role_from_token)
 
 app = FastAPI()
-
-# Перенаправляем весь трафик на HTTPS
-app.add_middleware(HTTPSRedirectMiddleware)
 
 # Инициализируем логгер
 if os.environ.get('LOG_LEVEL') == 'DEBUG':
