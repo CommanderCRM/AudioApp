@@ -1,5 +1,6 @@
 import pathlib
 import os
+from multiprocessing import Process
 from audioserver.logic.audiotools.tools import AudioFile
 from audioserver.logic.audiopreproc.preprocessing import AudioPreprocessor
 from audioserver.logic.audiopreproc.voiceactivity import VoiceActivityDetector
@@ -8,6 +9,7 @@ from audioserver.logic.audiosegm.segmentation import Segmentation
 from audioserver.logic.audiorecognition.recognition import recognize_vosk, levenstein
 from audioserver.logic.secactions import hash_gost_3411
 from audioserver.logic.audiometrics.envelopes import AudioEnvelopes
+
 
 # Пример загрузки и сохранения файла
 file = AudioFile('1.wav')
@@ -31,9 +33,49 @@ file8_name = file8.get_file_name()
 file15_name = file15.get_file_name()
 
 metrics = AudioMetrics()
-print(f'ERP between {file8_name} and {file15_name}:', metrics.get_audio_erp(y8, y15))
-print(f'EDR between {file8_name} and {file15_name}:', metrics.get_audio_edr(y8, y15))
-print(f'MSM between {file8_name} and {file15_name}:', metrics.get_audio_msm(y8, y15))
+
+# собственная имплементация, > 5 мин на каждую
+def print_dtw():
+    '''Расчет DTW с прогрессом в отдельном процессе'''
+    print(f'DTW between {file8_name} and {file15_name}:', metrics.get_dtw_native(y8, y15))
+
+def print_erp():
+    '''Расчет ERP с прогрессом в отдельном процессе'''
+    print(f'ERP between {file8_name} and {file15_name}:', metrics.get_erp_native(y8, y15))
+
+def print_edr():
+    '''Расчет EDR с прогрессом в отдельном процессе'''
+    print(f'EDR between {file8_name} and {file15_name}:', metrics.get_edr_native(y8, y15))
+
+def print_msm():
+    '''Расчет MSM с прогрессом в отдельном процессе'''
+    print(f'MSM between {file8_name} and {file15_name}:', metrics.get_msm_native(y8, y15))
+
+functions = [print_dtw, print_erp, print_edr, print_msm]
+
+processes = [Process(target=func) for func in functions]
+
+for process in processes:
+    process.start()
+
+for process in processes:
+    process.join()
+
+# sktime/scipy, быстрый расчет
+print(f'ERP between {file8_name} and {file15_name}:', metrics.get_erp(y8, y15))
+print(f'EDR between {file8_name} and {file15_name}:', metrics.get_edr(y8, y15))
+print(f'MSM between {file8_name} and {file15_name}:', metrics.get_msm(y8, y15))
+print(f'Minkowski between {file8_name} and {file15_name}:', metrics.get_minkowski(y8, y15))
+print(f'Pearson between {file8_name} and {file15_name} (coef, pval):', metrics.get_pearson(y8, y15))
+
+dtw_dist = metrics.get_dtw_unbound(y8, y15)
+mink_dist = metrics.get_minkowski(y8, y15)
+coef, _ = metrics.get_pearson(y8, y15)
+
+values = [dtw_dist, mink_dist, coef]
+coeffs = [0.3, 0.4, 0.3]
+
+print('Linear convolution between DTW, Minkowski, PCorr:', metrics.get_linconv(values, coeffs))
 
 # Пример сегментации, детектора голосовой активности, кодирования/декодирования base64
 file8 = AudioFile('8.wav')
