@@ -147,7 +147,11 @@ class AudioMetrics:
         """Получение DTW расстояния между двумя аудиофайлами (вся длина)"""
         dtw_class = dtw(y1, y2)
 
+        start = time.process_time()
         dtw_distance = dtw_class.distance
+        stop = time.process_time() - start
+
+        logger.debug(f'Время на получение DTW: {stop}')
 
         return dtw_distance
 
