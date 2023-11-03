@@ -8,44 +8,47 @@ CREATE TABLE patient_table (
   hospital VARCHAR(64),
   temporary_password VARCHAR(128),
   is_password_changed BOOL,
-  date_of_birth DATE
+  date_of_birth DATE,
+  patient_info VARCHAR
 );
 
-CREATE TABLE speech_table (
-  speech_id SERIAL PRIMARY KEY,
-  speech_type VARCHAR(50),
+CREATE TABLE signal_table (
+  signal_id SERIAL PRIMARY KEY,
+  signal_type VARCHAR(50),
   base64_value VARCHAR,
   base64_segment_value VARCHAR,
-  is_reference_speech BOOL,
+  is_reference_signal BOOL,
   real_value VARCHAR(50)
 );
 
-CREATE TABLE speech_compare_table (
-  speech_compare_id SERIAL PRIMARY KEY,
-  compared_speech_id_1 INT REFERENCES speech_table(speech_id),
-  compared_speech_id_2 INT REFERENCES speech_table(speech_id),
-  compared_speech_id_3 INT REFERENCES speech_table(speech_id),
-  speech_score REAL
+CREATE TABLE signal_compare_table (
+  signal_compare_id SERIAL PRIMARY KEY,
+  evaluated_signal_id INT REFERENCES signal_table(signal_id),
+  compared_signal_id_1 INT REFERENCES signal_table(signal_id),
+  compared_signal_id_2 INT REFERENCES signal_table(signal_id),
+  signal_score REAL
 );
 
 CREATE TABLE session_table (
   session_id SERIAL PRIMARY KEY,
   is_reference_session BOOL,
   session_type VARCHAR(50),
-  card_number VARCHAR(12) REFERENCES patient_table(card_number)
+  card_number VARCHAR(12) REFERENCES patient_table(card_number),
+  session_info VARCHAR,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE session_compare_table (
   session_compare_id SERIAL PRIMARY KEY,
+  evaluated_session_id INT REFERENCES session_table(session_id),
   compared_session_id_1 INT REFERENCES session_table(session_id),
   compared_session_id_2 INT REFERENCES session_table(session_id),
-  compared_session_id_3 INT REFERENCES session_table(session_id),
   session_score REAL
 );
 
-CREATE TABLE speech_session_table (
-  speech_session_id SERIAL PRIMARY KEY,
-  speech_id int REFERENCES speech_table(speech_id),
+CREATE TABLE signal_session_table (
+  signal_session_id SERIAL PRIMARY KEY,
+  signal_id int REFERENCES signal_table(signal_id),
   session_id int REFERENCES session_table(session_id)
 );
 
@@ -59,7 +62,8 @@ CREATE TABLE doctor_table (
 
 CREATE TABLE specialist_table (
   username VARCHAR(255) PRIMARY KEY,
-  password VARCHAR(128)
+  password VARCHAR(128),
+  specialist_info VARCHAR
 );
 
 CREATE TABLE doctor_patient_table (
