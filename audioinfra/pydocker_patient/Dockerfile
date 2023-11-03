@@ -16,7 +16,7 @@ COPY install_pygost.sh .
 COPY ssl.sh .
 RUN apt-get update && apt-get -y install wget=1.21.3-1+b2 --no-install-recommends \
 && apt-get -y install zstd=1.5.4+dfsg2-5 --no-install-recommends \
-&& apt-get -y install openssl=3.0.11-1~deb12u1 --no-install-recommends \
+&& apt-get -y install openssl=3.0.11-1~deb12u2 --no-install-recommends \
 && pip install --no-cache-dir -r requirements.txt \
 && ./install_pygost.sh \
 && ./ssl.sh
