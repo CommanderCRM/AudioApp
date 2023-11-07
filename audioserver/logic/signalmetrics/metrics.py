@@ -8,8 +8,8 @@ from scipy.spatial.distance import minkowski
 from scipy.stats import pearsonr
 from loguru import logger
 
-class AudioMetrics:
-    """Расчет расстояний между аудиофайлами"""
+class SignalMetrics:
+    """Расчет расстояний между рядами сигналов"""
     def dtw_native(self, s1,s2):
         """Расстояние DTW"""
         n = len(s1)

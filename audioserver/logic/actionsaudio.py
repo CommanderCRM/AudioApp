@@ -2,8 +2,8 @@ import os
 from loguru import logger
 from .audiotools.tools import AudioFile
 from .audiopreproc.preprocessing import AudioPreprocessor
-from .audiometrics.metrics import AudioMetrics
-from .audiometrics.envelopes import AudioEnvelopes
+from .signalmetrics.metrics import SignalMetrics
+from .signalmetrics.envelopes import SignalEnvelopes
 from .audiorecognition.recognition import recognize_vosk, levenstein
 
 # Инициализируем логгер
@@ -25,8 +25,8 @@ def load_and_reduce_noise(audio_file):
 
 def compare_two_sessions_dtw(speech_values_dict):
     """Сравнение двух сеансов по DTW"""
-    audio_metrics = AudioMetrics()
-    audio_envelopes = AudioEnvelopes()
+    audio_metrics = SignalMetrics()
+    audio_envelopes = SignalEnvelopes()
     dtw_distances = {}
 
     for key, speech_values in speech_values_dict.items():
@@ -65,8 +65,8 @@ def compare_two_sessions_dtw(speech_values_dict):
 
 def compare_three_sessions_dtw(speech_values_dict):
     """Сравнение трех сеансов по DTW"""
-    audio_metrics = AudioMetrics()
-    audio_envelopes = AudioEnvelopes()
+    audio_metrics = SignalMetrics()
+    audio_envelopes = SignalEnvelopes()
     dtw_distances = {}
 
     for key, speech_values in speech_values_dict.items():
