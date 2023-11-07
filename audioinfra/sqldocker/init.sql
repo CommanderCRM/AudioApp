@@ -2,85 +2,89 @@
 
 CREATE TABLE patient_table (
   card_number VARCHAR(12) PRIMARY KEY,
-  full_name VARCHAR(255),
-  gender CHAR(1),
+  full_name VARCHAR(255) NOT NULL,
+  gender CHAR(1) NOT NULL,
   constant_password VARCHAR(128),
-  hospital VARCHAR(64),
+  hospital VARCHAR(64) NOT NULL,
   temporary_password VARCHAR(128),
-  is_password_changed BOOL,
-  date_of_birth DATE
+  is_password_changed BOOL NOT NULL,
+  date_of_birth DATE NOT NULL,
+  patient_info VARCHAR
 );
 
-CREATE TABLE speech_table (
-  speech_id SERIAL PRIMARY KEY,
-  speech_type VARCHAR(50),
-  base64_value VARCHAR,
+CREATE TABLE signal_table (
+  signal_id SERIAL PRIMARY KEY,
+  signal_type VARCHAR(50) NOT NULL,
+  base64_value VARCHAR NOT NULL,
   base64_segment_value VARCHAR,
-  is_reference_speech BOOL,
-  real_value VARCHAR(50)
+  is_reference_signal BOOL NOT NULL,
+  real_value VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE speech_compare_table (
-  speech_compare_id SERIAL PRIMARY KEY,
-  compared_speech_id_1 INT REFERENCES speech_table(speech_id),
-  compared_speech_id_2 INT REFERENCES speech_table(speech_id),
-  compared_speech_id_3 INT REFERENCES speech_table(speech_id),
-  speech_score REAL
+CREATE TABLE signal_compare_table (
+  signal_compare_id SERIAL PRIMARY KEY,
+  compared_signal_id_1 INT REFERENCES signal_table(signal_id) NOT NULL,
+  compared_signal_id_2 INT REFERENCES signal_table(signal_id),
+  compared_signal_id_3 INT REFERENCES signal_table(signal_id),
+  signal_score REAL NOT NULL
 );
 
 CREATE TABLE session_table (
   session_id SERIAL PRIMARY KEY,
-  is_reference_session BOOL,
-  session_type VARCHAR(50),
-  card_number VARCHAR(12) REFERENCES patient_table(card_number)
+  is_reference_session BOOL NOT NULL,
+  session_type VARCHAR(50) NOT NULL,
+  card_number VARCHAR(12) REFERENCES patient_table(card_number) NOT NULL,
+  session_info VARCHAR NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE session_compare_table (
   session_compare_id SERIAL PRIMARY KEY,
-  compared_session_id_1 INT REFERENCES session_table(session_id),
+  compared_session_id_1 INT REFERENCES session_table(session_id) NOT NULL,
   compared_session_id_2 INT REFERENCES session_table(session_id),
   compared_session_id_3 INT REFERENCES session_table(session_id),
-  session_score REAL
+  session_score REAL NOT NULL
 );
 
-CREATE TABLE speech_session_table (
-  speech_session_id SERIAL PRIMARY KEY,
-  speech_id int REFERENCES speech_table(speech_id),
-  session_id int REFERENCES session_table(session_id)
+CREATE TABLE signal_session_table (
+  signal_session_id SERIAL PRIMARY KEY,
+  signal_id int REFERENCES signal_table(signal_id) NOT NULL,
+  session_id int REFERENCES session_table(session_id) NOT NULL
 );
 
 CREATE TABLE doctor_table (
   username VARCHAR(255) PRIMARY KEY,
-  specialization VARCHAR(255),
-  hospital VARCHAR(64),
-  password VARCHAR(128),
-  full_name VARCHAR(255)
+  specialization VARCHAR(255) NOT NULL,
+  hospital VARCHAR(64) NOT NULL,
+  password VARCHAR(128) NOT NULL,
+  full_name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE specialist_table (
   username VARCHAR(255) PRIMARY KEY,
-  password VARCHAR(128)
+  password VARCHAR(128) NOT NULL,
+  specialist_info VARCHAR
 );
 
 CREATE TABLE doctor_patient_table (
   doctor_patient_id SERIAL PRIMARY KEY,
-  doctor_username VARCHAR(255) REFERENCES doctor_table(username),
-  patient_card_number VARCHAR(12) REFERENCES patient_table(card_number)
+  doctor_username VARCHAR(255) REFERENCES doctor_table(username) NOT NULL,
+  patient_card_number VARCHAR(12) REFERENCES patient_table(card_number) NOT NULL
 );
 
 CREATE TABLE syllables_phrases_table (
-  syllable_phrase_id SERIAL PRIMARY KEY,
-  syllable_phrase_type VARCHAR(10),
-  dict VARCHAR(10),
-  value VARCHAR(50)
+  syllable_phrase_id SERIAL PRIMARY KEY NOT NULL,
+  syllable_phrase_type VARCHAR(10) NOT NULL,
+  dict VARCHAR(10) NOT NULL,
+  value VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE refresh_token_table (
   refresh_token_id SERIAL PRIMARY KEY,
-  token UUID,
-  username VARCHAR(255),
-  exp INT,
-  role VARCHAR(20)
+  token UUID NOT NULL,
+  username VARCHAR(255) NOT NULL,
+  exp INT NOT NULL,
+  role VARCHAR(20) NOT NULL
 );
 
 INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'e2fb95ed6eab55bec760d47cae055a38b7753459e4151dd546c01e0f1af7fafe84c61f4051e783091517c0054c7655fdada36cd631c38971e3f46797e81890ce', 'Ilia Krivosh');
