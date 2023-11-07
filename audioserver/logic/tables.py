@@ -14,7 +14,7 @@ class Hospital(str, Enum):
     HOSP_MSK_FIRST = "Moscow NII_1"
     HOSP_MSK_SECOND = "Moscow NII_2"
 
-class SpeechType(str, Enum):
+class SignalType(str, Enum):
     """Массив типов речи"""
     PHRASE = "фраза"
     SYLLABLE = "слог"
@@ -77,6 +77,10 @@ class PatientTable(SQLModel, table=True):
         title="1990-09-01",
         description="Дата рождения пациента"
     )
+    patient_info: str = Field(
+        title="Сведения",
+        description="Дополнительные сведения о пациенте"
+    )
     class Config():
         """Конфигурация модели"""
         use_enum_values = True
@@ -130,6 +134,10 @@ class PostPatientInfo(SQLModel):
         title=False,
         description="Флаг, указывающий, изменён ли пароль"
     )
+    patient_info: str = Field(
+        title="Сведения",
+        description="Дополнительные сведения о пациенте"
+    )
     class Config():
         """Конфигурация модели"""
         use_enum_values = True
@@ -160,6 +168,10 @@ class GetPatientInfo(SQLModel):
     doctor_info: List[str] = Field(
         title="boralek, shabanov",
         description="Идентификаторы лечащих врачей"
+    )
+    patient_info: str = Field(
+        title="Сведения",
+        description="Дополнительные сведения о пациенте"
     )
     class Config():
         """Конфигурация модели"""
@@ -199,7 +211,7 @@ class DoctorTable(SQLModel, table=True):
 
 class PostSpeechInfo(SQLModel):
     """Модель информации o речи"""
-    speech_type: SpeechType = Field(
+    speech_type: SignalType = Field(
         title="слог",
         description="Биологический тип сигнала"
     )
@@ -233,6 +245,10 @@ class PostSessionInfo(SQLModel):
         title="фразы",
         description="Тип биологического сигнала, записываемый в рамках одного сеанса"
     )
+    session_info: Optional[str] = Field(
+        title="Сведения",
+        description="Дополнительные сведения о сеансе"
+    )
 
 class SessionTable(SQLModel, table=True):
     """Таблица сессии"""
@@ -247,12 +263,20 @@ class SessionTable(SQLModel, table=True):
         description="Тип биологического сигнала, записываемый в рамках одного сеанса"
     )
     card_number: str = Field(foreign_key="patient_table.card_number")
+    session_info: str = Field(
+        title="Сведения",
+        description="Дополнительные сведения о сеансе"
+    )
+    created_at: date = Field(
+        title="01.01.1990",
+        description="Дата создания"
+    )
 
-class SpeechTable(SQLModel, table=True):
+class SignalTable(SQLModel, table=True):
     """Таблица информации o речи"""
-    __tablename__: str = "speech_table"
-    speech_id: Optional[int] = Field(default=None, primary_key=True)
-    speech_type: SpeechType = Field(
+    __tablename__: str = "signal_table"
+    signal_id: Optional[int] = Field(default=None, primary_key=True)
+    signal_type: SignalType = Field(
         title="слог",
         description="Биологический тип сигнала"
     )
@@ -264,7 +288,7 @@ class SpeechTable(SQLModel, table=True):
         title="UklGRgYvAABXQVZFZm",
         description="Сегментированное значение речи, закодированное в base64"
     )
-    is_reference_speech: bool = Field(
+    is_reference_signal: bool = Field(
         title="true",
         description="Флаг, указывающий на то, является ли речь эталонной"
     )
@@ -273,11 +297,11 @@ class SpeechTable(SQLModel, table=True):
         description="Реальное значение слога или фразы, которое должно было быть произнесено"
     )
 
-class SpeechSessionTable(SQLModel, table=True):
+class SignalSessionTable(SQLModel, table=True):
     """Таблица отношения речь/сеанс"""
-    __tablename__: str = "speech_session_table"
-    speech_session_id: Optional[int] = Field(default=None, primary_key=True)
-    speech_id: int = Field(foreign_key="speech_table.speech_id")
+    __tablename__: str = "signal_session_table"
+    signal_session_id: Optional[int] = Field(default=None, primary_key=True)
+    signal_id: int = Field(foreign_key="signal_table.signal_id")
     session_id: int = Field(foreign_key="session_table.session_id")
 
 class SpeechCompares(SQLModel):
@@ -297,16 +321,16 @@ class SpeechCompares(SQLModel):
 
 class GetSpeechInfoArray(SQLModel):
     """Информация o речи для отображения на клиенте"""
-    speech_id: int = Field(
+    signal_id: int = Field(
         title="1",
         description="Идентификатор речи"
     )
     speech_compares_history: Optional[List[SpeechCompares]]
-    speech_type: SpeechType = Field(
+    signal_type: SignalType = Field(
         title="слог",
         description="Биологический тип сигнала"
     )
-    is_reference_speech: bool = Field(
+    is_reference_signal: bool = Field(
         title="true",
         description="Флаг, указывающий на то, является ли речь эталонной"
     )
@@ -314,7 +338,6 @@ class GetSpeechInfoArray(SQLModel):
         title="кась",
         description="Реальное значение слога или фразы, которое должно было быть произнесено"
     )
-
 
 class GetSpeechInfo(SQLModel):
     """Информация o речи"""
@@ -346,6 +369,14 @@ class GetSessionInfo(SQLModel):
     )
     speech_array: List[GetSpeechInfoArray]
     session_compares: List[SessionCompares]
+    created_at: Optional[date] = Field(
+        title="01.01.1990",
+        description="Дата создания"
+    )
+    session_info: str = Field(
+        title="Сведения",
+        description="Дополнительные сведения о сеансе"
+    )
 
 class GetSessionInfoArray(SQLModel):
     """Информация o сессиях для пациента"""
@@ -392,19 +423,19 @@ class SyllablesPhrasesTable(SQLModel, table=True):
         description="Значение фразы либо слога"
     )
 
-class SpeechCompareTable(SQLModel, table=True):
+class SignalCompareTable(SQLModel, table=True):
     """Таблица сравнения речи
        1, 2 и 3 заполняются при сравнении с 2 эталонами
        1 и 2 заполняются при сравнении с одним эталоном
        1 заполняется при сравнении фраз с реальными значениями"""
-    __tablename__: str = "speech_compare_table"
-    speech_compare_id: Optional[int] = Field(default=None, primary_key=True)
-    compared_speech_id_1: int = Field(foreign_key="speech_table.speech_id")
-    compared_speech_id_2: Optional[int] = Field(foreign_key="speech_table.speech_id")
-    compared_speech_id_3: Optional[int] = Field(foreign_key="speech_table.speech_id")
-    speech_score: float = Field(
+    __tablename__: str = "signal_compare_table"
+    signal_compare_id: Optional[int] = Field(default=None, primary_key=True)
+    compared_signal_id_1: int = Field(foreign_key="signal_table.signal_id")
+    compared_signal_id_2: Optional[int] = Field(foreign_key="signal_table.signal_id")
+    compared_signal_id_3: Optional[int] = Field(foreign_key="signal_table.signal_id")
+    signal_score: float = Field(
         title="57.5",
-        description="Оценка речи"
+        description="Оценка сигнала"
     )
 
 class SessionCompareTable(SQLModel, table=True):
@@ -600,6 +631,10 @@ class SpecialistTable(SQLModel, table=True):
         description="Пароль специалиста",
         min_length=8,
         max_length=128
+    )
+    specialist_info: str = Field(
+        title="Сведения",
+        description="Дополнительные сведения о специалисте"
     )
 
 class GetDoctorInfo(SQLModel):

@@ -4,11 +4,11 @@ import os
 from sqlmodel import Session, create_engine, select
 from loguru import logger
 from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatientInfo,
-                     PostSessionInfo, SessionTable, PostSpeechInfo, SpeechTable,
-                     SpeechSessionTable, GetSpeechInfoArray, GetSessionInfo,
+                     PostSessionInfo, SessionTable, PostSpeechInfo, SignalTable,
+                     SignalSessionTable, GetSpeechInfoArray, GetSessionInfo,
                      GetSpeechInfo, GetSessionPatientInfo, SyllablesPhrasesTable,
                      GetPhrasesInfo, GetSessionInfoArray, SessionCompareTable,
-                     SpeechCompareTable, SpeechCompares, SessionCompares,
+                     SignalCompareTable, SpeechCompares, SessionCompares,
                      PostSessionInfoReturn, PasswordStatus, DoctorInfo,
                      DoctorTable, GetDoctorsInfo, SpecialistTable, GetDoctorInfo)
 from .actionsaudio import compare_two_sessions_dtw, compare_phrases_levenstein, compare_three_sessions_dtw
@@ -36,7 +36,8 @@ def convert_full_model_to_table(full_patient_model: PostPatientInfo) -> Tuple[Pa
         hospital=full_patient_model.hospital,
         temporary_password=full_patient_model.temporary_password,
         is_password_changed=full_patient_model.is_password_changed,
-        date_of_birth=full_patient_model.date_of_birth
+        date_of_birth=full_patient_model.date_of_birth,
+        patient_info=full_patient_model.patient_info
     )
     doctor_patient_list = []
     for doctor in full_patient_model.doctor_info:
@@ -57,7 +58,8 @@ def convert_table_to_model(patient: PatientTable) -> GetPatientInfo:
             date_of_birth=patient.date_of_birth,
             gender=patient.gender,
             card_number=patient.card_number,
-            doctor_info=doctor_info
+            doctor_info=doctor_info,
+            patient_info=patient.patient_info
         )
 
 def insert_patient(patient: PatientTable, doctor_patient_list: List[DoctorPatientTable]):
@@ -116,7 +118,8 @@ def insert_session_info(card_number: str, session_info: PostSessionInfo):
     session_table = SessionTable(
         is_reference_session=session_info.is_reference_session,
         session_type=session_info.session_type,
-        card_number=card_number
+        card_number=card_number,
+        session_info=session_info.session_info
     )
     with Session(engine) as session:
         logger.debug(f'Добавляем в БД информацию о сеансе {session_table}')
@@ -133,20 +136,20 @@ def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
             is_reference_speech = session_record.is_reference_session
             logger.debug(f'Тип речи для записи в БД (эталон или нет): {is_reference_speech}')
 
-    speech_table = SpeechTable(
-        speech_type=speech_info.speech_type,
+    speech_table = SignalTable(
+        signal_type=speech_info.speech_type,
         base64_value=speech_info.base64_value,
         base64_segment_value=speech_info.base64_value_segment,
-        is_reference_speech=is_reference_speech,
+        is_reference_signal=is_reference_speech,
         real_value=speech_info.real_value
     )
     with Session(engine) as session:
         logger.debug('Запишем в БД основную информацию о речи (base64 не логируется)')
-        logger.debug(f'{speech_table.speech_type}, {speech_table.is_reference_speech}, {speech_table.real_value}')
+        logger.debug(f'{speech_table.signal_type}, {speech_table.is_reference_signal}, {speech_table.real_value}')
         session.add(speech_table)
         session.commit()
-        speech_session_table = SpeechSessionTable(
-            speech_id=speech_table.speech_id,
+        speech_session_table = SignalSessionTable(
+            signal_id=speech_table.signal_id,
             session_id=session_id
         )
         logger.debug(f'Запишем в таблицу отношения речи/сеанса {speech_session_table}')
@@ -182,49 +185,51 @@ def select_session_info(_, session_id):
     with Session(engine) as session:
         session_info = session.exec(select(SessionTable)
                                     .where(SessionTable.session_id == session_id)).first()
-        speech_session_info = session.exec(select(SpeechSessionTable.speech_id)
-                                           .where(SpeechSessionTable.session_id == session_id)).all()
+        speech_session_info = session.exec(select(SignalSessionTable.signal_id)
+                                           .where(SignalSessionTable.session_id == session_id)).all()
         session_compares = get_comparison_history(session, SessionCompareTable, session_id)
 
         # В каждом сеансе может быть несколько записей речи, заполняем информацию о каждой
         speech_array = []
         for speech_id in speech_session_info:
-            speech_info = session.exec(select(SpeechTable)
-                                       .where(SpeechTable.speech_id == speech_id)).first()
-            speech_compares = session.exec(select(SpeechCompareTable)
-                                           .where(SpeechCompareTable.compared_speech_id_1 == speech_id)).all()
+            speech_info = session.exec(select(SignalTable)
+                                       .where(SignalTable.signal_id == speech_id)).first()
+            speech_compares = session.exec(select(SignalCompareTable)
+                                           .where(SignalCompareTable.compared_signal_id_1 == speech_id)).all()
 
             # Также каждая запись могла сравниваться с несколькими другими записями, заполнение истории сравнений
             # Речи, с которыми можем сравнивать - 2 или 3 (1 - референс)
             speech_compares_history = []
             for compare in speech_compares:
                 compared_speech_ids = [
-                    getattr(compare, f'compared_speech_id_{i}')
+                    getattr(compare, f'compared_signal_id_{i}')
                     for i in range(1, 4)
-                    if getattr(compare, f'compared_speech_id_{i}', None) is not None
+                    if getattr(compare, f'compared_signal_id_{i}', None) is not None
                     ]
 
                 for compared_speech_id in compared_speech_ids:
                     compared_session_id = session.exec(
-                        select(SpeechSessionTable.session_id)
-                        .where(SpeechSessionTable.speech_id == compared_speech_id)
+                        select(SignalSessionTable.session_id)
+                        .where(SignalSessionTable.signal_id == compared_speech_id)
                         ).first()
-                    speech_score = compare.speech_score
+                    speech_score = compare.signal_score
 
                     speech_compares_history.append(SpeechCompares(compared_session_id=compared_session_id,
                                                               compared_speech_id=[compared_speech_id],
                                                               speech_score=speech_score))
 
-            speech_array.append(GetSpeechInfoArray(speech_id=speech_info.speech_id,
+            speech_array.append(GetSpeechInfoArray(signal_id=speech_info.signal_id,
                                                    speech_compares_history=speech_compares_history,
-                                                   speech_type=speech_info.speech_type,
-                                                   is_reference_speech=speech_info.is_reference_speech,
+                                                   signal_type=speech_info.signal_type,
+                                                   is_reference_signal=speech_info.is_reference_signal,
                                                    real_value=speech_info.real_value))
 
         return GetSessionInfo(is_reference_session=session_info.is_reference_session,
                               session_type=session_info.session_type,
                               speech_array=speech_array,
-                              session_compares=session_compares)
+                              session_compares=session_compares,
+                              created_at=session_info.created_at,
+                              session_info=session_info.session_info)
 
 def select_session_patient_info(session_id):
     """Получение информации o сеансе для пациента"""
@@ -249,8 +254,8 @@ def select_session_by_key(session_number: int):
 def select_speech_info(_, __, speech_id):
     """Получение информации o речи"""
     with Session(engine) as session:
-        speech_info = session.exec(select(SpeechTable)
-                                   .where(SpeechTable.speech_id == speech_id)).first()
+        speech_info = session.exec(select(SignalTable)
+                                   .where(SignalTable.signal_id == speech_id)).first()
         speech_value = speech_info.base64_value
         return GetSpeechInfo(base64_value=speech_value)
 
@@ -285,13 +290,13 @@ def select_phrases_and_syllables():
 def get_session_speech_array(session_id: int):
     """Получение всех записей речи в сеансе"""
     with Session(engine) as session:
-        speech_session_info = session.exec(select(SpeechSessionTable.speech_id)
-                                           .where(SpeechSessionTable.session_id == session_id)).all()
+        speech_session_info = session.exec(select(SignalSessionTable.signal_id)
+                                           .where(SignalSessionTable.session_id == session_id)).all()
 
         speech_array = []
         for speech_id in speech_session_info:
-            speech_info = session.exec(select(SpeechTable)
-                                       .where(SpeechTable.speech_id == speech_id)).first()
+            speech_info = session.exec(select(SignalTable)
+                                       .where(SignalTable.signal_id == speech_id)).first()
             speech_array.append(GetSpeechInfoArray(**speech_info.__dict__))
 
         return speech_array
@@ -299,8 +304,8 @@ def get_session_speech_array(session_id: int):
 def get_speech_value(speech_id: int):
     """Получение base64-значения речи по ee ID"""
     with Session(engine) as session:
-        speech_info = session.exec(select(SpeechTable)
-                                   .where(SpeechTable.speech_id == speech_id)).first()
+        speech_info = session.exec(select(SignalTable)
+                                   .where(SignalTable.signal_id == speech_id)).first()
         return speech_info.base64_value
 
 def compare_two_sessions(_, session_1_id: int, session_2_id: int):
@@ -314,8 +319,8 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
     # Получение тех записей речи, которые можно сравнить
     for speech_1 in session_1_speeches:
         for speech_2 in session_2_speeches:
-            if speech_1.speech_type == speech_2.speech_type and speech_1.real_value == speech_2.real_value:
-                comparable_speech_ids[comparable_key] = [speech_1.speech_id, speech_2.speech_id]
+            if speech_1.signal_type == speech_2.signal_type and speech_1.real_value == speech_2.real_value:
+                comparable_speech_ids[comparable_key] = [speech_1.signal_id, speech_2.signal_id]
                 comparable_key += 1
 
     speech_values_dict = {}
@@ -345,10 +350,10 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
     # Заполнение таблицы сравнения записей речи
     with Session(engine) as session:
         for key, value in comparable_speech_ids.items():
-            speech_compare = SpeechCompareTable(
-                compared_speech_id_1=value[0],
-                compared_speech_id_2=value[1],
-                speech_score=dtw_distances[key],
+            speech_compare = SignalCompareTable(
+                compared_signal_id_1=value[0],
+                compared_signal_id_2=value[1],
+                signal_score=dtw_distances[key],
             )
             session.add(speech_compare)
             session.commit()
@@ -366,9 +371,9 @@ def compare_three_sessions(_, session_1_id: int, session_2_id: int, session_3_id
     for speech_1 in session_1_speeches:
         for speech_2 in session_2_speeches:
             for speech_3 in session_3_speeches:
-                if speech_1.speech_type == speech_2.speech_type == speech_3.speech_type and \
+                if speech_1.signal_type == speech_2.signal_type == speech_3.signal_type and \
                    speech_1.real_value == speech_2.real_value == speech_3.real_value:
-                    comparable_speech_ids[comparable_key] = [speech_1.speech_id, speech_2.speech_id, speech_3.speech_id]
+                    comparable_speech_ids[comparable_key] = [speech_1.signal_id, speech_2.signal_id, speech_3.signal_id]
                     logger.debug(f'Заполняем словарь по ключу {comparable_key} ID {comparable_speech_ids}')
                     comparable_key += 1
 
@@ -404,10 +409,10 @@ def compare_three_sessions(_, session_1_id: int, session_2_id: int, session_3_id
     # Заполнение таблицы сравнения записей речи
     with Session(engine) as session:
         for key, value in comparable_speech_ids.items():
-            speech_compare = SpeechCompareTable(
-                compared_speech_id_1=value[0],
-                compared_speech_id_2=value[1],
-                compared_speech_id_3=value[2],
+            speech_compare = SignalCompareTable(
+                compared_signal_id_1=value[0],
+                compared_signal_id_2=value[1],
+                compared_signal_id_3=value[2],
                 speech_score=dtw_distances[key],
             )
             logger.debug(f'Передаем в таблицу сравнения речи {speech_compare}')
@@ -423,9 +428,9 @@ def compare_phrases_real(_, session_id: int):
     # Заполнение инф. о фразе (ID, эталон, base64)
     session_speeches = get_session_speech_array(session_id)
     for speech_data in session_speeches:
-        if speech_data.speech_type == SPEECH_TYPE:
-            phrase_base64 = get_speech_value(speech_data.speech_id)
-            phrases_info[speech_data.speech_id] = [speech_data.real_value, phrase_base64]
+        if speech_data.signal_type == SPEECH_TYPE:
+            phrase_base64 = get_speech_value(speech_data.signal_id)
+            phrases_info[speech_data.signal_id] = [speech_data.real_value, phrase_base64]
 
     phrases_scores = {}
     # Получение точности сравнения с эталоном
@@ -449,8 +454,8 @@ def compare_phrases_real(_, session_id: int):
     # Заполнение таблицы сравнения записей речи
     with Session(engine) as session:
         for key, value in phrases_scores.items():
-            speech_compare = SpeechCompareTable(
-                compared_speech_id_1=key,
+            speech_compare = SignalCompareTable(
+                compared_signal_id_1=key,
                 speech_score=value,
             )
             print(speech_compare)

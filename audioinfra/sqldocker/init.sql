@@ -26,7 +26,7 @@ CREATE TABLE signal_compare_table (
   compared_signal_id_1 INT REFERENCES signal_table(signal_id) NOT NULL,
   compared_signal_id_2 INT REFERENCES signal_table(signal_id),
   compared_signal_id_3 INT REFERENCES signal_table(signal_id),
-  signal_score REAL NOT NULL
+  signal_score REAL
 );
 
 CREATE TABLE session_table (
@@ -34,7 +34,7 @@ CREATE TABLE session_table (
   is_reference_session BOOL NOT NULL,
   session_type VARCHAR(50) NOT NULL,
   card_number VARCHAR(12) REFERENCES patient_table(card_number) NOT NULL,
-  session_info VARCHAR NOT NULL,
+  session_info VARCHAR,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -43,7 +43,7 @@ CREATE TABLE session_compare_table (
   compared_session_id_1 INT REFERENCES session_table(session_id) NOT NULL,
   compared_session_id_2 INT REFERENCES session_table(session_id),
   compared_session_id_3 INT REFERENCES session_table(session_id),
-  session_score REAL NOT NULL
+  session_score REAL
 );
 
 CREATE TABLE signal_session_table (

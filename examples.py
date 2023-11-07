@@ -4,11 +4,11 @@ from multiprocessing import Process
 from audioserver.logic.audiotools.tools import AudioFile
 from audioserver.logic.audiopreproc.preprocessing import AudioPreprocessor
 from audioserver.logic.audiopreproc.voiceactivity import VoiceActivityDetector
-from audioserver.logic.audiometrics.metrics import AudioMetrics
+from audioserver.logic.signalmetrics.metrics import SignalMetrics
 from audioserver.logic.audiosegm.segmentation import Segmentation
 from audioserver.logic.audiorecognition.recognition import recognize_vosk, levenstein
 from audioserver.logic.secactions import hash_gost_3411
-from audioserver.logic.audiometrics.envelopes import AudioEnvelopes
+from audioserver.logic.signalmetrics.envelopes import SignalEnvelopes
 
 
 # Пример загрузки и сохранения файла
@@ -32,7 +32,7 @@ y15, sr15 = AudioFile('15.wav').load()
 file8_name = file8.get_file_name()
 file15_name = file15.get_file_name()
 
-metrics = AudioMetrics()
+metrics = SignalMetrics()
 
 # собственная имплементация, > 5 мин на каждую
 def print_dtw():
@@ -127,7 +127,7 @@ file = AudioFile('8.wav')
 y, sr = file.load()
 print('Значения ориг. аудиоряда: ', y)
 
-AE = AudioEnvelopes()
+AE = SignalEnvelopes()
 abs_envelope = AE.absolute_envelope(y)
 print('Огибающая по абсолютным значениям : ', abs_envelope)
 
@@ -144,7 +144,7 @@ print('Огибающая FFT: ', fft_envelope)
 y8, sr8 = AudioFile('8.wav').load()
 y9, sr9 = AudioFile('9.wav').load()
 
-AM = AudioMetrics()
+AM = SignalMetrics()
 distance, indices1, indices2 = AM.get_dtw_with_indices(y8, y9)
 
 print('Расстояние DTW: ', distance)
@@ -161,7 +161,7 @@ print('Длина сопост. y2: ', len(indices2))
 y8, sr8 = AudioFile('8.wav').load()
 y9, sr9 = AudioFile('15.wav').load()
 
-AM = AudioMetrics()
+AM = SignalMetrics()
 distance, indices1, indices2 = AM.get_dtw_with_indices(y8, y9)
 
 print('Расстояние DTW: ', distance)
@@ -178,7 +178,7 @@ print('Длина сопост. y2: ', len(indices2))
 y8, sr8 = AudioFile('8.wav').load()
 y15, sr15 = AudioFile('15.wav').load()
 
-AM = AudioMetrics()
+AM = SignalMetrics()
 distance = AM.get_dtw_unbound(y8, y15)
 
 print('Расстояние DTW: ', distance)
@@ -191,7 +191,7 @@ print('Длина y2: ', len(y15))
 y8, sr8 = AudioFile('8.wav').load()
 y15, sr15 = AudioFile('15.wav').load()
 
-AM = AudioMetrics()
+AM = SignalMetrics()
 y1_transformed, y2_transformed = AM.get_dtw_transformed_sequences(y8, y15)
 
 print('Исходный ряд y1: ', y8)

@@ -10,8 +10,8 @@ if os.environ.get('LOG_LEVEL') == 'DEBUG':
 else:
     LEVEL = 'INFO'
 
-class AudioEnvelopes:
-    """Огибающие аудиоряда"""
+class SignalEnvelopes:
+    """Огибающие сигналов"""
 
     def absolute_envelope(self, y):
         """Огибающая по модулю значений"""
