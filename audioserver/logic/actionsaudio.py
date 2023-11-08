@@ -140,7 +140,7 @@ def compare_phrases_levenstein(real_value, base64):
 
     phrase_file_reduced = AudioFile("phrase_reduced.wav")
     file_path = phrase_file_reduced.get_file_path()
-    model_path = os.path.join(os.getcwd(), 'logic', 'audiorecognition', 'vosk-model-ru-0.22')
+    model_path = os.path.join(os.getcwd(), 'logic', 'audiorecognition', 'vosk-model-ru-0.42')
 
     # Получение точности распознавания
     recognition_result = recognize_vosk(file_path, model_path)

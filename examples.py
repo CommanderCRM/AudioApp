@@ -10,7 +10,6 @@ from audioserver.logic.audiorecognition.recognition import recognize_vosk, leven
 from audioserver.logic.secactions import hash_gost_3411
 from audioserver.logic.signalmetrics.envelopes import SignalEnvelopes
 
-
 # Пример загрузки и сохранения файла
 file = AudioFile('1.wav')
 y, sr = file.load()
@@ -99,7 +98,7 @@ y, sr = file.load_in_16k()
 file.save(y, sr, '3_16k.wav')
 current_path = pathlib.Path(__file__).parent.resolve()
 file_path = current_path.joinpath('3_16k.wav')
-model_path = os.path.join(os.getcwd(), 'audiorecognition', 'vosk-model-ru-0.22')
+model_path = os.path.join(os.getcwd(), 'audioserver', 'logic', 'audiorecognition', 'vosk-model-ru-0.42')
 
 RESULT = recognize_vosk(file_path, model_path)
 print('Recognition result: ', RESULT)
