@@ -14,7 +14,8 @@ patient_data = {
     "card_number": "111111111111",
     "constant_password": "",
     "temporary_password": "c32041a07c88c1a1d429c12f35e26c5f44e7e85e2f7a37eb157dd34f3290e5e2",
-    "is_password_changed": False
+    "is_password_changed": False,
+    "patient_info": "Тестовая информация"
     }
 
 def test_correct_patient_data():

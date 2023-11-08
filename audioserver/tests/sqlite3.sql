@@ -6,7 +6,8 @@ CREATE TABLE patient_table (
   hospital TEXT,
   temporary_password TEXT,
   is_password_changed INTEGER,
-  date_of_birth TEXT
+  date_of_birth TEXT,
+  patient_info TEXT
 );
 
 CREATE TABLE speech_table (

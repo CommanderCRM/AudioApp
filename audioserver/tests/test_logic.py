@@ -22,7 +22,8 @@ def test_insert_patient():
         hospital="TomskNII1",
         temporary_password="cbat", # nosec
         is_password_changed=0, # nosec
-        date_of_birth="2000-01-01"
+        date_of_birth="2000-01-01",
+        patient_info="Тестовая информация"
     )
     doctor_patient_table = DoctorPatientTable(
         doctor_patient_id=1,
@@ -47,7 +48,8 @@ def test_select_all_patients():
             hospital="TomskNII1",
             temporary_password="cbat", # nosec
             is_password_changed=0, # nosec
-            date_of_birth="2000-01-01"
+            date_of_birth="2000-01-01",
+            patient_info="Тестовая информация"
         )
         doctor_patient_table = DoctorPatientTable(
             doctor_patient_id={i},
@@ -70,7 +72,8 @@ def test_select_patient_by_key():
         hospital="TomskNII1",
         temporary_password="cbat", # nosec
         is_password_changed=0, # nosec
-        date_of_birth="2000-01-01"
+        date_of_birth="2000-01-01",
+        patient_info="Тестовая информация"
     )
     doctor_patient_table = DoctorPatientTable(
             doctor_patient_id=4,
