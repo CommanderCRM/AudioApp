@@ -16,7 +16,7 @@ from logic.actionsauth import (check_token, get_username_from_token, get_uuid_fr
 app = FastAPI()
 
 # Перенаправляем весь трафик на HTTPS
-app.add_middleware(HTTPSRedirectMiddleware)
+#app.add_middleware(HTTPSRedirectMiddleware)
 
 class ErrorCode(Enum):
     """Типы ошибок"""

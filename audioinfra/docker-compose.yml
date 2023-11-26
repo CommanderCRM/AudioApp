@@ -25,7 +25,7 @@ services:
      - TESTING=${TESTING}
      - LOG_LEVEL=${LOG_LEVEL}
     ports:
-      - "48080:48080"
+      - "80:80"
     depends_on:
       - sql
     volumes:
@@ -42,7 +42,7 @@ services:
      - TESTING=${TESTING}
      - LOG_LEVEL=${LOG_LEVEL}
     ports:
-      - "50080:50080"
+      - "443:443"
     depends_on:
       - doctor
       - sql
