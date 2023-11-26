@@ -447,7 +447,6 @@ def compare_phrases_real(_, session_id: int):
             compared_session_id_1=session_id,
             session_score=accuracy_mean,
         )
-        print(session_compare)
         session.add(session_compare)
         session.commit()
 
@@ -456,9 +455,8 @@ def compare_phrases_real(_, session_id: int):
         for key, value in phrases_scores.items():
             speech_compare = SignalCompareTable(
                 compared_signal_id_1=key,
-                speech_score=value,
+                signal_score=value,
             )
-            print(speech_compare)
             session.add(speech_compare)
             session.commit()
 

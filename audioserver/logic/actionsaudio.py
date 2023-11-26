@@ -4,7 +4,7 @@ from .audiotools.tools import AudioFile
 from .audiopreproc.preprocessing import AudioPreprocessor
 from .signalmetrics.metrics import SignalMetrics
 from .signalmetrics.envelopes import SignalEnvelopes
-from .audiorecognition.recognition import recognize_vosk, levenstein
+from .audiorecognition.recognition import run_recognition, levenstein
 
 # Инициализируем логгер
 if os.environ.get('LOG_LEVEL') == 'DEBUG':
@@ -143,7 +143,7 @@ def compare_phrases_levenstein(real_value, base64):
     model_path = os.path.join(os.getcwd(), 'logic', 'audiorecognition', 'vosk-model-ru-0.42')
 
     # Получение точности распознавания
-    recognition_result = recognize_vosk(file_path, model_path)
+    recognition_result = run_recognition(file_path, model_path)
     original_string = real_value
     _, __, accuracy = levenstein(recognition_result, original_string)
 

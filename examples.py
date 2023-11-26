@@ -6,7 +6,7 @@ from audioserver.logic.audiopreproc.preprocessing import AudioPreprocessor
 from audioserver.logic.audiopreproc.voiceactivity import VoiceActivityDetector
 from audioserver.logic.signalmetrics.metrics import SignalMetrics
 from audioserver.logic.audiosegm.segmentation import Segmentation
-from audioserver.logic.audiorecognition.recognition import recognize_vosk, levenstein
+from audioserver.logic.audiorecognition.recognition import run_recognition, levenstein
 from audioserver.logic.secactions import hash_gost_3411
 from audioserver.logic.signalmetrics.envelopes import SignalEnvelopes
 
@@ -100,7 +100,7 @@ current_path = pathlib.Path(__file__).parent.resolve()
 file_path = current_path.joinpath('3_16k.wav')
 model_path = os.path.join(os.getcwd(), 'audioserver', 'logic', 'audiorecognition', 'vosk-model-ru-0.42')
 
-RESULT = recognize_vosk(file_path, model_path)
+RESULT = run_recognition(file_path, model_path)
 print('Recognition result: ', RESULT)
 ORIG_STR = 'белый пар расстилается над лужами'
 levenstein_distance, original_length, recognition_accuracy = levenstein(RESULT, ORIG_STR)
