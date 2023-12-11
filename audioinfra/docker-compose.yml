@@ -1,9 +1,9 @@
 name: 'audioapp'
 services:
-  sql:
+  postgresql:
     build:
       context: .
-    image: postgres:15.4
+    image: postgres:16.1
     container_name: sql_server
     environment:
       - POSTGRES_USER=postgres
@@ -13,40 +13,18 @@ services:
       - "5432:5432"
     volumes:
       - ..:/app
-      - ./sqldocker/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./sqldocker/data:/var/lib/postgresql/data
-  doctor:
+  pgadmin:
+    depends_on: [postgresql]
     build:
-      context: ./pydocker
-      dockerfile: Dockerfile
-    image: audiodocker_doctor
-    container_name: doctor_server
+      context: .
+    image: dpage/pgadmin4:8.0
+    container_name: sql_gui
     environment:
-     - TESTING=${TESTING}
-     - LOG_LEVEL=${LOG_LEVEL}
-    ports:
-      - "48080:48080"
-    depends_on:
-      - sql
+      - PGADMIN_DEFAULT_EMAIL=boralek@mail.ru
+      - PGADMIN_DEFAULT_PASSWORD=boralek
     volumes:
       - ..:/app
-    working_dir: /app/audioserver
-    tty: true
-  patient:
-    build:
-      context: ./pydocker_patient
-      dockerfile: Dockerfile
-    image: audiodocker_patient
-    container_name: patient_server
-    environment:
-     - TESTING=${TESTING}
-     - LOG_LEVEL=${LOG_LEVEL}
     ports:
-      - "50080:50080"
-    depends_on:
-      - doctor
-      - sql
-    volumes:
-      - ..:/app
-    working_dir: /app/audioserver
-    tty: true
+      - "5480:80"
+
