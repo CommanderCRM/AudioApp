@@ -87,9 +87,27 @@ CREATE TABLE refresh_token_table (
   role VARCHAR(20) NOT NULL
 );
 
-INSERT INTO doctor_table VALUES ('user1', 'logoped', 'Tomsk NII', 'e2fb95ed6eab55bec760d47cae055a38b7753459e4151dd546c01e0f1af7fafe84c61f4051e783091517c0054c7655fdada36cd631c38971e3f46797e81890ce', 'Ilia Krivosh');
-INSERT INTO doctor_table VALUES ('user2', 'logoped onkolog', 'Tomsk NII', 'd55efc9dd983fcb3911dff5ea08776cdab9cf6275b8bcc04ab4297d7b93f862808a9843daa377a3de7a404c15042c416f847a0889fc5af4362e5d4a2826a9f0e', 'Ilia Bebrov');
-INSERT INTO specialist_table VALUES ('user3', '696560849678c23b9c51b4c0f95cec5a3f5d85d75fc4f93151fe897bf252a0fd6807699a6720dd3ee094414f7d5d6f5cbd73ce338491e6780e798d925f34f09f');
+INSERT INTO doctor_table VALUES ('user0', 'logoped onkolog', 'Tomsk NII', 'aca8d61fe60d8d9c5c6efe801df4e66706b23dae45224607a414c41126c8f0b847fe4d0366b409f7698bf00ebfc495bc2cafc45807c3e489d4a23a2ee5d57638', 'Evgenij Ivanov');
+INSERT INTO doctor_table VALUES ('user1', 'logoped onkolog', 'Tomsk NII', '5820de135352b89fa85a1c20505917a91c114476697903219648a1c7057f9803b6160cc2e0b6ca3c23ea3bcdf49968aa4bc960f9f4ad48f1c08bd19951b04f32', 'Denis Smirnov');
+INSERT INTO doctor_table VALUES ('user2', 'logoped onkolog', 'Tomsk NII', '1c35eb57c2fd7b6e095d3543751f1822ee696c7b6521a29b218714ee881279df043f28441cfe15792f2515b9a2d004fcc2c46fcfff8d0b049ef32f40e1b81339', 'Anton Kuznetsov');
+INSERT INTO doctor_table VALUES ('user3', 'logoped onkolog', 'Tomsk NII', '84754c158b68e69e4d3e3c4f056cd62421c0213fdaab448f912d79d7229267c6252e6c37618f73f9bde7adc9b2c0b790029cb038c132c2f904a644574a42b22d', 'Igor Popov');
+INSERT INTO doctor_table VALUES ('user4', 'logoped onkolog', 'Tomsk NII', '0a5d23378bdcf3695ead8964b95b6287644ef07146747ca928555b9102f2c92ab601879907fe07b48efdb34fe65a0813cf415e77c2425dc10c6f3e4abda5a2a8', 'Jurij Vasilev');
+INSERT INTO doctor_table VALUES ('user5', 'logoped onkolog', 'Tomsk NII', '49aa16561666bdc50c69b51c3f3762c2072c5085c3bd16d8a7e6308e008c47ef355e2e927be5785df78a3f3e7ca3e0a0a0fd65c19304b8932dce24117a291bf5', 'Oleg Petrov');
+INSERT INTO doctor_table VALUES ('user6', 'logoped onkolog', 'Tomsk NII', 'aa8a69f884759b7e972bd7c2b8c0591ea1a0f93a425b2fbf374dd6cdfb42e6aabe5c41297bf4f9f77e98b39b6d3e259f384dda580a713be3335f138e1bfb9c81', 'Vjacheslav Sokolov');
+INSERT INTO doctor_table VALUES ('user7', 'logoped onkolog', 'Tomsk NII', '5e0b0cea5cf12f918cc7bfc9a97677a1ce541941a4e686aa5c7fd139de79f02a520ed227c6f696682b45cf78b7da49e92e27c5bf5348389732d0f51b44b3d122', 'Vasilij Mihajlov');
+INSERT INTO doctor_table VALUES ('user8', 'logoped onkolog', 'Tomsk NII', '4a752cd159c31d5fda0d6e1dfbe994abe921f8b0b9be1ed49c3cfe7475a966c38e8f1f877f3be4ea09aa6637f7681cc84b5c83a7eb9e9d8129738b4eda86f121', 'Stanislav Novikov');
+INSERT INTO doctor_table VALUES ('user9', 'logoped onkolog', 'Tomsk NII', '084253f28220ede5bab03a25fc3d48d214b7493013a58625111a3a65c00a93fd1c40648d34a0476eee0ff4dc2323dd07800a6a8b32acc5787819fb8116096eca', 'Vadim Fedorov');
+INSERT INTO doctor_table VALUES ('user10', 'logoped onkolog', 'Tomsk NII', '59e5058a9ac6080cbc552c563844826774b73965fdf04ed3e6be652062e35fc86f3108c37af031b3398b72f2c6e756fad4664f73773c4ddff3330c0fcbf7b29e', 'Elena Koneva');
+INSERT INTO doctor_table VALUES ('user11', 'logoped', 'Moscow NII_1', '84ead26caf7a79ea3fcd66ebe173d9b33c8f727727c3503a47df2377cf40f05d184baa10e2f9aa509937842619ac33249118920bb875ca0b29fb0f3dd793fae7', 'Natalja Poljanskaja');
+INSERT INTO doctor_table VALUES ('user12', 'logoped', 'Moscow NII_1', 'de70cd5800928076bc7dbd3617df1dca2d00f5a5be137b71ee8fe5773765f82a292c5a417de980902f503f49a4127538e22783606c8f5f6960dbf469cb3b6d13', 'Olga Snegova');
+INSERT INTO doctor_table VALUES ('user13', 'logoped', 'Moscow NII_1', '9d9609bdd72bdf0dc6cb1ea75f439d6e5cacfbaabfe7df1954ba1028f7e8622b39f8a199ce22b3d3ac8386cf3ce61f534848c8f587566994f17a27ba08629c1a', 'Julija Karpova');
+INSERT INTO doctor_table VALUES ('user14', 'logoped', 'Moscow NII_1', 'a0716871ddd002d7c04381c9c154b842d3eb0f32269b11038dcbc6836b462d45da4535a9b7099e54e069243868f8f348cf9a6be468ea68fa03e7efbb0a109adc', 'Tatjana Matveeva');
+INSERT INTO doctor_table VALUES ('user15', 'logoped', 'Moscow NII_1', '37d29ab64d506168b5fb208391f207f5eb186166f06642fab3290e7f3b48d2f8c730b401af2e7f4aa33d21a67cf7e1f5d1e2e3b5cf17c8b432f37c8243459f24', 'Irina Medvedeva');
+INSERT INTO doctor_table VALUES ('user16', 'logoped', 'Moscow NII_1', '3585fed3201d6f1b53ce345934af90ce5ed582622b994979a2226a9507669927f7ffede576713b85b27dc40479a38d56d07ca6dfc1922e7aa1a9b3a16367b2cb', 'Svetlana Belaja');
+INSERT INTO doctor_table VALUES ('user17', 'logoped', 'Moscow NII_1', '1a2512d93ac51233d5f452c255213a37974132aea27a1f8aed833cc81776dd32dfc7ff8230647a8e9668c67136822d018e9dcda283c604575c78bb849a67015d', 'Marina Poljakova');
+INSERT INTO doctor_table VALUES ('user18', 'logoped', 'Moscow NII_1', '7621dc4101d83b2b6124b861781397c493e8b656bd424204471e4442af010a40b2bb7f4a89fe0dc100a7bd35e1d605935cac1c36192bc343f6caf9cd42b58d3a', 'Nadezhda Frolova');
+INSERT INTO doctor_table VALUES ('user19', 'logoped', 'Moscow NII_1', 'd14f41365c0edf3c855d5f300ffdb9fb2438b7438fd0caf43032ad4447562f5532d0990bbb6639da3ec9569f931d9036ef9f7feb212281c26ae63ed1513fda09', 'Ljubov Levchenko');
+INSERT INTO specialist_table VALUES ('user20', '696560849678c23b9c51b4c0f95cec5a3f5d85d75fc4f93151fe897bf252a0fd6807699a6720dd3ee094414f7d5d6f5cbd73ce338491e6780e798d925f34f09f');
 
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','Белая пелена лежала на полях');
 INSERT INTO syllables_phrases_table (syllable_phrase_type, dict, value) VALUES ('phrase','phrases','В школу приезжали герои фронта');
