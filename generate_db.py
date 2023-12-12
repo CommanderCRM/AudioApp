@@ -3,9 +3,20 @@ import string
 from transliterate import translit
 from audioserver.logic.secactions import hash_gost_3411
 
+def generate_password(pass_length: int) -> str:
+    """Генерация пароля"""
+    alphabet = string.ascii_letters + string.digits
+    password = ''.join(secrets.choice(alphabet) for idx in range(pass_length))
+
+    return password
+
+def transliterate_ru_to_en(text: str) -> str:
+    """Транслитерация с русского в английский"""
+
+    return translit(text, language_code='ru', reversed=True)
+
 def generate_doctors():
     """Генерация врачей для БД"""
-    alphabet = string.ascii_letters + string.digits
 
     names = ['Евгений', 'Денис', 'Антон', 'Игорь', 'Юрий', 'Олег', 'Вячеслав',
             'Василий', 'Станислав', 'Вадим',
@@ -19,8 +30,14 @@ def generate_doctors():
 
     for idx, value in enumerate(names):
         if idx > 10:
-            print(f"INSERT INTO doctor_table VALUES ('user{idx}', 'logoped', 'Moscow NII_1', '{hash_gost_3411(''.join(secrets.choice(alphabet) for i in range(9)))}', '{translit(value, language_code='ru', reversed=True)} {translit(surnames[idx], language_code='ru', reversed=True)}');")
+            hospital = "Moscow NII_1"
         else:
-            print(f"INSERT INTO doctor_table VALUES ('user{idx}', 'logoped onkolog', 'Tomsk NII', '{hash_gost_3411(''.join(secrets.choice(alphabet) for i in range(9)))}', '{translit(value, language_code='ru', reversed=True)} {translit(surnames[idx], language_code='ru', reversed=True)}');")
+            hospital = "Tomsk NII"
+
+        print(f"INSERT INTO doctor_table VALUES ('user{idx}', 'logoped', '{hospital}', '{hash_gost_3411(generate_password(9))}', '{transliterate_ru_to_en(value)} {transliterate_ru_to_en(surnames[idx])}');")
+
+def generate_specialists():
+    """Генерация специалистов для БД"""
+    return
 
 generate_doctors()
