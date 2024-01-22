@@ -1,0 +1,1834 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Doctors API",
+    "version": "1.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://petstore3.swagger.io/api/v3"
+    }
+  ],
+  "tags": [
+    {
+      "name": "patients",
+      "description": "Все запросы, необходимые для управления пациентами"
+    },
+    {
+      "name": "sessions",
+      "description": "Все запросы, необходимые для управления сеансами"
+    },
+    {
+      "name": "login-endpoint",
+      "description": "Запрос на доступ в систему"
+    },
+    {
+      "name": "logout-endpoint",
+      "description": "Запрос на выход из системы"
+    },
+    {
+      "name": "settings",
+      "description": "Запрос на изменение пароля"
+    }
+  ],
+  "paths": {
+    "/patients": {
+      "post": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Добавить нового пациента",
+        "description": "Добавить нового пациента",
+        "operationId": "addPatient",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Добавить нового пациента в систему",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/post_patient_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_1"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_2"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_3"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_4"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_14"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Получить список всех пациентов",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 100
+            },
+            "description": "ограничение на количество пациентов, которое клиент запрашивает за раз"
+          }
+        ],
+        "description": "Получить список всех пациентов",
+        "operationId": "getPatients",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/get_patient_info"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/doctors": {
+      "get": {
+        "tags": [
+          "patients"
+        ],
+        "operationId": "getDoctorsInfo",
+        "summary": "Получить информацию о враче",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/get_doctor_info"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_1"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_2"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_3"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_4"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_14"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Такого врача не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/patients/{card_number}": {
+      "get": {
+        "tags": [
+          "patients"
+        ],
+        "summary": "Получить информацию о пациенте и его сенсах",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          }
+        ],
+        "description": "Получить информацию о пациенте и его сенсах",
+        "operationId": "getPatient",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/get_session_patient_info"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Такого пациента не существует"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Создать сеанс",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          }
+        ],
+        "description": "Создать сеанс",
+        "operationId": "postSession",
+        "requestBody": {
+          "description": "Информация для создания сеанса",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/post_doctor_session_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/post_session_info_return"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_2"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Пациента, для которого создаётся сеанс не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/patients/{card_number}/session": {
+      "patch": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Оценить сеансы",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Информация для сравнения сеансов",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/sessions_id"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_8"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_9"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Сеанса или пациента не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/patients/{card_number}/session/{session_id}": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Получить информацию о сеансе и записях, записанных в его рамках",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "description": "Получить информацию о сеансе и записях, записанных в его рамках",
+        "operationId": "getSession",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/get_session_info"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Сеанса или пациента не существует"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Загрузить/записать речь",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "description": "Передать информацию о записанной речи на сервер (путем записи или загрузки файла)",
+        "operationId": "postSpeech",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/post_speech_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_2"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_7"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Пациента или сеанса не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Выполнить сравнение фраз с реальным значением",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_8"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Сеанса или пациента не существует"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/patients/{card_number}/session/{session_id}/speech": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Получить информацию о существующих фразах и слогах",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "description": "Получить информацию о существующих фразах и слогах",
+        "operationId": "getPhrases",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/get_phrases_info"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Сеанса или пациента не существует"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/patients/{card_number}/session/{session_id}/speech/{speech_id}": {
+      "get": {
+        "tags": [
+          "sessions"
+        ],
+        "summary": "Пололучить информацию о речи (используется, чтоюы скачать/прослушать речь)",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "card_number",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/card_number"
+            }
+          },
+          {
+            "in": "path",
+            "name": "speech_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/speech_id"
+            }
+          },
+          {
+            "in": "path",
+            "name": "session_id",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/session_id"
+            }
+          }
+        ],
+        "description": "Получить информацию о речи, чтобы сформировать звуковой файл для выгрузки/прослушивания",
+        "operationId": "getSpeech",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/get_speech_info"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "404": {
+            "description": "Сеанса, пациента или речи не существует"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "login-endpoint"
+        ],
+        "summary": "Войти в систему",
+        "operationId": "login",
+        "requestBody": {
+          "description": "Данные для входа в систему",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/login_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/token_object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_11"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/update_tokens": {
+      "post": {
+        "tags": [
+          "login-endpoint"
+        ],
+        "summary": "Обновить пару токенов",
+        "operationId": "updateTokens",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "refresh_token",
+            "required": true,
+            "description": "токен обновления, полученный при входе в систему",
+            "schema": {
+              "$ref": "#/components/schemas/refresh_token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/token_object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/logout": {
+      "post": {
+        "tags": [
+          "logout-endpoint"
+        ],
+        "summary": "Выйти из системы",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "refresh_token",
+            "required": true,
+            "description": "токен обновления, полученный при входе в систему",
+            "schema": {
+              "$ref": "#/components/schemas/refresh_token"
+            }
+          }
+        ],
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    },
+    "/settings": {
+      "patch": {
+        "tags": [
+          "settings"
+        ],
+        "summary": "Изменить текущий пароль пользователя",
+        "operationId": "PATIENTCHANGEPASSword",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Данные для изменения текущего пароля пользователя",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/password_change_info"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Успешное выполнение операции"
+          },
+          "400": {
+            "description": "Ошибка в запросе клиента",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/base_result_code_object"
+                    }
+                  ],
+                  "properties": {
+                    "result_code": {
+                      "type": "integer",
+                      "oneOf": [
+                        {
+                          "$ref": "#/components/schemas/code_6"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_12"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_13"
+                        },
+                        {
+                          "$ref": "#/components/schemas/code_14"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Отсутствуют права на выполнение запроса"
+          },
+          "500": {
+            "description": "Внутрненняя ошибка сервера"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "refresh_token": {
+        "type": "string",
+        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXV"
+      },
+      "card_number": {
+        "type": "string",
+        "example": 111111111111,
+        "description": "Номер личной карты пациента, используется как логин при входе",
+        "minLength": 12,
+        "maxLength": 12
+      },
+      "speech_id": {
+        "type": "integer",
+        "example": 1,
+        "description": "идентификатор аудиофайла, закодированного в base64, в базе данных"
+      },
+      "session_id": {
+        "type": "integer",
+        "example": 1337,
+        "description": "идентификатор сеанса в базе данных"
+      },
+      "session_score": {
+        "type": "number",
+        "example": 56.6,
+        "description": "оценка сеанса речевой реабилитации",
+        "nullable": true
+      },
+      "speech_score": {
+        "type": "number",
+        "example": 35.3,
+        "description": "оценка качества речи",
+        "nullable": true
+      },
+      "session_compares": {
+        "type": "object",
+        "properties": {
+          "compared_sessions_id": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/session_id"
+                },
+                {
+                  "example": [
+                    1338,
+                    1339
+                  ]
+                }
+              ]
+            },
+            "description": "сеанс, с которым выполнялось сравнение"
+          },
+          "session_score": {
+            "$ref": "#/components/schemas/session_score"
+          }
+        },
+        "nullable": true,
+        "description": "информация о сравнениях сеанса с другим или с реальными значениями (если список сеансов для сравнения пустой, то сравнивался с реальными значениями)"
+      },
+      "token_object": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "токен аутентификации - используется при каждом запросе для аутентификации и авторизации пользователя (сохраняется в памяти веб/мобильного приложения)",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6InBhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.ku6d_nU853g6Ly2XIx6mgggMMDte8eYvCs80Q4NxJx4"
+          },
+          "refsresh_token": {
+            "type": "string",
+            "description": "токен обновления - используется для обновления пары токенов (сохраняется в httpOnly cookie)",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwicm9sZSI6InBhdGllbnQiLCJpYXQiOjE1MTYyMzkwMjJ9.ku6d_nU853g6Ly2XIx6mgggMMDte8eYvCs80Q4NxJx4"
+          }
+        }
+      },
+      "login_info": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "doctor_login_1",
+            "description": "логин врача или специалиста",
+            "nullable": false
+          },
+          "password": {
+            "type": "string",
+            "example": "ivanguy_top1!",
+            "maxLength": 128,
+            "nullable": false,
+            "description": "пароль врача или специалиста"
+          }
+        }
+      },
+      "get_doctor_info": {
+        "type": "object",
+        "properties": {
+          "doctor_login": {
+            "type": "string",
+            "example": "boralek",
+            "description": "уникальный идентификатор пациента - логин"
+          },
+          "hospital": {
+            "type": "string",
+            "enum": [
+              "Tomsk NII",
+              "Moscow NII_1",
+              "Moscow NII_2"
+            ],
+            "description": "Больница врача"
+          }
+        },
+        "description": "Информация о враче, добавляющем пациента. Полученная информация используется в POST /patients"
+      },
+      "post_session_info_return": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/session_id"
+              },
+              {
+                "description": "идентификатор созданного сеанса"
+              },
+              {
+                "example": 1
+              }
+            ]
+          }
+        }
+      },
+      "sessions_id": {
+        "type": "object",
+        "properties": {
+          "sessions_id": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/session_id"
+            },
+            "description": "массив выбранных для оценки сеансов",
+            "example": [
+              1,
+              2,
+              3
+            ]
+          }
+        }
+      },
+      "speech_compares": {
+        "type": "object",
+        "properties": {
+          "compared_speeches_id": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/speech_id"
+                },
+                {
+                  "example": [
+                    2,
+                    3
+                  ]
+                }
+              ]
+            },
+            "description": "речь, с которой выполнялось сравнение"
+          },
+          "speech_score": {
+            "$ref": "#/components/schemas/speech_score"
+          }
+        },
+        "description": "результат сравнения речи",
+        "nullable": true
+      },
+      "post_patient_info": {
+        "type": "object",
+        "description": "полная информация о пациенте, используется при регистрации",
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "example": "Кривошеин Илья Андреевич",
+            "description": "Полное имя пациента"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "format": "date",
+            "example": "18.09.2000",
+            "description": "Дата рождения пациента"
+          },
+          "doctor_info": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "example": [
+                "boralek123",
+                "shaban456",
+                "krivosh789"
+              ]
+            },
+            "description": "идентификаторы лечащих врачей, при создании отправляется только один идентификатор врача, который добавляет пациента (используется логин)"
+          },
+          "hospital": {
+            "type": "string",
+            "enum": [
+              "Tomsk NII",
+              "Moscow NII_1",
+              "Moscow NII_2"
+            ],
+            "description": "больница пациента (в качестве значения используется больница врача, который добавляет пациента), названия не финальные"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "m",
+              "f"
+            ],
+            "description": "Пол пациента"
+          },
+          "card_number": {
+            "$ref": "#/components/schemas/card_number"
+          },
+          "constant_password": {
+            "type": "string",
+            "example": null,
+            "minLength": 8,
+            "nullable": true,
+            "description": "постоянный пароль пациента, по умолчанию null"
+          },
+          "temporary_password": {
+            "type": "string",
+            "example": "patient11111!",
+            "minLength": 8,
+            "nullable": true,
+            "description": "временный пароль пациента, заменяется на постоянный при первом входе пациента в систему"
+          },
+          "is_password_changed": {
+            "type": "boolean",
+            "example": false,
+            "description": "Флаг, указывающий, изменён ли пароль"
+          }
+        }
+      },
+      "get_patient_info": {
+        "description": "сокращённая информация о пациенте, используется при получении информации о пациенте",
+        "type": "object",
+        "properties": {
+          "full_mame": {
+            "type": "string",
+            "example": "Кривошеин Илья Андреевич",
+            "description": "Полное имя пациента"
+          },
+          "date_of_birth": {
+            "type": "string",
+            "format": "date",
+            "example": "18.09.2000",
+            "description": "Дата рождения пациента"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "m",
+              "f"
+            ],
+            "description": "Пол пациента"
+          },
+          "card_number": {
+            "$ref": "#/components/schemas/card_number"
+          },
+          "doctor_info": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "example": [
+              "doctor 1",
+              "vrach 2",
+              "medic 3"
+            ],
+            "description": "идентификаторы лечащих врачей, при создании отправляется только один идентификатор врача, который добавляет пациента"
+          }
+        }
+      },
+      "post_speech_info": {
+        "type": "object",
+        "description": "информация о произнесённой речи, необходимая для загрузки",
+        "properties": {
+          "speech_type": {
+            "type": "string",
+            "enum": [
+              "фраза",
+              "слог"
+            ],
+            "example": "фраза",
+            "description": "Биологический тип сигнала (слог, фраза, данные стопы и т.п), в нашей предметной области и апи стоп и др. нет, только слог/фраза"
+          },
+          "base64_value": {
+            "type": "string",
+            "description": "записанный звуковой файл, закодированный в base64",
+            "example": "UklGRgYvAABXQVZFZm10IBIAAAABAAEA4C4AAMBdAAACABAAAABkYXRh4C4AAP//AAAAAAEAAAAAAAAAAAD//wAAAAABAAIAAQABAAEAAAAAAAEAAQABAAEA/////wAAAAABAAEA//8BAAEAAAACAAEAAgABAAEAAgABAAAAAAAAAAEAAgAAAAEAAAABAAAA//8BAAAAAAABAAEAAAABAAAA//8AAAEAAQAAAAAAAAAAAAAAAAACAAEAAAABAAAAAgABAP//AQAAAAIAAgAAAAEAAAABAAEAAAABAAEAAgABAAEAAAABAAAAAQABAAIAAAABAAEAAAABAAEAAAABAAEAAAABAAAAAgABAAEA/////wAAAAACAAEAAQADAP7///8AAAAA//8CAAAA//8AAP7////9/////v///////f/9//7//f/+/wEA///+/////f/+//7///... (в итоге будет сильно длиннее)"
+          },
+          "real_value": {
+            "type": "string",
+            "example": "кась",
+            "description": "реальное значение слога или фразы, которое должно было быть произнесено"
+          }
+        }
+      },
+      "get_speech_info_array": {
+        "type": "object",
+        "description": "информация о произнесённой речи, необходимая для отображения на клиенте",
+        "properties": {
+          "speech_id": {
+            "$ref": "#/components/schemas/speech_id"
+          },
+          "speech_compares_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/speech_compares"
+            },
+            "description": "результаты сравнения речи с другой речью",
+            "nullable": true
+          },
+          "speech_type": {
+            "type": "string",
+            "enum": [
+              "фраза",
+              "слог"
+            ],
+            "description": "Биологический тип сигнала (слог, фраза, данные стопы и т.п), в нашей предметной области и апи стоп и др. нет, только слог/фраза"
+          },
+          "is_reference_speech": {
+            "type": "boolean",
+            "example": true,
+            "description": "флаг, означающий, являелится ли речь эталоном (определяется сервером на основании типа сеанса, в котором произнесена речь, - эталонный он или нет)"
+          },
+          "real_value": {
+            "type": "string",
+            "example": "кась",
+            "description": "реальное значение слога или фразы, которое должно было быть произнесено"
+          }
+        }
+      },
+      "get_speech_info": {
+        "type": "object",
+        "description": "информация о речи, необходимая для прослушивания/скачивания",
+        "properties": {
+          "base64_value": {
+            "type": "string",
+            "description": "записанный звуковой файл, закодированный в base64",
+            "example": "UklGRgYvAABXQVZFZm10IBIAAAABAAEA4C4AAMBdAAACABAAAABkYXRh4C4AAP//AAAAAAEAAAAAAAAAAAD//wAAAAABAAIAAQABAAEAAAAAAAEAAQABAAEA/////wAAAAABAAEA//8BAAEAAAACAAEAAgABAAEAAgABAAAAAAAAAAEAAgAAAAEAAAABAAAA//8BAAAAAAABAAEAAAABAAAA//8AAAEAAQAAAAAAAAAAAAAAAAACAAEAAAABAAAAAgABAP//AQAAAAIAAgAAAAEAAAABAAEAAAABAAEAAgABAAEAAAABAAAAAQABAAIAAAABAAEAAAABAAEAAAABAAEAAAABAAAAAgABAAEA/////wAAAAACAAEAAQADAP7///8AAAAA//8CAAAA//8AAP7////9/////v///////f/9//7//f/+/wEA///+/////f/+//7///... (в итоге будет сильно длиннее)"
+          }
+        }
+      },
+      "post_doctor_session_info": {
+        "type": "object",
+        "description": "информация о сеансах пациента для добавления в бд",
+        "properties": {
+          "is_reference_session": {
+            "type": "boolean",
+            "example": true,
+            "description": "флаг, указывающий на это, является ли сеанс эталонным"
+          },
+          "session_type": {
+            "type": "string",
+            "enum": [
+              "фразы",
+              "слоги"
+            ],
+            "description": "тип биологического сигнала, записываемый в рамках одного сеанса"
+          }
+        }
+      },
+      "get_session_info_array": {
+        "type": "object",
+        "description": "информация о сеансах пациента для отображения на клиенте в списке всех сеансов",
+        "properties": {
+          "session_id": {
+            "$ref": "#/components/schemas/session_id"
+          },
+          "session_compares_history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/session_compares"
+            }
+          },
+          "is_reference_session": {
+            "type": "boolean",
+            "example": true,
+            "description": "флаг, указывающий на это, является ли сеанс эталонным"
+          },
+          "session_type": {
+            "type": "string",
+            "enum": [
+              "фразы",
+              "слоги"
+            ],
+            "description": "тип биологического сигнала, записываемый в рамках одного сеанса"
+          }
+        }
+      },
+      "get_session_info": {
+        "type": "object",
+        "description": "информация о сеансе пациента для отображения на клиенте",
+        "properties": {
+          "is_reference_session": {
+            "type": "boolean",
+            "example": true,
+            "description": "флаг, указывающий на это, является ли сеанс эталонным"
+          },
+          "session_type": {
+            "type": "string",
+            "enum": [
+              "фразы",
+              "слоги"
+            ],
+            "description": "тип биологического сигнала, записываемый в рамках одного сеанса"
+          },
+          "speech_array": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/get_speech_info_array"
+            },
+            "description": "информация о произнесённой в рамках сеанса речи"
+          },
+          "session_compares": {
+            "$ref": "#/components/schemas/session_compares"
+          }
+        }
+      },
+      "get_session_patient_info": {
+        "type": "object",
+        "description": "информация о пациенте и его сеансах",
+        "properties": {
+          "get_patient_info": {
+            "$ref": "#/components/schemas/get_patient_info"
+          },
+          "sessions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/get_session_info_array"
+            }
+          }
+        }
+      },
+      "get_phrases_info": {
+        "type": "object",
+        "description": "информация о фразах и слогах, используется при записи/загрузке речи, чтобы выбрать реальное значение",
+        "properties": {
+          "phrases": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "example": [
+              "мама",
+              "папа",
+              "илья"
+            ],
+            "description": "информация о фразах"
+          },
+          "syllables": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "example": [
+              "кась",
+              "тясь",
+              "илья"
+            ],
+            "description": "информация о слогах"
+          }
+        }
+      },
+      "password_change_info": {
+        "type": "object",
+        "description": "информация о пациенте, необходимая для смены пароля",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "doctor_login_1",
+            "description": "логин врача или специалиста",
+            "nullable": false
+          },
+          "old_password": {
+            "type": "string",
+            "example": "doctor_24215_doctor_!",
+            "minLength": 8,
+            "nullable": false,
+            "description": "текущий пароль пользователя"
+          },
+          "new_password": {
+            "type": "string",
+            "example": "doctor_24215_doctor_!!",
+            "minLength": 8,
+            "nullable": false,
+            "description": "новый пароль, указанный пользователем"
+          }
+        }
+      },
+      "base_result_code_object": {
+        "type": "object",
+        "required": [
+          "result_code"
+        ],
+        "properties": {
+          "result_code": {
+            "type": "integer"
+          }
+        }
+      },
+      "code_1": {
+        "title": "1",
+        "type": "integer",
+        "description": "Объект такого типа уже существует",
+        "enum": [
+          1
+        ]
+      },
+      "code_2": {
+        "title": "2",
+        "type": "integer",
+        "description": "Превышено максимальное число объектов этого типа",
+        "enum": [
+          2
+        ]
+      },
+      "code_3": {
+        "title": "3",
+        "type": "integer",
+        "description": "Временный пароль не изменён, но в запросе содержится постоянный пароль",
+        "enum": [
+          3
+        ]
+      },
+      "code_4": {
+        "title": "4",
+        "type": "integer",
+        "description": "Временный пароль изменён, но он содержится в запросе",
+        "enum": [
+          4
+        ]
+      },
+      "code_6": {
+        "title": "6",
+        "type": "integer",
+        "description": "Несоответсвие требованиям API (например: указаны не все данные в запросе, неверный тип данных, невалидное значение атрибута)",
+        "enum": [
+          6
+        ]
+      },
+      "code_7": {
+        "title": "7",
+        "type": "integer",
+        "description": "Ошибка обработки файла",
+        "enum": [
+          7
+        ]
+      },
+      "code_8": {
+        "title": "8",
+        "type": "integer",
+        "description": "Тип сеанса/сеансов не позволяет выполнить запрос",
+        "enum": [
+          8
+        ]
+      },
+      "code_9": {
+        "title": "9",
+        "type": "integer",
+        "description": "В сеансах разное количество записей",
+        "enum": [
+          9
+        ]
+      },
+      "code_11": {
+        "title": "11",
+        "type": "integer",
+        "description": "Неверный логин или пароль",
+        "enum": [
+          11
+        ]
+      },
+      "code_12": {
+        "title": "12",
+        "type": "integer",
+        "description": "Время жизни токена доступа истекло",
+        "enum": [
+          12
+        ]
+      },
+      "code_13": {
+        "title": "13",
+        "type": "integer",
+        "description": "Время жизни токена обновления истекло",
+        "enum": [
+          13
+        ]
+      },
+      "code_14": {
+        "title": "14",
+        "type": "integer",
+        "description": "Ошибка валидации пароля",
+        "enum": [
+          14
+        ]
+      }
+    }
+  }
+}
