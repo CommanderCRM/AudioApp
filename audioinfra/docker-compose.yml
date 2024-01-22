@@ -50,3 +50,22 @@ services:
       - ..:/app
     working_dir: /app/audioserver
     tty: true
+  client:
+    build:
+      context: ../audioclient
+      dockerfile: Dockerfile
+    image: client
+    container_name: client
+    environment:
+      - REACT_APP_BASE_URL_DOCTOR=http://doctor_server:48080/
+      - REACT_APP_BASE_URL_CLIENT=http://patient_server:50080/
+    ports:
+      - "3000:3000"
+    depends_on:
+      - doctor
+      - patient
+    volumes:
+      - ../audioclient:/app
+      - /app/node_modules
+    working_dir: /app
+    tty: true

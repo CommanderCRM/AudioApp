@@ -1,9 +1,10 @@
 import re
 import wave
+import multiprocessing
 import Levenshtein
 import vosk
 
-def recognize_vosk(path_to_file, path_to_model):
+def recognize_vosk(path_to_file, path_to_model, result):
     """Распознавание речи"""
     # Загрузка модели локально, модель инициализируется при каждом запуске цикла, ускоряет работу
     model_path = path_to_model
@@ -23,8 +24,18 @@ def recognize_vosk(path_to_file, path_to_model):
     result_recognition = re.sub("[^А-Яа-я]", " ", result_recognition)
     result_recognition = ' '.join(result_recognition.split())
 
-    return result_recognition
+    result.update({'value': result_recognition})
 
+def run_recognition(path_to_file, path_to_model):
+    """Запуск функции распознавания в отдельном процессе"""
+    manager = multiprocessing.Manager()
+    result = manager.dict()
+
+    process = multiprocessing.Process(target=recognize_vosk, args=(path_to_file, path_to_model, result))
+    process.start()
+    process.join()
+
+    return result['value']
 
 def levenstein(result, orig_str):
     """Расчет расстояния Левенштейна и точность фразы"""
