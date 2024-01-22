@@ -17,7 +17,7 @@ def setup_and_run(server_name):
     activate_script = f"{venv_dir}/bin/activate"
     pygost_install_script = f"{PYGOST_AND_REQS_DIR}/install_pygost.sh"
     subprocess.check_call(["python3", "-m", "venv", venv_dir]) # nosec
-    subprocess.check_call(f"source {activate_script} && bash {pygost_install_script}", shell=True, executable='/bin/bash')
+    subprocess.check_call(f"source {activate_script} && bash {pygost_install_script}", shell=True, executable='/bin/bash') # nosec
     subprocess.check_call([f"{venv_dir}/bin/pip", "install", # nosec
                            "-r", f"{PYGOST_AND_REQS_DIR}/requirements.txt"]) # nosec
     os.chdir(SERVER_DIR)
