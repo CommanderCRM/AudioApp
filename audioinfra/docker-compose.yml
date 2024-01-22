@@ -25,7 +25,7 @@ services:
      - TESTING=${TESTING}
      - LOG_LEVEL=${LOG_LEVEL}
     ports:
-      - "80:80"
+      - "48080:48080"
     depends_on:
       - sql
     volumes:
@@ -57,10 +57,10 @@ services:
     image: client
     container_name: client
     environment:
-      - REACT_APP_BASE_URL_DOCTOR=http://doctor_server:48080/
-      - REACT_APP_BASE_URL_CLIENT=http://patient_server:50080/
+      - REACT_APP_BASE_URL_DOCTOR=http://127.0.0.1:48080/
+      - REACT_APP_BASE_URL_CLIENT=http://127.0.0.1:443/
     ports:
-      - "3000:3000"
+      - "80:3000"
     depends_on:
       - doctor
       - patient
