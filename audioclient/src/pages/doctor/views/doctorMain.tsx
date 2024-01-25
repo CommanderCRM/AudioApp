@@ -138,12 +138,13 @@ export const DoctorMainPage: React.FC = () => {
     doctor.isUpdatePatient = !doctor.isUpdatePatient;
     setIsOpen(!isOpen);
   };
-
+  console.log(doctor)
   return (
     <>
       {isOpen && <AddPatient open={isOpen} handleClose={handleClose} />}
-
-      <div className="flex w-full justify-end my-10 pe-5">
+      {
+        
+        !doctor.specialist ? <div className="flex w-full justify-end my-10 pe-5">
         <Button
           variant="contained"
           onClick={handleClose}
@@ -152,7 +153,8 @@ export const DoctorMainPage: React.FC = () => {
         >
           Добавить пациента
         </Button>
-      </div>
+      </div> : ''}
+      
 
       <div>
         <TextField
@@ -160,6 +162,7 @@ export const DoctorMainPage: React.FC = () => {
           variant="outlined"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          style={doctor.specialist? {marginTop:100} : {}}
           sx={{ mb: 2, mx: 2 }}
         />
       </div>

@@ -1,3 +1,6 @@
+# SQL
+audioinfra/sqldocker/data
+
 # Audio-related
 *vosk-model*
 *.wav

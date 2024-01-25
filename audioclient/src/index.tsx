@@ -1,12 +1,12 @@
-import React, { createContext } from "react";
-import ReactDOM from "react-dom/client";
-import "./index.css";
-import App from "./App";
-import { BrowserRouter } from "react-router-dom";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import Doctor from "./store/doctor";
-import Client from "./store/client";
+import React, { createContext } from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+import { BrowserRouter } from 'react-router-dom';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import Doctor from './store/doctor';
+import Client from './store/client';
 
 //main layout
 
@@ -28,9 +28,7 @@ export const ContextClient = createContext<StateClient>({
   client,
 });
 
-const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   <React.StrictMode>
     <BrowserRouter>
@@ -42,5 +40,5 @@ root.render(
         </ContextClient.Provider>
       </Context.Provider>
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

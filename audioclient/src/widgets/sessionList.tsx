@@ -73,7 +73,7 @@ export const SessionList = ({ speechList, name }: any) => {
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
-              <TableCell>Индентификатор сессии</TableCell>
+              <TableCell>Идентификатор сессии</TableCell>
               <TableCell>Тип сигнала</TableCell>
               <TableCell>Тип сеанса</TableCell>
               <TableCell></TableCell>

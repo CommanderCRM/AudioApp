@@ -59,7 +59,7 @@ export const SessionCardP = () => {
       )}
       <div className="mx-10">
         <div style={{ color: "#1976d2" }} className="my-5">
-          Индендефикатор сеанса: {session}
+          Идентификатор сеанса: {session}
         </div>
         <div
           className="flex justify-between my-5"
@@ -102,7 +102,7 @@ const SessionTable = ({ session }: any) => {
         <Table sx={{ minWidth: 650 }}>
           <TableHead>
             <TableRow>
-              <TableCell>Индендефикатор</TableCell>
+              <TableCell>Идентификатор</TableCell>
               <TableCell>Тип</TableCell>
             </TableRow>
           </TableHead>
@@ -168,7 +168,7 @@ const PatientDialogExists = ({
               />
             </>
           ) : (
-            <>Вы записали все речи</>
+            <>Вы записали все фразы</>
           )}
         </DialogContent>
         <DialogActions>

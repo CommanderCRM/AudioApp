@@ -2,7 +2,7 @@ from enum import Enum
 from fastapi import FastAPI, status, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from logic.tables import (PostSpeechInfo, TemporaryPasswordChangePatientInfo, TokenObject,
                           PasswordPatientInfo, PostSessionInfoPatient, PostSessionInfo,
                           PasswordChangePatientInfo)
@@ -14,9 +14,16 @@ from logic.actionsauth import (check_token, get_username_from_token, get_uuid_fr
                                create_two_tokens, get_role_from_token)
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost", "http://localhost:80", "http://localhost:3000", "http://127.0.0.1:80", "http://127.0.0.1:3000", "http://0.0.0.0:80", "http://0.0.0.0:3000",],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Перенаправляем весь трафик на HTTPS
-#app.add_middleware(HTTPSRedirectMiddleware)
+# app.add_middleware(HTTPSRedirectMiddleware)
 
 class ErrorCode(Enum):
     """Типы ошибок"""

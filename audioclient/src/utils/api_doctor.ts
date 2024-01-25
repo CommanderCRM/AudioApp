@@ -33,9 +33,10 @@ $api_doctor.interceptors.response.use(
         document.cookie = `tok=${response.data.refresh_token}; path=/;`;
         return $api_doctor.request(originalRequest);
       } catch (error: any) {
-        if (error.response.status === 500) {
-        }
-        // window.location.href = '/login'
+        // if (error.response.status === 500) {
+        //   window.location.href = '/';
+        // }
+        window.location.href = '/';
       }
     } else {
       // localStorage.clear()

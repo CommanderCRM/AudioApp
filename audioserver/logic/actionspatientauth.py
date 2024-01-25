@@ -10,7 +10,7 @@ JWT_KEY = "8694c19e-17d7-4479-88eb-402c07fea387" # nosec
 if os.getenv('TESTING'):
     engine = create_engine('sqlite:///sqlite3.db')
 else:
-    engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
+    engine = create_engine("postgresql://webpegas:webpegas@sql:5432/postgres", echo=True)
 
 def check_temp_pass_equality(card_number, temporary_password):
     """Проверка совпадения временного и постоянного паролей"""
@@ -24,9 +24,7 @@ def check_temp_pass_equality(card_number, temporary_password):
 
 def change_temporary_password(card_number, constant_password, temporary_password):
     """Смена временного пароля на постоянный"""
-    if (select_patient_by_key(card_number) and constant_password != temporary_password
-    and check_temp_pass_equality(card_number, temporary_password)
-    and validate_pass(constant_password)):
+    if select_patient_by_key(card_number) and constant_password != temporary_password:
         hashed_const = hash_gost_3411(constant_password)
 
         # Непосредственная смена пароля

@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI, status, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from loguru import logger
 from logic.tables import (PostPatientInfo, PostSessionInfo, PostSpeechInfo,
                           CompareSessionsIDs, TokenObject, PasswordChangeInfo, LoginInfo)
@@ -18,7 +18,13 @@ from logic.actionsauth import (check_token, get_username_from_token, get_uuid_fr
                                create_two_tokens, get_role_from_token)
 
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost", "http://localhost:80", "http://localhost:3000", "http://127.0.0.1:80", "http://127.0.0.1:3000", "http://0.0.0.0:80", "http://0.0.0.0:3000",],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Перенаправляем весь трафик на HTTPS
 #app.add_middleware(HTTPSRedirectMiddleware)
 
@@ -299,7 +305,12 @@ async def change_const_doct_spec_password(request: Request):
             return change_const_password(change_info.username,
                                                 change_info.old_password, change_info.new_password,
                                                 role)
-
+@app.post('/role')
+async def get_user_role(request: Request):
+    if await send_access_token_for_check(request):
+        access_token = await get_token_from_header(request)
+        role = get_role_from_token(access_token)
+        return {'role':role}
 @app.get("/logout")
 async def logout(request: Request):
     """Выход врача/специалиста из системы"""

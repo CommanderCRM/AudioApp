@@ -34,4 +34,3 @@ COPY --from=builder /usr/share/cert.cer /usr/share
 ENV PATH="/opt/venv/bin:$PATH"
 
 ENTRYPOINT ["python", "-m", "uvicorn", "patient_server:app", "--host", "0.0.0.0", "--port", "443"]
-#            "--ssl-certfile", "/usr/share/cert.cer", "--ssl-keyfile", "/usr/share/cert.key"]

@@ -31,7 +31,7 @@ export const SlogChart = ({ handleCloseChart, open, sessionsData }: any) => {
     <Dialog open={open} onClose={handleCloseChart} fullWidth>
       <DialogContent>
         {!evals.length ? (
-          <span>Сеансы не оценёны, невозможно построить график!</span>
+          <span>Сеансы не оценены, невозможно построить график!</span>
         ) : (
           <LineChart
             xAxis={[{ scaleType: "point", data: labels }]}

@@ -16,15 +16,13 @@
 - Перейти в директорию ```audioinfra```
 - ```docker compose up```
 
-### Распознавание речи
-- Для распознавания речи получить .zip архив модели Vosk (например vosk-model-ru-0.42) [отсюда](https://alphacephei.com/vosk/models), распаковать в директорию ```audioserver/logic/audiorecognition```
-
-### Применение предсобранных образов Docker
+### Локальный запуск
 
 - Получить .tar-архивы с образами Docker
 - Перенести их в директорию ```audioinfra```
 - Запустить скрипт ```local_dockers.py``` в данной директории с параметром ```-i``` либо ```--install```
 - После установки образов ввести ```docker compose up```
+- Для распознавания речи получить .zip архив модели Vosk (например vosk-model-ru-0.22) [отсюда](https://alphacephei.com/vosk/models), распаковать в директорию ```audioserver/logic/audiorecognition```
 
 - Для доступа к основному контейнеру Docker локально можно использовать ```docker run --rm -it --entrypoint /bin/bash -v *репозиторий*:/app audiodocker```
 

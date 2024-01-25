@@ -6,9 +6,15 @@ import { $api_doctor } from "../utils/api_doctor";
 export default class Doctor {
   name: any = "";
   isUpdatePatient: boolean = false;
+  specialist: any = false;
 
   constructor() {
     makeAutoObservable(this);
+  }
+  async clear(){
+    this.name = '';
+    this.isUpdatePatient = false;
+    this.specialist = false;
   }
   //add patient
   async createPatient(form: any) {
@@ -33,12 +39,21 @@ export default class Doctor {
       );
       if(response.data.access_token){
         localStorage.setItem("tok", response.data.access_token);
+        localStorage.setItem("user", username);
         let date = new Date();
       date.setTime(date.getTime() + 24 * 60 * 60 * 1000);
 
       document.cookie = `tok=${
         response.data.refresh_token
       }; path=/;expires=${date.toUTCString()}`;
+      console.log('Получение роли')
+      const role = await $api_doctor.post(`${process.env.REACT_APP_BASE_URL_DOCTOR}role/`)
+      if(role.data.role == 'specialist'){
+        this.specialist = true;
+        localStorage.setItem("role", '1');
+      }else{
+        localStorage.setItem("role", '0');
+      }
       return true;
       }else {
         return false;

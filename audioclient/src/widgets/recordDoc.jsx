@@ -17,7 +17,6 @@ export const RecorderVoiceItem = ({
   const [phrases, setPhrases] = useState([]);
   const [index, setIndex] = useState(1);
   const [isMic, setisMic] = useState(false);
-  const [audioData, setAudioData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -83,7 +82,6 @@ export const RecorderVoiceItem = ({
           speechId={speechId}
           handleIndex={handleIndex}
           real_val={phrases[index - 1]}
-          setAudioData={setAudioData}
         />
       ) : (
         <div className="flex flex-col items-center justify-center ">
@@ -113,10 +111,12 @@ export const RecorderVoiceItem = ({
 };
 
 //fucntion that records audio
-const RecordVoice = ({ speechId, handleIndex, real_val, setAudioData }) => {
-  const onStop = async (audioData) => {
+const RecordVoice = ({ speechId, handleIndex, real_val }) => {
+  const [audio, setAudio] = useState(null);
+  const [showAudio, setShow] = useState(false);
+  const handleNext = async () => {
     var reader = new window.FileReader();
-    reader.readAsDataURL(audioData);
+    reader.readAsDataURL(audio);
     reader.onloadend = function () {
       const base64 = reader.result.split(",")[1];
       const data = {
@@ -131,6 +131,7 @@ const RecordVoice = ({ speechId, handleIndex, real_val, setAudioData }) => {
       doctor
         .updateSessionSpeech(speechId, data)
         .then(() => {
+          setShow(false);
           handleIndex();
         })
         .catch((error) =>
@@ -138,20 +139,54 @@ const RecordVoice = ({ speechId, handleIndex, real_val, setAudioData }) => {
         );
     };
   };
-
+  const onStop = (audioData) => {
+    setAudio(audioData);
+    setShow(true);
+  };
   return (
     <div>
       <div className="flex justify-center">
-        <AudioRecorder
-          onRecordingComplete={(blob) => onStop(blob)}
-          audioTrackConstraints={{
-            noiseSuppression: true,
-            echoCancellation: true,
-          }}
-          downloadOnSavePress={true}
-          downloadFileExtension="webm"
-          showVisualizer
-        />
+        {!showAudio ? (
+          <AudioRecorder
+            onRecordingComplete={(blob) => onStop(blob)}
+            audioTrackConstraints={{
+              noiseSuppression: true,
+              echoCancellation: true,
+            }}
+            downloadOnSavePress={true}
+            downloadFileExtension="webm"
+            showVisualizer
+          />
+        ) : (
+          <ListenAudio
+            audio={audio}
+            handleNext={handleNext}
+            setShow={setShow}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+const ListenAudio = ({ audio, handleNext, setShow }) => {
+  const url = URL.createObjectURL(audio);
+  return (
+    <div>
+      <div className="flex-col align-center">
+        <audio src={url} controls={true} />
+        <div className="flex justify-between">
+          <Button onClick={handleNext} variant="outlined" sx={{ mt: 2 }}>
+            Продолжить
+          </Button>
+          <Button
+            onClick={() => setShow(false)}
+            variant="outlined"
+            sx={{ mt: 2 }}
+          >
+            Перезаписать
+          </Button>
+        </div>
       </div>
     </div>
   );

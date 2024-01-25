@@ -9,9 +9,16 @@ export const AppBarComp = observer(({ name }: any) => {
   const navigate = useNavigate();
   const handelClick = () => {
     localStorage.clear();
+    document.cookie = 'tok=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    doctor && doctor.clear();
     navigate("/");
   };
-
+  if(!doctor.name && localStorage.getItem('tok')){
+    doctor.name = localStorage.getItem('user');
+    var role = localStorage.getItem('role')
+    console.log(role == '1')
+    doctor.specialist = role == '1';
+  }
   return (
     <>
       <AppBar position="static">
@@ -21,11 +28,8 @@ export const AppBarComp = observer(({ name }: any) => {
           </span>
           <div className="flex justify-between items-center">
             <span style={{ marginRight: 10, fontSize: 20 }}>
-              {name === "Доктор"
-                ? doctor.name
-                : client.card != ""
-                ? "№ " + client.card
-                : client.card}
+              {name === "Доктор" || name === 'Специалист'
+                ? doctor.name : client.card != ""  ? "№ " + client.card : client.card}
             </span>
             <IconButton color="inherit" onClick={handelClick}>
               <LogoutIcon />

@@ -32,6 +32,16 @@ export const AuthPage = observer(() => {
           ShowErrorToastMessage("Неверный логин или пароль!");
         }
       } else {
+        if (nav === 'Специалист'){
+          flag = await doctor.login(username, password);
+          
+        if (flag) {
+          ShowSuccessToastMessage("Выполнено успешно!");
+          navigate(DOCTORROOT);
+        } else {
+          ShowErrorToastMessage("Неверный логин или пароль!");
+        }
+        }
         client.card = username;
         client.lastPass = password;
         flag = await client.checkStatusPass();
@@ -57,7 +67,8 @@ export const AuthPage = observer(() => {
     <div className="flex flex-col justify-center w-80 mx-auto my-10">
       <Tabs onChange={handleChange} value={nav} centered>
         <Tab label="Пациент" value="Пациент" />
-        <Tab label="Врач" value="Врач" />
+        <Tab label="Врач / Специалист" value="Врач" />
+        {/* <Tab label="Специалист" value="Специалист" /> */}
       </Tabs>
 
       <AuthFields

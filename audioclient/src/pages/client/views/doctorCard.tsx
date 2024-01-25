@@ -169,7 +169,7 @@ const PatientDialog = ({ open, handleClose, card }: any) => {
               />
             </>
           ) : (
-            <>Вы записали все речи</>
+            <>Вы записали все фразы</>
           )}
         </DialogContent>
         <DialogActions>

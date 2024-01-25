@@ -13,11 +13,12 @@ from .tables import (PatientTable, DoctorPatientTable, PostPatientInfo, GetPatie
                      DoctorTable, GetDoctorsInfo, SpecialistTable, GetDoctorInfo)
 from .actionsaudio import compare_two_sessions_dtw, compare_phrases_levenstein, compare_three_sessions_dtw
 from .secactions import hash_gost_3411, validate_pass
+from .converter import base64_to_wav
 
 if os.getenv('TESTING'):
     engine = create_engine('sqlite:///sqlite3.db')
 else:
-    engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
+    engine = create_engine("postgresql://webpegas:webpegas@sql:5432/postgres", echo=True)
 
 # Инициализируем логгер
 if os.environ.get('LOG_LEVEL') == 'DEBUG':
@@ -138,7 +139,7 @@ def insert_speech(_, session_id: int, speech_info: PostSpeechInfo):
 
     speech_table = SignalTable(
         signal_type=speech_info.speech_type,
-        base64_value=speech_info.base64_value,
+        base64_value=base64_to_wav(speech_info.base64_value),
         base64_segment_value=speech_info.base64_value_segment,
         is_reference_signal=is_reference_speech,
         real_value=speech_info.real_value
@@ -335,6 +336,7 @@ def compare_two_sessions(_, session_1_id: int, session_2_id: int):
 
     # Получение расстояний DTW для каждой пары слогов и общей оценки сеанса (среднее)
     dtw_distances = compare_two_sessions_dtw(speech_values_dict)
+    logger.debug(dtw_distances.values())
     dtw_mean = statistics.mean(dtw_distances.values())
 
     # Заполнение таблицы сравнения сеансов

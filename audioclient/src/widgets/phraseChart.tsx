@@ -24,7 +24,7 @@ export const PhraseChart = ({ handleCloseChart, open, sessionsData }: any) => {
     <Dialog open={open} onClose={handleCloseChart} fullWidth>
       <DialogContent>
         {!evals.length ? (
-          <span>Сеансы не оценёны, невозможно построить график!</span>
+          <span>Сеансы не оценены, невозможно построить график!</span>
         ) : (
           <LineChart
             xAxis={[{ data: x_nums }]}

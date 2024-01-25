@@ -13,7 +13,7 @@ JWT_KEY = "8694c19e-17d7-4479-88eb-402c07fea387" # nosec
 if os.getenv('TESTING'):
     engine = create_engine('sqlite:///sqlite3.db')
 else:
-    engine = create_engine("postgresql://postgres:postgres@sql:5432/postgres", echo=True)
+    engine = create_engine("postgresql://webpegas:webpegas@sql:5432/postgres", echo=True)
 
 def create_two_tokens(card_number, role):
     """Создание пары токенов"""
@@ -109,6 +109,7 @@ def check_data_and_login(username, constant_password):
         role = 'doctor'
     elif select_specialist_by_key(username):
         constant_password_hash = hash_gost_3411(constant_password)
+        print(constant_password_hash)
         role = 'specialist'
 
     with Session(engine) as session:

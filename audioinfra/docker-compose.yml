@@ -6,8 +6,8 @@ services:
     image: postgres:15.4
     container_name: sql_server
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=webpegas
+      - POSTGRES_PASSWORD=webpegas
       - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
@@ -56,9 +56,6 @@ services:
       dockerfile: Dockerfile
     image: client
     container_name: client
-    environment:
-      - REACT_APP_BASE_URL_DOCTOR=http://127.0.0.1:48080/
-      - REACT_APP_BASE_URL_CLIENT=http://127.0.0.1:443/
     ports:
       - "80:3000"
     depends_on:

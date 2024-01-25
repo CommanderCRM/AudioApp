@@ -2,13 +2,14 @@ import os
 import base64
 import librosa
 import soundfile as sf
+from loguru import logger
 
 class AudioFile:
     """Вспомогательные инструменты для работы с аудиофайлом"""
     def __init__(self, file):
         """Инициализация аудиофайла"""
         self.file = file
-
+        logger.debug(f'path: {file}')
     def load(self):
         """Загрузка файла (аудиоряд, частота дискретизации по умолчанию)"""
         y, sr = librosa.load(self.file, sr=None)

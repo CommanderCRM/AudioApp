@@ -35,7 +35,7 @@ def run_recognition(path_to_file, path_to_model):
     process.start()
     process.join()
 
-    return result['value']
+    return result.get('value')
 
 def levenstein(result, orig_str):
     """Расчет расстояния Левенштейна и точность фразы"""

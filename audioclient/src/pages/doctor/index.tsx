@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { DoctorURL } from "../../utils/path";
 import { AppBarComp } from "../../components/appBar";
+import { doctor } from "../..";
 
 //function renders all doctor's routes
 export const DoctorRoot = () => {
@@ -9,10 +10,13 @@ export const DoctorRoot = () => {
       <Route key={path} path={path} element={<Component />} />
     ));
   };
-
+  var role = localStorage.getItem('role')
+  console.log(role == '1')
+  doctor.specialist = role == '1';
+  const title = doctor.specialist ? 'Специалист':'Доктор';
   return (
     <>
-      <AppBarComp name="Доктор" />
+      <AppBarComp name={title} />
       <Routes>
         {renderRoutes()}
         <Route path="/error" element={<></>} />

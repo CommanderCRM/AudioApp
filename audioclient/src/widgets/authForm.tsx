@@ -25,8 +25,9 @@ export const AuthFields = ({
 
   return (
     <>
-      <span className="AuthTitle  my-20">Вход {name}а</span>
-      {name === "Врач" ? (
+      <span className="AuthTitle  my-20">Вход {name == 'Врач' ? 'Врача / Специалист' : 'Пациент'}а</span>
+      
+      {name === "Врач" || name ==="Специалист" ? (
         <DoctorForm
           username={username}
           password={password}
@@ -35,7 +36,8 @@ export const AuthFields = ({
         />
       ) : (
         <ClientForm username={username} setUserName={setUserName} />
-      )}
+      )
+      }
 
       <FormControl
         required
