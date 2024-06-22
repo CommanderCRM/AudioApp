@@ -71,7 +71,7 @@ export const AddPatient = ({ open, handleClose }: any) => {
         syllablesCount: 1,
         minSyllableLength: 7,
         maxSyllableLength: 7,
-      }) + specchars[Math.floor(Math.random() * 30)]
+      }) + specchars[Math.floor(window.crypto.getRandomValues(new Uint32Array(1))[0] * 30]
     );
   };
 
