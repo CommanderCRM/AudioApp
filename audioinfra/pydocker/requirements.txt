@@ -1,4 +1,4 @@
-fastapi==0.103.1
+fastapi==0.109.1
 librosa==0.10.1
 noisereduce==2.0.1
 numpy==1.24.4
