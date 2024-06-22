@@ -51,7 +51,7 @@
     "mini-css-extract-plugin": "^2.4.5",
     "mobx": "^6.11.0",
     "mobx-react-lite": "^4.0.5",
-    "npm": "^10.2.4",
+    "npm": "^10.5.2",
     "omgopass": "^3.2.1",
     "pcm-util": "^3.0.0",
     "pcmjs": "^0.0.2",
