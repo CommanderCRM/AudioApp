@@ -55,7 +55,7 @@
     "omgopass": "^3.2.1",
     "pcm-util": "^3.0.0",
     "pcmjs": "^0.0.2",
-    "postcss": "^8.5.14",
+    "postcss": "^8.5.25",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^6.2.1",
     "postcss-normalize": "^10.0.1",
